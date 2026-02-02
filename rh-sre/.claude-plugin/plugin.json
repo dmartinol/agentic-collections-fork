@@ -1,0 +1,13 @@
+{
+  "name": "SRE plugins",
+  "version": "0.1.0",
+  "description": "SRE plugins for Red Hat platforms and products",
+  "author": {
+    "name": "Red Hat",
+    "email": "dmartino@redhat.com"
+  },
+  "homepage": "https://github.com/dmartinol/ai5-marketplaces",
+  "repository": "https://github.com/dmartinol/ai5-marketplaces",
+  "license": "Apache-2.0",
+  "keywords": ["sre", "red-hat", "platforms", "products", "automation"]
+}
