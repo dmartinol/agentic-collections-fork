@@ -156,6 +156,77 @@ def parse_agents(pack_dir: str) -> List[Dict[str, Any]]:
     return sorted(agents, key=lambda a: a['name'])
 
 
+def sanitize_for_json(obj: Any) -> Any:
+    """
+    Convert objects to JSON-serializable format.
+    Handles date objects and other non-serializable types.
+
+    Args:
+        obj: Object to sanitize
+
+    Returns:
+        JSON-serializable version of the object
+    """
+    from datetime import date, datetime
+
+    if isinstance(obj, (date, datetime)):
+        return obj.isoformat()
+    elif isinstance(obj, dict):
+        return {k: sanitize_for_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [sanitize_for_json(item) for item in obj]
+    else:
+        return obj
+
+
+def parse_docs(pack_dir: str) -> List[Dict[str, Any]]:
+    """
+    Parse documentation files from docs/**/*.md files.
+
+    Args:
+        pack_dir: Name of the pack directory
+
+    Returns:
+        List of doc dictionaries with title, sources, category, file_path
+    """
+    docs = []
+    docs_dir = Path(pack_dir) / 'docs'
+
+    if not docs_dir.exists():
+        return docs
+
+    # Files to exclude from documentation parsing
+    EXCLUDE_FILES = {'README.md', 'INDEX.md', 'SOURCES.md'}
+
+    # Find all .md files recursively (excluding .ai-index directory)
+    for doc_file in docs_dir.rglob('*.md'):
+        # Skip excluded files and files in .ai-index directory
+        if doc_file.name in EXCLUDE_FILES or '.ai-index' in doc_file.parts:
+            continue
+
+        frontmatter = parse_yaml_frontmatter(doc_file)
+
+        # Extract metadata
+        title = frontmatter.get('title', doc_file.stem.replace('-', ' ').title())
+        category = frontmatter.get('category', doc_file.parent.name)
+        sources = frontmatter.get('sources', [])
+
+        # Ensure sources is a list and sanitize for JSON
+        if not isinstance(sources, list):
+            sources = []
+        sources = sanitize_for_json(sources)
+
+        docs.append({
+            'title': title,
+            'category': category,
+            'sources': sources,
+            'file_path': str(doc_file.relative_to(pack_dir))
+        })
+
+    # Sort by category first, then by title
+    return sorted(docs, key=lambda d: (d['category'], d['title']))
+
+
 def generate_pack_data() -> List[Dict[str, Any]]:
     """
     Generate pack data for all agentic packs.
@@ -172,18 +243,21 @@ def generate_pack_data() -> List[Dict[str, Any]]:
             print(f"Warning: Pack directory {pack_dir} does not exist, skipping")
             continue
 
+        docs = parse_docs(pack_dir)
+
         pack = {
             'name': pack_dir,
             'path': f'./{pack_dir}',
             'plugin': parse_plugin_json(pack_dir),
             'skills': parse_skills(pack_dir),
             'agents': parse_agents(pack_dir),
+            'docs': docs,
             'has_readme': (pack_path / 'README.md').exists()
         }
 
         packs.append(pack)
 
-        print(f"✓ Parsed {pack_dir}: {len(pack['skills'])} skills, {len(pack['agents'])} agents")
+        print(f"✓ Parsed {pack_dir}: {len(pack['skills'])} skills, {len(pack['agents'])} agents, {len(docs)} docs")
 
     return packs
 
@@ -202,4 +276,4 @@ if __name__ == '__main__':
     for pack in packs:
         plugin = pack['plugin']
         print(f"  • {plugin['name']} v{plugin['version']}")
-        print(f"    Skills: {len(pack['skills'])}, Agents: {len(pack['agents'])}")
+        print(f"    Skills: {len(pack['skills'])}, Agents: {len(pack['agents'])}, Docs: {len(pack['docs'])}")

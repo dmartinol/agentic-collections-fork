@@ -82,14 +82,39 @@ def parse_mcp_file(pack_dir: str) -> List[Dict[str, Any]]:
         return []
 
 
+def load_custom_mcp_data() -> Dict[str, Any]:
+    """
+    Load custom MCP data from docs/mcp.json.
+
+    Returns:
+        Dictionary mapping server names to custom data (repository, tools)
+    """
+    custom_data_file = Path('docs/mcp.json')
+
+    if not custom_data_file.exists():
+        print("Warning: docs/mcp.json not found, skipping custom data")
+        return {}
+
+    try:
+        with open(custom_data_file, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Warning: Failed to load docs/mcp.json: {e}")
+        return {}
+
+
 def generate_mcp_data() -> List[Dict[str, Any]]:
     """
     Generate MCP server data for all agentic packs.
+    Merges data from .mcp.json files with custom data from docs/mcp.json.
 
     Returns:
         List of MCP server dictionaries
     """
     mcp_servers = []
+
+    # Load custom data (repository URLs and tool descriptions)
+    custom_data = load_custom_mcp_data()
 
     for pack_dir in PACK_DIRS:
         pack_path = Path(pack_dir)
@@ -98,6 +123,19 @@ def generate_mcp_data() -> List[Dict[str, Any]]:
             continue
 
         servers = parse_mcp_file(pack_dir)
+
+        # Merge custom data for each server
+        for server in servers:
+            server_name = server['name']
+            if server_name in custom_data:
+                # Add repository and tools from custom data
+                server['repository'] = custom_data[server_name].get('repository', '')
+                server['tools'] = custom_data[server_name].get('tools', [])
+            else:
+                # No custom data available
+                server['repository'] = ''
+                server['tools'] = []
+
         mcp_servers.extend(servers)
 
         if servers:

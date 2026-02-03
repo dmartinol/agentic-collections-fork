@@ -325,6 +325,29 @@ section.collapsed .grid {
     box-shadow: 0 4px 12px rgba(238, 0, 0, 0.3);
 }
 
+/* README badge in top-right corner of MCP cards */
+.readme-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--transition-speed) ease;
+    z-index: 10;
+}
+
+.readme-badge:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--bg-card);
+}
+
 /* Modal */
 .modal {
     display: none;
@@ -440,6 +463,13 @@ section.collapsed .grid {
     color: var(--text-secondary);
     line-height: 1.6;
     margin-top: 1rem;
+}
+
+.modal-repository-link {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+    word-break: break-all;
 }
 
 /* Modal Body */

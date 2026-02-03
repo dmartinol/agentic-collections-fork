@@ -172,6 +172,18 @@ function renderMCPServers(servers) {
 function createMCPCard(server) {
     const div = document.createElement('div');
     div.className = 'card mcp-card';
+    div.style.position = 'relative'; // For absolute positioning of README button
+
+    // README button in top-right corner (if repository exists)
+    if (server.repository) {
+        const readmeButton = document.createElement('a');
+        readmeButton.href = server.repository;
+        readmeButton.target = '_blank';
+        readmeButton.className = 'readme-badge';
+        readmeButton.textContent = 'README';
+        readmeButton.onclick = (e) => e.stopPropagation(); // Prevent card click
+        div.appendChild(readmeButton);
+    }
 
     // Server name
     const h3 = document.createElement('h3');
@@ -198,11 +210,20 @@ function createMCPCard(server) {
         : 'No env vars';
     div.appendChild(envVars);
 
+    // Tools count
+    if (server.tools && server.tools.length > 0) {
+        const toolsInfo = document.createElement('div');
+        toolsInfo.className = 'env-vars';
+        toolsInfo.textContent = `${server.tools.length} tool${server.tools.length !== 1 ? 's' : ''}`;
+        div.appendChild(toolsInfo);
+    }
+
     // Details button
-    const button = document.createElement('button');
-    button.textContent = 'Details';
-    button.onclick = () => showMCPDetails(server.name, server.pack);
-    div.appendChild(button);
+    const detailsButton = document.createElement('button');
+    detailsButton.textContent = 'Details';
+    detailsButton.onclick = () => showMCPDetails(server.name, server.pack);
+    detailsButton.style.marginTop = 'auto';
+    div.appendChild(detailsButton);
 
     return div;
 }
@@ -376,7 +397,45 @@ function showPackDetails(packName) {
     installSection.appendChild(codeWrapper);
     body.appendChild(installSection);
 
-    // Skills section
+    // Agents section (shown first)
+    if (pack.agents.length > 0) {
+        const agentsSection = document.createElement('div');
+        agentsSection.className = 'modal-section';
+
+        const agentsHeader = document.createElement('div');
+        agentsHeader.className = 'modal-section-header';
+        agentsHeader.textContent = 'AGENTS';
+        agentsSection.appendChild(agentsHeader);
+
+        const agentsList = document.createElement('div');
+        agentsList.className = 'item-list';
+
+        pack.agents.forEach(agent => {
+            const agentDef = document.createElement('div');
+            agentDef.className = 'agent-definition';
+
+            // Agent syntax block
+            const syntaxBlock = document.createElement('div');
+            syntaxBlock.className = 'definition-syntax';
+            const syntaxCode = document.createElement('code');
+            syntaxCode.textContent = agent.name;
+            syntaxBlock.appendChild(syntaxCode);
+            agentDef.appendChild(syntaxBlock);
+
+            // Agent description (with expand/collapse for long text)
+            const desc = document.createElement('div');
+            desc.className = 'definition-description';
+            desc.appendChild(createExpandableText(agent.description, 200));
+            agentDef.appendChild(desc);
+
+            agentsList.appendChild(agentDef);
+        });
+
+        agentsSection.appendChild(agentsList);
+        body.appendChild(agentsSection);
+    }
+
+    // Skills section (shown second)
     if (pack.skills.length > 0) {
         const skillsSection = document.createElement('div');
         skillsSection.className = 'modal-section';
@@ -414,42 +473,111 @@ function showPackDetails(packName) {
         body.appendChild(skillsSection);
     }
 
-    // Agents section
-    if (pack.agents.length > 0) {
-        const agentsSection = document.createElement('div');
-        agentsSection.className = 'modal-section';
+    // Docs section (shown third, if documentation exists)
+    if (pack.docs && pack.docs.length > 0) {
+        const docsSection = document.createElement('div');
+        docsSection.className = 'modal-section';
 
-        const agentsHeader = document.createElement('div');
-        agentsHeader.className = 'modal-section-header';
-        agentsHeader.textContent = 'AGENTS';
-        agentsSection.appendChild(agentsHeader);
+        const docsHeader = document.createElement('div');
+        docsHeader.className = 'modal-section-header';
+        docsHeader.textContent = 'DOCS';
+        docsSection.appendChild(docsHeader);
 
-        const agentsList = document.createElement('div');
-        agentsList.className = 'item-list';
-
-        pack.agents.forEach(agent => {
-            const agentDef = document.createElement('div');
-            agentDef.className = 'agent-definition';
-
-            // Agent syntax block
-            const syntaxBlock = document.createElement('div');
-            syntaxBlock.className = 'definition-syntax';
-            const syntaxCode = document.createElement('code');
-            syntaxCode.textContent = agent.name;
-            syntaxBlock.appendChild(syntaxCode);
-            agentDef.appendChild(syntaxBlock);
-
-            // Agent description (with expand/collapse for long text)
-            const desc = document.createElement('div');
-            desc.className = 'definition-description';
-            desc.appendChild(createExpandableText(agent.description, 200));
-            agentDef.appendChild(desc);
-
-            agentsList.appendChild(agentDef);
+        // Group docs by category
+        const docsByCategory = {};
+        pack.docs.forEach(doc => {
+            const category = doc.category || 'general';
+            if (!docsByCategory[category]) {
+                docsByCategory[category] = [];
+            }
+            docsByCategory[category].push(doc);
         });
 
-        agentsSection.appendChild(agentsList);
-        body.appendChild(agentsSection);
+        // Render each category
+        Object.keys(docsByCategory).sort().forEach(category => {
+            const categorySection = document.createElement('div');
+            categorySection.style.marginBottom = '1.5rem';
+
+            // Category header
+            const categoryHeader = document.createElement('div');
+            categoryHeader.className = 'modal-section-label';
+            categoryHeader.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+            categorySection.appendChild(categoryHeader);
+
+            // Doc list for this category
+            const docsList = document.createElement('div');
+            docsList.className = 'item-list';
+
+            docsByCategory[category].forEach(doc => {
+                const docDef = document.createElement('div');
+                docDef.className = 'skill-definition';
+
+                // Doc title
+                const titleBlock = document.createElement('div');
+                titleBlock.className = 'definition-syntax';
+                const titleCode = document.createElement('code');
+                titleCode.textContent = doc.title;
+                titleBlock.appendChild(titleCode);
+                docDef.appendChild(titleBlock);
+
+                // Sources section
+                if (doc.sources && doc.sources.length > 0) {
+                    const sourcesDiv = document.createElement('div');
+                    sourcesDiv.className = 'definition-description';
+
+                    doc.sources.forEach((source, index) => {
+                        // Add separator between sources
+                        if (index > 0) {
+                            sourcesDiv.appendChild(document.createElement('br'));
+                        }
+
+                        // Source title label
+                        const sourceLabel = document.createElement('span');
+                        sourceLabel.textContent = 'Source: ';
+                        sourceLabel.style.color = 'var(--text-muted)';
+                        sourceLabel.style.fontSize = '0.85rem';
+                        sourcesDiv.appendChild(sourceLabel);
+
+                        // Source link
+                        const sourceLink = document.createElement('a');
+                        sourceLink.href = source.url;
+                        sourceLink.target = '_blank';
+                        sourceLink.textContent = source.title;
+                        sourceLink.style.color = 'var(--primary)';
+                        sourceLink.style.textDecoration = 'none';
+                        sourceLink.onmouseover = () => { sourceLink.style.textDecoration = 'underline'; };
+                        sourceLink.onmouseout = () => { sourceLink.style.textDecoration = 'none'; };
+                        sourcesDiv.appendChild(sourceLink);
+                    });
+
+                    docDef.appendChild(sourcesDiv);
+                }
+
+                docsList.appendChild(docDef);
+            });
+
+            categorySection.appendChild(docsList);
+            docsSection.appendChild(categorySection);
+        });
+
+        // Link to full documentation on GitHub
+        const docsLink = document.createElement('div');
+        docsLink.style.marginTop = '1.5rem';
+        docsLink.style.paddingTop = '1rem';
+        docsLink.style.borderTop = '1px solid var(--border)';
+        const link = document.createElement('a');
+        link.href = `https://github.com/dmartinol/ai5-marketplaces/tree/main/${pack.name}/docs`;
+        link.target = '_blank';
+        link.textContent = 'View full documentation on GitHub →';
+        link.style.color = 'var(--primary)';
+        link.style.textDecoration = 'none';
+        link.style.fontWeight = '600';
+        link.onmouseover = () => { link.style.textDecoration = 'underline'; };
+        link.onmouseout = () => { link.style.textDecoration = 'none'; };
+        docsLink.appendChild(link);
+        docsSection.appendChild(docsLink);
+
+        body.appendChild(docsSection);
     }
 
     details.appendChild(body);
@@ -506,6 +634,30 @@ function showMCPDetails(serverName, packName) {
         desc.textContent = `MCP server from ${server.pack} pack`;
     }
     header.appendChild(desc);
+
+    // Repository link (if available)
+    if (server.repository) {
+        const repoLink = document.createElement('div');
+        repoLink.className = 'modal-repository-link';
+
+        const repoLabel = document.createElement('span');
+        repoLabel.textContent = 'Repository: ';
+        repoLabel.style.color = 'var(--text-muted)';
+        repoLink.appendChild(repoLabel);
+
+        const repoUrl = document.createElement('a');
+        repoUrl.href = server.repository;
+        repoUrl.target = '_blank';
+        repoUrl.textContent = server.repository;
+        repoUrl.style.color = 'var(--primary)';
+        repoUrl.style.textDecoration = 'none';
+        repoUrl.style.transition = 'color var(--transition-speed) ease';
+        repoUrl.onmouseover = () => { repoUrl.style.textDecoration = 'underline'; };
+        repoUrl.onmouseout = () => { repoUrl.style.textDecoration = 'none'; };
+        repoLink.appendChild(repoUrl);
+
+        header.appendChild(repoLink);
+    }
 
     details.appendChild(header);
 
@@ -596,6 +748,44 @@ function showMCPDetails(serverName, packName) {
 
     secSection.appendChild(secList);
     body.appendChild(secSection);
+
+    // Tools section (if available)
+    if (server.tools && server.tools.length > 0) {
+        const toolsSection = document.createElement('div');
+        toolsSection.className = 'modal-section';
+
+        const toolsHeader = document.createElement('div');
+        toolsHeader.className = 'modal-section-header';
+        toolsHeader.textContent = 'TOOLS';
+        toolsSection.appendChild(toolsHeader);
+
+        const toolsList = document.createElement('div');
+        toolsList.className = 'item-list';
+
+        server.tools.forEach(tool => {
+            const toolDef = document.createElement('div');
+            toolDef.className = 'skill-definition';
+
+            // Tool name in syntax block
+            const syntaxBlock = document.createElement('div');
+            syntaxBlock.className = 'definition-syntax';
+            const syntaxCode = document.createElement('code');
+            syntaxCode.textContent = tool.name;
+            syntaxBlock.appendChild(syntaxCode);
+            toolDef.appendChild(syntaxBlock);
+
+            // Tool description (with expand/collapse for long text)
+            const desc = document.createElement('div');
+            desc.className = 'definition-description';
+            desc.appendChild(createExpandableText(tool.description, 200));
+            toolDef.appendChild(desc);
+
+            toolsList.appendChild(toolDef);
+        });
+
+        toolsSection.appendChild(toolsList);
+        body.appendChild(toolsSection);
+    }
 
     details.appendChild(body);
     modal.style.display = 'flex';
