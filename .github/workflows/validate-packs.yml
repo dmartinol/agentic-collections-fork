@@ -1,4 +1,4 @@
-name: Validate Agentic Packs
+name: Validate Agentic Collections
 
 on:
   pull_request:

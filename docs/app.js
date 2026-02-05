@@ -1,5 +1,5 @@
 /**
- * ai5-marketplaces Documentation Site
+ * agentic-collections Documentation Site
  *
  * SECURITY: All DOM manipulation uses textContent and createElement
  * to prevent XSS vulnerabilities. No innerHTML with user data.
@@ -211,7 +211,7 @@ function createMCPCard(server) {
     // Pack tag
     const packTag = document.createElement('p');
     packTag.className = 'pack-tag';
-    packTag.textContent = `Pack: ${server.pack}`;
+    packTag.textContent = `Collection: ${server.pack}`;
     div.appendChild(packTag);
 
     // Container
@@ -402,7 +402,7 @@ function showPackDetails(packName) {
 
     const pre = document.createElement('pre');
     const code = document.createElement('code');
-    code.textContent = `git clone https://github.com/RHEcosystemAppEng/agentic-collections\ncd ai5-marketplaces/${pack.name}`;
+    code.textContent = `git clone https://github.com/RHEcosystemAppEng/agentic-collections\ncd agentic-collections/${pack.name}`;
     pre.appendChild(code);
     codeWrapper.appendChild(pre);
 

@@ -1,8 +1,8 @@
-# Gitleaks configuration for ai5-marketplaces
+# Gitleaks configuration agentic-collections
 # Version: 8.18+
 # Documentation: https://github.com/gitleaks/gitleaks
 
-title = "ai5-marketplaces Secret Detection"
+title = "agentic-collections Secret Detection"
 
 [extend]
 # Use gitleaks default rules as base

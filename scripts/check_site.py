@@ -32,7 +32,7 @@ def print_summary(data):
     print(f"   Generated: {data['generated_at']}")
 
     # Packs section
-    print(f"\n📦 Agentic Packs ({len(data['packs'])} total)")
+    print(f"\n📦 Agentic Collections ({len(data['packs'])} total)")
     print("   " + "-"*56)
     for pack in data['packs']:
         plugin = pack['plugin']
@@ -64,11 +64,11 @@ def print_checklist():
 1. Open http://localhost:8000 in your browser
 
 2. Verify the header:
-   □ Title displays: "ai5-marketplaces"
+   □ Title displays: "agentic-collections"
    □ Subtitle displays
    □ Search bar is visible
 
-3. Test Agentic Packs section:
+3. Test Agentic Collections section:
    □ Section header shows correct count
    □ Pack cards display in a grid
    □ Each card shows: name, version, skill/agent counts

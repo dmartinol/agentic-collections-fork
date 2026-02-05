@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Validate agentic pack structure before documentation generation.
+Validate agentic collection structure before documentation generation.
 """
 
 import json
@@ -10,7 +10,7 @@ from typing import List, Tuple
 import yaml
 import re
 
-# List of agentic packs to validate
+# List of agentic collections to validate
 PACK_DIRS = ['rh-sre', 'rh-developer', 'ocp-admin', 'rh-support-engineer', 'rh-virt']
 
 
@@ -19,7 +19,7 @@ def validate_plugin_json(pack_dir: str) -> List[str]:
     Validate plugin.json structure.
 
     Args:
-        pack_dir: Pack directory name
+        pack_dir: Collection directory name
 
     Returns:
         List of error messages (empty if valid)
@@ -213,7 +213,7 @@ def main():
     """
     Main validation function.
     """
-    print("🔍 Validating agentic pack structure...")
+    print("🔍 Validating agentic collection structure...")
     print()
 
     all_errors = []
@@ -238,7 +238,7 @@ def main():
         print()
         return 1
     else:
-        print("✅ All packs validated successfully")
+        print("✅ All collections validated successfully")
         print()
         return 0
 

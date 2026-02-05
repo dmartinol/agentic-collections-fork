@@ -99,7 +99,7 @@ AGENT_COUNT=$(python -c "import json; packs = json.load(open('docs/data.json'))[
 echo -e "${GREEN}✓${NC}"
 echo ""
 echo "   Found:"
-echo "   - ${PACK_COUNT} agentic packs"
+echo "   - ${PACK_COUNT} agentic collections"
 echo "   - ${SKILL_COUNT} skills"
 echo "   - ${AGENT_COUNT} agents"
 echo "   - ${MCP_COUNT} MCP servers"

@@ -21,7 +21,7 @@ def build_website():
     print()
 
     # Generate pack data
-    print("📦 Parsing agentic packs...")
+    print("📦 Parsing agentic collections...")
     pack_data = generate_pack_data()
     print()
 
@@ -35,7 +35,7 @@ def build_website():
         'repository': {
             'name': 'agentic-collections',
             'owner': 'Red Hat Ecosystem Engineering',
-            'description': 'Agentic packs for Red Hat platforms and products',
+            'description': 'Agentic collections for Red Hat platforms and products',
             'url': 'https://github.com/RHEcosystemAppEng/agentic-collections'
         },
         'packs': pack_data,
@@ -55,7 +55,7 @@ def build_website():
     print(f"✅ Generated {output_file}")
     print()
     print("📊 Summary:")
-    print(f"   • {len(pack_data)} agentic packs")
+    print(f"   • {len(pack_data)} agentic collections")
     total_skills = sum(len(p['skills']) for p in pack_data)
     total_agents = sum(len(p['agents']) for p in pack_data)
     print(f"   • {total_skills} skills")

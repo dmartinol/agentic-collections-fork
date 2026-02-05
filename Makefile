@@ -1,7 +1,7 @@
 .PHONY: help install validate generate serve clean test test-full check-uv
 
 help:
-	@echo "ai5-marketplaces Documentation Generator"
+	@echo "agentic-collections Documentation Generator"
 	@echo ""
 	@echo "Available targets:"
 	@echo "  install     - Install Python dependencies (requires uv)"
@@ -35,7 +35,7 @@ install: check-uv
 	@echo "Dependencies installed in isolated environment!"
 
 validate: check-uv
-	@echo "Validating agentic pack structure..."
+	@echo "Validating agentic collection structure..."
 	@uv run python scripts/validate_structure.py
 	@echo "✓ Validation passed!"
 

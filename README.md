@@ -1,4 +1,4 @@
-Agentic packs to automate interaction with Red Hat platforms and products for various marketplaces.
+Agentic collections to automate interaction with Red Hat platforms and products for various marketplaces.
 
 
 | Agentic Pack | Persona/Role | Marketplaces |
@@ -14,9 +14,9 @@ Agentic packs to automate interaction with Red Hat platforms and products for va
 View the interactive documentation at: **https://rhecosystemappeng.github.io/agentic-collections**
 
 The site provides:
-- **Agentic Packs**: Browse all available packs, skills, and agents with detailed descriptions
+- **Agentic Collections**: Browse all available collections, skills, and agents with detailed descriptions
 - **MCP Servers**: Explore MCP server configurations and integration details
-- **Search**: Find packs, skills, agents, and servers by keyword across all content
+- **Search**: Find collection, skills, agents, and servers by keyword across all content
 
 ### Prerequisites
 

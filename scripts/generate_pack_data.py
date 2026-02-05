@@ -57,7 +57,7 @@ def parse_plugin_json(pack_dir: str) -> Dict[str, Any]:
     defaults = {
         'name': pack_dir,
         'version': '0.0.0',
-        'description': f'{pack_dir} agentic pack',
+        'description': f'{pack_dir} agentic collection',
         'author': {'name': 'Red Hat'},
         'license': 'Apache-2.0',
         'keywords': []
@@ -264,13 +264,13 @@ def generate_pack_data() -> List[Dict[str, Any]]:
 
 if __name__ == '__main__':
     # Test the script
-    print("Parsing agentic packs...")
+    print("Parsing agentic collections...")
     print()
 
     packs = generate_pack_data()
 
     print()
-    print(f"Found {len(packs)} packs total")
+    print(f"Found {len(packs)} collections total")
     print()
     print("Summary:")
     for pack in packs:

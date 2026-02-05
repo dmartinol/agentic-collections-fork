@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This repository contains **agentic packs** - plugin collections that automate interactions with Red Hat platforms and products across multiple AI marketplaces (Claude Code, Cursor, ChatGPT). Each pack is persona-specific and includes skills, agents, and supporting documentation.
+This repository contains **agentic collections** - plugin collections that automate interactions with Red Hat platforms and products across multiple AI marketplaces (Claude Code, Cursor, ChatGPT). Each pack is persona-specific and includes skills, agents, and supporting documentation.
 
 ## Repository Structure
 
 ```
-ai5-marketplaces/
+agentic-collections/
 ├── rh-sre/              # Site Reliability Engineering pack (reference implementation)
 ├── rh-developer/        # Developer tools pack
 ├── ocp-admin/           # OpenShift administration pack
@@ -37,7 +37,7 @@ Each pack follows this structure:
     └── .ai-index/      # Semantic indexing for token optimization
 ```
 
-## Working with Agentic Packs
+## Working with Agentic Collections
 
 ### Skills vs Agents
 
@@ -236,7 +236,7 @@ The `rh-sre` pack is the most complete implementation, demonstrating:
 - MCP server integration
 - Red Hat Insights platform integration
 
-When creating new packs, use `rh-sre` as the architectural reference.
+When creating new collection, use `rh-sre` as the architectural reference.
 
 ## Key Principles
 
