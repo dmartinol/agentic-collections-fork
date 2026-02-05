@@ -61,18 +61,42 @@ Each pack follows this structure:
 
 ### 1. Document Consultation Transparency
 
-When a skill or agent consults documentation (from `docs/` or skill/agent files), it **MUST** explicitly declare this to the user:
+When a skill or agent consults documentation (from `docs/` or skill/agent files), it **MUST**:
+1. **Actually read the file** using the Read tool to load it into context
+2. **Then declare** the consultation to the user
 
-**Required Format**:
+**CRITICAL**: Document consultation means READING the file, not just claiming to have read it.
+
+**Required Implementation**:
+```markdown
+**Document Consultation** (REQUIRED):
+1. **Action**: Read [filename.md](path/to/filename.md) using the Read tool to understand [specific topic]
+2. **Output to user**: "I consulted [filename.md](path/to/filename.md) to understand [specific topic]."
 ```
-I consulted [filename.md](path/to/filename.md) to understand [specific topic].
+
+**❌ WRONG - Transparency Theater** (just claims, no actual reading):
+```markdown
+**Document Consultation** (output to user):
+```
+I consulted [filename.md](path/to/filename.md) to understand [topic].
+```
 ```
 
-**Examples**:
-- "I consulted [cvss-scoring.md](rh-sre/docs/references/cvss-scoring.md) to verify the CVSS severity mapping."
-- "I consulted [playbook-generator/SKILL.md](rh-sre/skills/playbook-generator/SKILL.md) to understand playbook generation parameters."
+**✅ CORRECT - Actual Consultation** (reads first, then declares):
+```markdown
+**Document Consultation** (REQUIRED):
+1. **Action**: Read [cvss-scoring.md](../../docs/references/cvss-scoring.md) using the Read tool to understand CVSS severity mapping
+2. **Output to user**: "I consulted [cvss-scoring.md](../../docs/references/cvss-scoring.md) to understand CVSS severity mapping."
+```
 
-**Rationale**: Provides transparency and helps users understand the AI's knowledge sources.
+**Examples in execution**:
+- Read `docs/references/cvss-scoring.md` → "I consulted [cvss-scoring.md](rh-sre/docs/references/cvss-scoring.md) to verify the CVSS severity mapping."
+- Read `skills/playbook-generator/SKILL.md` → "I consulted [playbook-generator/SKILL.md](rh-sre/skills/playbook-generator/SKILL.md) to understand playbook generation parameters."
+
+**Rationale**:
+- **Substance**: Ensures AI actually enriches its context with domain knowledge
+- **Transparency**: Users understand the AI's knowledge sources
+- **Auditability**: The execution-summary skill can track actual Read tool calls
 
 ### 2. Precise Parameter Specification
 
