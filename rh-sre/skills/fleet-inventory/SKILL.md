@@ -1,7 +1,7 @@
 ---
 name: fleet-inventory
 description: |
-  Query and display Red Hat Lightspeed managed system inventory. Use this skill for information-gathering requests about the fleet, registered systems, or inventory queries. This skill focuses on discovery and listing only - for remediation actions, transition to the remediator agent.
+  Query and display Red Hat Lightspeed managed system inventory. Use this skill for information-gathering requests about the fleet, registered systems, or inventory queries. This skill focuses on discovery and listing only - for remediation actions, transition to the sre-agents:remediator agent (invoke the `sre-agents:remediator` agent).
 
   **When to use this skill**:
   - "Show the managed fleet"
@@ -10,7 +10,7 @@ description: |
   - "How many RHEL 8 systems do we have?"
   - "Show me production systems"
 
-  **When NOT to use this skill** (use remediator agent instead):
+  **When NOT to use this skill** (use sre-agents:remediator agent instead):
   - "Remediate CVE-X on these systems"
   - "Create a playbook for..."
   - "Patch system Y"
@@ -54,13 +54,13 @@ See **Step 0** in the Workflow section below for implementation details.
 - Count systems matching criteria
 - Verify system registration status
 
-**Use the remediator agent when you need**:
+**Use the sre-agents:remediator agent when you need**:
 - Remediate vulnerabilities on systems
 - Generate or execute playbooks
 - Perform infrastructure changes
 - End-to-end CVE remediation workflows
 
-**How they work together**: Use this skill for discovery ("What systems are affected?"), then transition to the remediator agent for action ("Remediate those systems").
+**How they work together**: Use this skill for discovery ("What systems are affected?"), then transition to the sre-agents:remediator agent (invoke the `sre-agents:remediator` agent) for action ("Remediate those systems").
 
 ## Workflow
 
@@ -273,7 +273,7 @@ get_cve_systems(
 ```
 Status: "Vulnerable"
 → CVE affects this system, patch not applied
-→ Action: Suggest remediation via remediator agent
+→ Action: Suggest remediation via sre-agents:remediator agent
 
 Status: "Patched"
 → CVE previously affected, now remediated
@@ -322,13 +322,13 @@ Retrieved from Red Hat Lightspeed on YYYY-MM-DDTHH:MM:SSZ
 
 ### Step 5: Offer Remediation Transition
 
-When appropriate, suggest transitioning to the remediator agent:
+When appropriate, suggest transitioning to the sre-agents:remediator agent:
 
 ```markdown
 ## Next Steps
 
 **For CVE Remediation**:
-If you need to remediate vulnerabilities on any of these systems, I can help using the remediator agent:
+If you need to remediate vulnerabilities on any of these systems, I can help using the sre-agents:remediator agent (invoke the `sre-agents:remediator` agent):
 
 Examples:
 - "Remediate CVE-2024-1234 on web-server-01"
@@ -370,7 +370,7 @@ Examples:
 - `system-context` - Get detailed system configuration for specific hosts
   - Use after: Fleet discovery identifies systems needing deeper investigation
 
-- `remediator` (agent) - Transition to remediation workflows after discovery
+- `sre-agents:remediator` (agent) - Transition to remediation workflows after discovery (invoke the `sre-agents:remediator` agent)
   - Use after: "Show affected systems" → "Remediate those systems"
 
 ### Reference Documentation
@@ -395,7 +395,7 @@ CVSS 8.1, Critical severity, affects httpd package
     ↓
 User: "Remediate CVE-2024-1234 on all production systems"
     ↓
-remediator agent (action)
+sre-agents:remediator agent (action - invoke the `sre-agents:remediator` agent)
     ↓
 Playbook generated and executed
 ```
@@ -478,7 +478,7 @@ Retrieved from Red Hat Lightspeed on 2024-01-20T10:30:00Z
 
 ## Next Steps
 
-**To remediate these systems**, use the remediator agent:
+**To remediate these systems**, use the sre-agents:remediator agent (invoke the `sre-agents:remediator` agent):
 - Single system: "Remediate CVE-2024-1234 on web-server-01"
 - Batch production: "Remediate CVE-2024-1234 on all production systems"
 - All vulnerable: "Create playbook for CVE-2024-1234 affecting these 12 systems"
@@ -673,7 +673,7 @@ The following systems have not checked in recently (> 7 days):
 1. **Start broad, then filter** - Retrieve full inventory first, then apply user-requested filters
 2. **Group by meaningful categories** - Environment, RHEL version, tier/function for clarity
 3. **Highlight stale systems** - Warn users about systems with potentially outdated vulnerability data
-4. **Offer remediation transitions** - Always suggest next steps using remediator agent
+4. **Offer remediation transitions** - Always suggest next steps using sre-agents:remediator agent (the `sre-agents:remediator` agent)
 5. **Use clear formatting** - Tables for detailed lists, summaries for high-level overviews
 6. **Include percentages** - Help users understand fleet composition at a glance
 7. **Show last check-in times** - Indicate data freshness and system health
@@ -701,7 +701,7 @@ Response: CVSS 8.1, Critical severity
   ↓
 User: "Remediate CVE-2024-1234 on all affected systems"
   ↓
-remediator agent (orchestrates remediation)
+sre-agents:remediator agent (orchestrates remediation - invoke the `sre-agents:remediator` agent)
   ↓
 Complete: Playbook generated and executed
 ```
@@ -722,7 +722,7 @@ Response: 3 critical CVEs
   ↓
 User: "Create remediation plan"
   ↓
-remediator agent (multi-CVE workflow)
+sre-agents:remediator agent (multi-CVE workflow - invoke the `sre-agents:remediator` agent)
 ```
 
 **Information-First Principle**:
@@ -730,7 +730,7 @@ remediator agent (multi-CVE workflow)
 Always follow this sequence:
 1. What systems do we have? (fleet-inventory)
 2. What are they vulnerable to? (cve-impact)
-3. How do we fix it? (remediator agent)
+3. How do we fix it? (sre-agents:remediator agent via the `sre-agents:remediator` agent)
 
 This ensures informed decisions before taking remediation actions.
 ```

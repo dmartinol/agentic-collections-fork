@@ -14,7 +14,7 @@ description: |
 
 This skill generates Ansible remediation playbooks for CVE vulnerabilities, applying Red Hat best practices, RHEL-specific patterns, and Kubernetes safety considerations.
 
-**Integration with Remediator Agent**: The remediator agent orchestrates this skill as part of its Step 4 (Generate Playbook) workflow. For standalone playbook generation, you can invoke this skill directly.
+**Integration with Remediator Agent**: The sre-agents:remediator agent (invoked) orchestrates this skill as part of its Step 4 (Generate Playbook) workflow. For standalone playbook generation, you can invoke this skill directly.
 
 ## When to Use This Skill
 
@@ -24,13 +24,13 @@ This skill generates Ansible remediation playbooks for CVE vulnerabilities, appl
 - Apply Red Hat best practices to playbook generation
 - Standalone playbook generation without full remediation workflow
 
-**Use the remediator agent when you need**:
+**Use the sre-agents:remediator agent when you need**:
 - End-to-end CVE remediation (analysis → validation → playbook → execution → verification)
 - Integrated impact analysis before playbook generation
 - System context gathering and remediation strategy determination
 - Execution guidance and verification workflows
 
-**How they work together**: The remediator agent orchestrates this skill after gathering system context and determining remediation strategy. The agent provides CVE details, system information, and deployment context, and this skill generates the optimized playbook.
+**How they work together**: The sre-agents:remediator agent (invoked) orchestrates this skill after gathering system context and determining remediation strategy. The agent provides CVE details, system information, and deployment context, and this skill generates the optimized playbook.
 
 ## Workflow
 
@@ -468,7 +468,7 @@ All documentation is available in the `docs/` directory.
 - **system-context**: Provides system inventory and deployment context for playbook targeting
 - **remediation-verifier**: Verifies playbook execution success after deployment
 
-**Orchestration Example** (from remediator agent):
+**Orchestration Example** (from sre-agents:remediator agent - invoked):
 1. Agent invokes cve-impact skill → Gets risk assessment
 2. Agent gathers context → Determines deployment requirements
 3. Agent invokes playbook-generator skill → Generates production-ready playbook

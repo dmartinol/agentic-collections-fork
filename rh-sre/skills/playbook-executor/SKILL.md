@@ -14,7 +14,7 @@ description: |
 
 This skill executes Ansible remediation playbooks and tracks their execution status through the mock Ansible MCP server.
 
-**Integration with Remediator Agent**: The remediator agent orchestrates this skill as part of its Step 5 (Execute Playbook) workflow. For standalone playbook execution, you can invoke this skill directly.
+**Integration with Remediator Agent**: The sre-agents:remediator agent (invoked) orchestrates this skill as part of its Step 5 (Execute Playbook) workflow. For standalone playbook execution, you can invoke this skill directly.
 
 ## When to Use This Skill
 
@@ -24,12 +24,12 @@ This skill executes Ansible remediation playbooks and tracks their execution sta
 - Monitor playbook job completion
 - Verify playbook execution succeeded
 
-**Use the remediator agent when you need**:
+**Use the sre-agents:remediator agent when you need**:
 - Full remediation workflow including playbook execution
 - Integrated CVE analysis → playbook generation → execution → verification
 - End-to-end remediation orchestration
 
-**How they work together**: The remediator agent invokes this skill after generating a remediation playbook, asking the user for confirmation before execution, then monitoring the job to completion.
+**How they work together**: The sre-agents:remediator agent (invoked) invokes this skill after generating a remediation playbook, asking the user for confirmation before execution, then monitoring the job to completion.
 
 ## Workflow
 
@@ -448,9 +448,9 @@ Troubleshooting:
 
 - **playbook-generator**: Generates playbooks that this skill executes
 - **remediation-verifier**: Verifies success after this skill completes execution
-- **remediator agent**: Orchestrates full workflow including playbook execution
+- **sre-agents:remediator agent**: Orchestrates full workflow including playbook execution (invoked)
 
-**Orchestration Example** (from remediator agent):
+**Orchestration Example** (from sre-agents:remediator agent - invoked):
 1. Agent invokes playbook-generator skill → Creates playbook YAML
 2. playbook-generator skill asks for confirmation → User approves playbook content
 3. Agent invokes playbook-executor skill → Skill asks for execution confirmation

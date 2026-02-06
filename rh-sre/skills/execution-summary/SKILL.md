@@ -32,8 +32,8 @@ Do NOT use when:
 
 **What to extract**:
 
-1. **Agents invoked** - Look for Task tool calls with subagent_type parameter
-   - Example: `Task(subagent_type="remediator")` → `rh-sre:remediator`
+1. **Agents invoked** - Look for agent invocations in the conversation
+   - Example: Agent `remediator` → `rh-sre:remediator`
    - Include plugin prefix: `rh-sre:`
 
 2. **Skills invoked** - Look for Skill tool calls
@@ -65,8 +65,8 @@ Do NOT use when:
 **Action**: Organize extracted resources into categories and remove duplicates
 
 **Categories**:
-- **Agents**: Task tool invocations with subagent_type
-- **Skills**: Skill tool invocations
+- **Agents**: Agent invocations
+- **Skills**: Skill invocations
 - **Tools**: MCP tool calls (group by server)
 - **Docs**: Documentation files read
 
@@ -326,10 +326,10 @@ Note: "unknown-plugin:custom-skill" origin unclear - verify plugin source.
 
 This skill complements other rh-sre skills:
 
-**After remediator agent**:
+**After sre-agents:remediator agent**:
 ```
 User: "Remediate CVE-X"
-→ remediator agent executes full workflow
+→ sre-agents:remediator agent executes full workflow (invoked)
 User: "Generate execution summary"
 → execution-summary shows complete resource usage
 ```
