@@ -36,21 +36,24 @@ This skill generates Ansible remediation playbooks for CVE vulnerabilities, appl
 
 ### 1. Documentation Consultation
 
-**Before generating playbooks, consult Red Hat documentation**:
+**CRITICAL**: Document consultation MUST happen BEFORE playbook generation.
 
-- **Read** `docs/ansible/cve-remediation-templates.md` to understand playbook patterns for this CVE type:
-  - Template 1: Package Update (user-space packages)
-  - Template 2: Service Restart (configuration changes)
-  - Template 3: Configuration File Update (system configs)
-  - Template 4: Kernel Update with Reboot (kernel CVEs)
-  - Template 5: SELinux Context Update (SELinux issues)
-  - Template 6: Batch Remediation (multiple CVEs)
+**Document Consultation** (REQUIRED - Execute FIRST):
+1. **Action**: Read [cve-remediation-templates.md](../../docs/ansible/cve-remediation-templates.md) using the Read tool to understand playbook patterns for this CVE type:
+   - Template 1: Package Update (user-space packages)
+   - Template 2: Service Restart (configuration changes)
+   - Template 3: Configuration File Update (system configs)
+   - Template 4: Kernel Update with Reboot (kernel CVEs)
+   - Template 5: SELinux Context Update (SELinux issues)
+   - Template 6: Batch Remediation (multiple CVEs)
 
-- **Check** `docs/rhel/package-management.md` for RHEL-specific update considerations:
-  - DNF vs YUM (RHEL 7 vs 8/9)
-  - Reboot detection patterns (`needs-restarting`)
-  - Service restart after package updates
-  - Repository and subscription management
+2. **Action**: Read [package-management.md](../../docs/rhel/package-management.md) using the Read tool for RHEL-specific update considerations:
+   - DNF vs YUM (RHEL 7 vs 8/9)
+   - Reboot detection patterns (`needs-restarting`)
+   - Service restart after package updates
+   - Repository and subscription management
+
+3. **Output to user**: "I consulted [cve-remediation-templates.md](../../docs/ansible/cve-remediation-templates.md) and [package-management.md](../../docs/rhel/package-management.md) to understand playbook patterns and RHEL-specific best practices."
 
 
 ### 2. CVE Type Detection
@@ -90,20 +93,22 @@ System Context Checks:
 
 ### 4. Playbook Generation
 
-**MCP Tool**: `create_vulnerability_playbook` (from lightspeed-mcp remediations toolset)
+**CRITICAL**: Document consultation MUST happen BEFORE tool invocation (see Step 1).
 
-Generate base playbook using Red Hat Lightspeed:
+**MCP Tool**: `create_vulnerability_playbook` or `remediations__create_vulnerability_playbook` (from lightspeed-mcp)
 
-```yaml
-# Call MCP tool with parameters:
-create_vulnerability_playbook(
-  cve_ids=["CVE-YYYY-NNNNN"],
-  system_ids=["uuid-1", "uuid-2"],
-  auto_reboot=false  # We handle reboots explicitly
-)
-```
+**Parameters**:
+- `cve_ids`: Array of CVE identifiers
+  - Example: `["CVE-2024-1234"]`
+  - Format: CVE-YYYY-NNNNN strings
+- `system_ids`: Array of system UUIDs from Red Hat Lightspeed inventory
+  - Example: `["uuid-1", "uuid-2"]`
+  - Format: UUID strings (get from system-context skill)
+- `auto_reboot`: Boolean controlling automatic reboot behavior
+  - Example: `false` (we handle reboots explicitly in playbook)
+  - Recommended: `false` to maintain control over reboot timing
 
-The tool returns a base playbook that you will enhance with patterns from documentation.
+**Expected Output**: Base Ansible playbook YAML that will be enhanced with patterns from documentation
 
 ### 5. Playbook Enhancement
 
@@ -216,9 +221,36 @@ Validation Checks:
 ✓ Error handling present (failed_when, ignore_errors where appropriate)
 ```
 
+## Critical: Human-in-the-Loop Requirements
+
+This skill generates code that will execute on production systems. **Explicit user confirmation is REQUIRED** before returning the playbook.
+
+**Before Playbook Return** (REQUIRED):
+1. **Display Playbook Preview**: Show complete playbook YAML to user
+2. **Display Metadata**: Show CVE IDs, target systems, reboot requirements, Kubernetes considerations
+3. **Ask for Confirmation**:
+   ```
+   ❓ Review the playbook above. This playbook will:
+   - Update packages on N systems
+   - Require reboot: [Yes/No]
+   - Affect Kubernetes pods: [Yes/No]
+
+   Should I provide this playbook for execution?
+
+   Options:
+   - "yes" or "proceed" - Provide playbook for execution
+   - "modify" - Request changes to playbook
+   - "abort" - Cancel playbook generation
+
+   Please respond with your choice.
+   ```
+4. **Wait for Explicit Confirmation**: Do not provide playbook without "yes" or "proceed"
+
+**Never assume approval** - always wait for explicit user confirmation before providing executable playbooks.
+
 ### 7. Return Playbook
 
-Return the production-ready playbook with metadata:
+**ONLY after receiving explicit user confirmation**, return the production-ready playbook with metadata:
 
 ```yaml
 # Playbook metadata to return:
@@ -387,16 +419,37 @@ To generate Kubernetes-safe playbooks, ensure:
 Proceeding with standard playbook (without pod eviction). Add pod eviction manually if needed.
 ```
 
+## Dependencies
+
+### Required MCP Servers
+- `lightspeed-mcp` - Red Hat Lightspeed platform access
+
+### Required MCP Tools
+- `create_vulnerability_playbook` or `remediations__create_vulnerability_playbook` (from lightspeed-mcp) - Generate base remediation playbook from Red Hat Lightspeed
+  - Parameters: cve_ids (array of strings), system_ids (array of UUID strings), auto_reboot (boolean)
+  - Returns: Base Ansible playbook YAML for remediation
+
+### Related Skills
+- `cve-impact` - Provides CVE severity and risk assessment to inform playbook complexity
+- `system-context` - Provides system inventory and deployment context for playbook targeting
+- `remediation-verifier` - Verifies playbook execution success after deployment
+- `playbook-executor` - Executes generated playbooks and tracks job status
+
+### Reference Documentation
+- [cve-remediation-templates.md](../../docs/ansible/cve-remediation-templates.md) - Ansible playbook templates for different CVE types
+- [package-management.md](../../docs/rhel/package-management.md) - RHEL package management best practices (DNF vs YUM, reboot detection)
+
 ## Best Practices
 
-1. **Always consult documentation first** - Load relevant docs before calling MCP tools
+1. **Always consult documentation first** - Read [cve-remediation-templates.md] and [package-management.md] BEFORE calling MCP tools
 2. **Detect CVE type** - Use appropriate template for kernel vs package vs service CVEs
 3. **Check Kubernetes context** - Add pod eviction for K8s-deployed systems
 4. **RHEL version awareness** - Use dnf for RHEL 8/9, yum for RHEL 7
 5. **Include pre-flight checks** - Validate OS, subscription status before proceeding
 6. **Add rollback capability** - Use snapshots, backups for safety
 7. **Audit everything** - Log all actions to /var/log/cve-remediation.log
-8. **Test first** - Always recommend testing in staging before production
+8. **Require user approval** - ALWAYS get explicit confirmation before providing executable playbooks
+9. **Test first** - Always recommend testing in staging before production
 
 ## Tools Reference
 

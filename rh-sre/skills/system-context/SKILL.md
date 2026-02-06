@@ -36,15 +36,22 @@ This skill gathers comprehensive system inventory and deployment context for CVE
 
 ### 1. Identify Affected Systems
 
-**MCP Tool**: `get_cve_systems` (from lightspeed-mcp vulnerability toolset)
+**MCP Tool**: `get_cve_systems` or `vulnerability__get_cve_systems` (from lightspeed-mcp)
 
-Retrieve list of systems affected by the CVE:
+**Parameters**:
+- `cve_id`: Exact CVE identifier (format: `"CVE-YYYY-NNNNN"`)
+  - Example: `"CVE-2024-1234"`
+- `limit`: Optional number of systems to return (default: all)
+  - Example: `100`
+  - Use for large deployments to paginate results
+- `offset`: Optional pagination offset (default: 0)
+  - Example: `0`
+  - Use with limit for pagination
 
-```
-Input: CVE-YYYY-NNNNN
-Output: List of system UUIDs and basic metadata
+**Expected Output**: List of system UUIDs and basic metadata
 
-Example Response:
+**Example Response**:
+```json
 {
   "systems": [
     {
@@ -64,24 +71,30 @@ Example Response:
 
 ### 2. Gather Detailed System Information
 
-**MCP Tool**: `get_host_details` (from lightspeed-mcp inventory toolset)
+**MCP Tool**: `get_host_details` or `inventory__get_host_details` (from lightspeed-mcp)
 
-For each affected system, retrieve comprehensive details:
+**Parameters**:
+- `system_id`: UUID of the system to retrieve (from get_cve_systems result)
+  - Example: `"uuid-1"`
+  - Format: UUID string
+- `include_system_profile`: `true` (retrieve complete system profile including packages, services)
+  - Example: `true`
+  - Recommended: Always true for context gathering
+- `include_tags`: Optional boolean to include system tags (default: true)
+  - Example: `true`
+  - Tags provide environment, role, criticality classification
 
-```
-Input: system_uuid
-Output: Detailed system profile
+**Expected Output**: Detailed system profile
 
-Key Information to Extract:
+**Key Information to Extract**:
 - RHEL version (rhel_version, os_release)
-- System type (bare_metal, VM, cloud instance)
+- System type (infrastructure_type: bare_metal, virtualized, container)
 - IP addresses (network_interfaces)
 - Tags (environment, role, criticality)
 - System profile (CPU, memory, disk)
-- Installed packages
-- Running services
-- Last check-in time
-```
+- Installed packages (installed_packages)
+- Running services (enabled_services, running_processes)
+- Last check-in time (updated)
 
 **System Profile Structure**:
 ```json
@@ -441,23 +454,38 @@ To improve system classification:
 3. Ensure all systems are registered and reporting
 ```
 
+## Dependencies
+
+### Required MCP Servers
+- `lightspeed-mcp` - Red Hat Lightspeed platform access
+
+### Required MCP Tools
+- `get_cve_systems` or `vulnerability__get_cve_systems` (from lightspeed-mcp) - List systems affected by CVE
+  - Parameters: cve_id (string, format CVE-YYYY-NNNNN), limit (number, optional), offset (number, optional)
+  - Returns: List of system UUIDs and basic metadata (hostname, display_name)
+- `get_host_details` or `inventory__get_host_details` (from lightspeed-mcp) - Get detailed system information
+  - Parameters: system_id (UUID string), include_system_profile (boolean), include_tags (boolean, optional)
+  - Returns: Complete system profile including RHEL version, infrastructure type, tags, packages, services
+
+### Related Skills
+- `cve-impact` - Provides CVE severity to inform criticality assessment
+- `playbook-generator` - Consumes context to generate appropriate remediation playbook
+- `remediation-verifier` - Uses system context to verify remediation on correct systems
+- `cve-validation` - Validates CVE before gathering affected systems
+
+### Reference Documentation
+- None required (system context is gathered from MCP tool queries)
+
 ## Best Practices
 
-1. **Always gather full context** - Don't skip system details even if it seems simple
-2. **Classify by environment** - Always test in staging before production
-3. **Check system criticality** - Remediation strategy depends on system importance
-4. **Respect criticality tags** - High-criticality systems need extra care
-5. **Detect RHEL version mix** - Playbooks must handle multiple versions
-6. **Consider batch size** - Balance speed vs risk (5-10 systems recommended)
-7. **Plan for rollback** - Always have a backup strategy
-
-## Tools Reference
-
-This skill primarily uses:
-- `get_cve_systems` (vulnerability toolset) - Get list of systems affected by CVE
-- `get_host_details` (inventory toolset) - Get detailed system information
-
-All tools are provided by the lightspeed-mcp MCP server configured in `.mcp.json`.
+1. **Always gather full context** - Don't skip system details even if deployment seems simple
+2. **Classify by environment** - Always test in staging before production deployment
+3. **Check system criticality** - Remediation strategy depends on system importance (critical vs low)
+4. **Respect criticality tags** - High-criticality systems need maintenance windows and extra care
+5. **Detect RHEL version mix** - Playbooks must handle multiple versions (conditional dnf/yum logic)
+6. **Consider batch size** - Balance speed vs risk (5-10 systems per batch recommended)
+7. **Plan for rollback** - Always have a backup strategy (snapshots, maintenance windows)
+8. **Use pagination for large fleets** - If get_cve_systems returns 100+ systems, use limit/offset parameters
 
 ## Integration with Other Skills
 

@@ -181,11 +181,17 @@ See troubleshooting steps above.
 - `ansible-mcp-server` - Mock Ansible playbook execution server
 
 ### Required MCP Tools
-- `execute_playbook` (from ansible-mcp-server) - Create playbook execution jobs
-- `get_job_status` (from ansible-mcp-server) - Monitor job status
+- `execute_playbook` (from ansible-mcp-server) - Create playbook execution jobs (mock implementation)
+  - Parameters: playbook_path (string - absolute path to playbook file)
+  - Returns: Job ID for status tracking
+  - Note: Mock implementation validates path exists but doesn't execute
+- `get_job_status` (from ansible-mcp-server) - Monitor job status (mock implementation)
+  - Parameters: job_id (string - job ID from execute_playbook)
+  - Returns: Job status (PENDING, RUNNING, COMPLETED)
+  - Note: Mock implementation simulates job lifecycle
 
 ### Related Skills
-- `playbook-executor` - Uses Ansible MCP for playbook execution
+- `playbook-executor` - **PRIMARY USER** - Uses Ansible MCP for playbook execution (invokes this validator as prerequisite)
 - `playbook-generator` - Generates playbooks for execution
 - `remediation-verifier` - Verifies playbook execution results
 

@@ -35,50 +35,68 @@ This skill verifies CVE remediation success by validating that vulnerabilities h
 
 ### 1. CVE Status Verification
 
-**MCP Tool**: `get_cve` and `get_cve_systems` (from lightspeed-mcp vulnerability toolset)
+**MCP Tool**: `get_cve` or `vulnerability__get_cve` (from lightspeed-mcp)
 
-Check CVE status in Red Hat Lightspeed after remediation:
+**Parameters for get_cve**:
+- `cve_id`: Exact CVE identifier (format: `"CVE-YYYY-NNNNN"`)
+  - Example: `"CVE-2024-1234"`
+- `include_details`: `true` (retrieve complete metadata including remediation status)
 
-```
-Step 1: Retrieve current CVE status
-Tool: get_cve(cve_id="CVE-2024-1234")
-
-Expected After Remediation:
-- CVE metadata still exists (CVE doesn't disappear)
+**Expected After Remediation**:
+- CVE metadata still exists (CVE doesn't disappear from database)
 - Remediation marked as applied
 - Fixed version recorded
 
-Step 2: Check affected systems list
-Tool: get_cve_systems(cve_id="CVE-2024-1234")
+**MCP Tool**: `get_cve_systems` or `vulnerability__get_cve_systems` (from lightspeed-mcp)
 
-Expected After Remediation:
+**Parameters for get_cve_systems**:
+- `cve_id`: Exact CVE identifier (format: `"CVE-YYYY-NNNNN"`)
+  - Example: `"CVE-2024-1234"`
+- `limit`: Optional number of systems to return (default: all)
+  - Example: `100`
+- `offset`: Optional pagination offset (default: 0)
+  - Example: `0`
+
+**Expected After Remediation**:
 - Target systems removed from affected list OR
 - Systems marked as "patched" status OR
 - Systems show fixed package version
 
-Verification Logic:
+**Verification Logic**:
+```
 ✓ System UUID not in affected systems list → PASS
 ✓ System status = "patched" → PASS
 ✗ System still in affected list with "vulnerable" status → FAIL
 ```
 
-**Important**: Red Hat Lightspeed updates may take time (up to 24 hours). Consider this when interpreting results.
+**Important**: Red Hat Lightspeed inventory updates may take time (up to 24 hours after remediation). Consider this timing when interpreting results.
 
 ### 2. Package Version Verification
 
-**MCP Tool**: `get_host_details` (from lightspeed-mcp inventory toolset)
+**MCP Tool**: `get_host_details` or `inventory__get_host_details` (from lightspeed-mcp)
 
-Verify package versions on remediated systems:
+**Parameters**:
+- `system_id`: UUID of the system to verify (from Red Hat Lightspeed inventory)
+  - Example: `"uuid-1"`
+  - Format: UUID string (get from system-context skill or get_cve_systems result)
+- `include_system_profile`: `true` (retrieve installed packages and service status)
+  - Example: `true`
 
+**Expected Output**: System details including:
+- `system_profile.installed_packages` - List of installed RPM packages with versions
+- `system_profile.enabled_services` - Services enabled at boot
+- `system_profile.running_processes` - Currently running processes
+
+**Verification Workflow**:
 ```
 For each target system:
 
 1. Get current installed packages
-   Tool: get_host_details(system_id="uuid-1")
+   Tool: get_host_details(system_id="uuid-1", include_system_profile=true)
    Extract: system_profile.installed_packages
 
 2. Compare against expected fixed versions
-   CVE Fix: httpd-2.4.37-1.el8 → httpd-2.4.37-2.el8
+   CVE Fix Example: httpd-2.4.37-1.el8 → httpd-2.4.37-2.el8
 
    Installed Packages Check:
    ✓ httpd-2.4.37-2.el8 (or newer) installed → PASS
@@ -107,7 +125,9 @@ def verify_package_version(installed, expected_fixed):
 
 ### 3. Service Health Verification
 
-**MCP Tool**: `get_host_details` (from lightspeed-mcp inventory toolset)
+**MCP Tool**: `get_host_details` or `inventory__get_host_details` (from lightspeed-mcp)
+
+**Parameters**: Same as Step 2 - system_id with include_system_profile=true
 
 Verify affected services are running properly:
 
@@ -321,23 +341,39 @@ When completing verification, provide output in this format:
 3. Identify failed systems: web-server-18, web-server-19
 4. Return: "⚠ 18/20 systems verified. 2 systems failed package update. Troubleshooting guidance provided."
 
+## Dependencies
+
+### Required MCP Servers
+- `lightspeed-mcp` - Red Hat Lightspeed platform access
+
+### Required MCP Tools
+- `get_cve` or `vulnerability__get_cve` (from lightspeed-mcp) - Get CVE metadata and remediation status
+  - Parameters: cve_id (string, format CVE-YYYY-NNNNN), include_details (boolean)
+  - Returns: CVE metadata including remediation status
+- `get_cve_systems` or `vulnerability__get_cve_systems` (from lightspeed-mcp) - List systems affected by CVE
+  - Parameters: cve_id (string), limit (number), offset (number)
+  - Returns: List of systems with vulnerability status
+- `get_host_details` or `inventory__get_host_details` (from lightspeed-mcp) - Get system details including packages and services
+  - Parameters: system_id (UUID string), include_system_profile (boolean)
+  - Returns: System profile with installed_packages, enabled_services, running_processes
+
+### Related Skills
+- `playbook-generator` - Generates playbooks that this skill verifies
+- `system-context` - Provides system context for verification scope
+- `cve-impact` - Initial impact assessment to compare against verification results
+- `playbook-executor` - Executes playbooks that this skill verifies
+
+### Reference Documentation
+- None required (verification skill uses MCP tool data)
+
 ## Best Practices
 
-1. **Wait before verification** - Allow 5-10 minutes after playbook execution
-2. **Check multiple indicators** - CVE status + package version + service health
-3. **Re-scan with Lightspeed** - Recommend insights-client --check-results
-4. **Document failures** - Provide detailed troubleshooting for any failures
-5. **Consider timing** - Lightspeed inventory updates may take up to 24 hours
-6. **Verify at scale** - Use batch verification for large deployments
-
-## Tools Reference
-
-This skill primarily uses:
-- `get_cve` (vulnerability toolset) - Get CVE metadata
-- `get_cve_systems` (vulnerability toolset) - Check if systems still affected
-- `get_host_details` (inventory toolset) - Verify package versions and service status
-
-All tools are provided by the lightspeed-mcp MCP server configured in `.mcp.json`.
+1. **Wait before verification** - Allow 5-10 minutes after playbook execution for system updates to register
+2. **Check multiple indicators** - CVE status + package version + service health (defense in depth)
+3. **Re-scan with Lightspeed** - Recommend `insights-client --check-results` to update inventory
+4. **Document failures** - Provide detailed troubleshooting for any verification failures
+5. **Consider timing** - Lightspeed inventory updates may take up to 24 hours to propagate
+6. **Verify at scale** - Use batch verification for large deployments (call get_host_details in parallel)
 
 ## Integration with Other Skills
 

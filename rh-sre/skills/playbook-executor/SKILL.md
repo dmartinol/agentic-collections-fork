@@ -61,32 +61,74 @@ with os.fdopen(temp_fd, 'w') as f:
 - File must exist and be readable before calling execute_playbook
 - Keep track of temp_path for cleanup after completion
 
+## Critical: Human-in-the-Loop Requirements
+
+This skill executes code on production systems. **Explicit user confirmation is REQUIRED** before playbook execution.
+
+**Before Playbook Execution** (REQUIRED):
+1. **Display Playbook Path**: Show which playbook file will be executed
+2. **Display Target Systems**: Show which systems will be affected
+3. **Display Risk Assessment**: Show reboot requirements, downtime estimates, affected services
+4. **Ask for Confirmation**:
+   ```
+   ⚠️  CRITICAL: Playbook Execution Confirmation Required
+
+   This playbook will:
+   - Execute on: N production systems
+   - Require reboot: [Yes/No]
+   - Estimated downtime: X minutes per system
+   - Affected services: [list]
+
+   Playbook file: /tmp/remediation-CVE-YYYY-NNNNN.yml
+
+   ❓ Execute this playbook now?
+
+   Options:
+   - "yes" or "execute" - Proceed with playbook execution
+   - "review" - Show playbook content again
+   - "abort" - Cancel execution
+
+   Please respond with your choice.
+   ```
+4. **Wait for Explicit Confirmation**: Do not execute without "yes" or "execute"
+
+**Never assume approval** - always wait for explicit user confirmation before executing playbooks on production systems.
+
 ### 2. Execute Playbook
+
+**ONLY after receiving explicit user confirmation**, proceed with execution.
 
 **MCP Tool**: `execute_playbook` (from ansible-mcp-server)
 
-Submit playbook for execution and receive job ID:
+**Parameters**:
+- `playbook_path`: Absolute path to playbook file in container filesystem
+  - Example: `"/playbooks/remediation-CVE-2024-1234.yml"`
+  - Format: MUST start with `/playbooks/` (container mount point)
+  - Conversion: Host path `/tmp/file.yml` → Container path `/playbooks/file.yml`
 
+**Path Conversion Logic**:
 ```
 IMPORTANT: Convert host path to container path before calling execute_playbook
 
 Host path:      /tmp/remediation-CVE-2024-1234.yml
 Container path: /playbooks/remediation-CVE-2024-1234.yml
 
-Path conversion:
+Python conversion:
 container_path = host_path.replace('/tmp/', '/playbooks/')
+```
 
-Tool: execute_playbook(playbook_path="/playbooks/remediation-CVE-2024-1234.yml")
-
-Expected Response:
+**Expected Output**:
+```json
 {
   "job_id": "job_12345",
   "status": "PENDING",
   "playbook_path": "/playbooks/remediation-CVE-2024-1234.yml"
 }
+```
 
-Verification:
-✓ job_id returned (used for status tracking)
+**Verification**:
+```
+✓ job_id returned (string - used for status tracking)
 ✓ status = "PENDING" (job queued for execution)
 ✓ playbook_path uses container path (/playbooks/)
 ```
@@ -106,26 +148,55 @@ If execute_playbook fails:
 
 **MCP Tool**: `get_job_status` (from ansible-mcp-server)
 
-Poll job status until completion:
+**Parameters**:
+- `job_id`: Job identifier from execute_playbook response
+  - Example: `"job_12345"`
+  - Format: String returned from execute_playbook
 
+**Expected Output** (varies by job status):
+```json
+// When PENDING
+{
+  "job_id": "job_12345",
+  "status": "PENDING",
+  "started_at": null,
+  "completed_at": null
+}
+
+// When RUNNING
+{
+  "job_id": "job_12345",
+  "status": "RUNNING",
+  "started_at": "2024-01-20T15:30:02Z",
+  "completed_at": null
+}
+
+// When COMPLETED
+{
+  "job_id": "job_12345",
+  "status": "COMPLETED",
+  "started_at": "2024-01-20T15:30:02Z",
+  "completed_at": "2024-01-20T15:30:07Z"
+}
 ```
-Input: job_id from execute_playbook response
-Tool: get_job_status(job_id="job_12345")
 
-Job Status Timeline:
-T+0s:  {"job_id": "job_12345", "status": "PENDING", "started_at": null, "completed_at": null}
-T+2s:  {"job_id": "job_12345", "status": "RUNNING", "started_at": "2024-01-20T15:30:02Z", "completed_at": null}
-T+7s:  {"job_id": "job_12345", "status": "COMPLETED", "started_at": "2024-01-20T15:30:02Z", "completed_at": "2024-01-20T15:30:07Z"}
+**Job Status Timeline Example**:
+```
+T+0s:  Status: PENDING   (started_at: null, completed_at: null)
+T+2s:  Status: RUNNING   (started_at: ISO8601, completed_at: null)
+T+7s:  Status: COMPLETED (started_at: ISO8601, completed_at: ISO8601)
 
 Status Transitions:
 PENDING → RUNNING → COMPLETED
+```
 
-Polling Strategy:
+**Polling Strategy**:
+```
 1. Initial check: Immediately after execute_playbook
 2. While status = "PENDING" or "RUNNING":
    - Wait 2 seconds
-   - Call get_job_status
-   - Check status
+   - Call get_job_status(job_id=job_id)
+   - Check status field
 3. When status = "COMPLETED":
    - Stop polling
    - Report success
@@ -337,25 +408,41 @@ Troubleshooting:
 3. Retry status check manually: get_job_status(job_id="job_12345")
 ```
 
+## Dependencies
+
+### Required MCP Servers
+- `ansible-mcp-server` - Mock Ansible playbook execution server (container-based)
+
+### Required MCP Tools
+- `execute_playbook` (from ansible-mcp-server) - Submit playbook for execution
+  - Parameters: playbook_path (string - absolute path in container filesystem starting with /playbooks/)
+  - Returns: Job object with job_id, status, playbook_path
+  - Note: Mock implementation validates path and creates test job
+- `get_job_status` (from ansible-mcp-server) - Track execution progress
+  - Parameters: job_id (string - job ID from execute_playbook)
+  - Returns: Job status object with job_id, status (PENDING/RUNNING/COMPLETED), started_at, completed_at
+  - Note: Mock implementation simulates job lifecycle
+
+### Related Skills
+- `mcp-ansible-validator` - **PREREQUISITE** - Validates Ansible MCP server before execution (invoke in Step 0 if not validated in session)
+- `playbook-generator` - Generates playbooks that this skill executes
+- `remediation-verifier` - Verifies success after this skill completes execution
+
+### Reference Documentation
+- None required (execution skill)
+
 ## Best Practices
 
-1. **Always save playbook to /tmp** - Required for container volume mount access
-2. **Convert paths correctly** - Host path `/tmp/file.yml` → Container path `/playbooks/file.yml`
-3. **Poll status efficiently** - 2-second intervals balance responsiveness and overhead
-4. **Handle all status transitions** - PENDING → RUNNING → COMPLETED
-5. **Cleanup temp files** - Remove after successful completion from `/tmp/` on host
-6. **Provide progress updates** - Keep user informed during polling
-7. **Link to verification** - Always suggest remediation-verifier skill after execution
-8. **Keep temp files on failure** - Useful for debugging failed executions
-9. **Use unique temp filenames** - Include CVE ID or timestamp to avoid conflicts
-
-## Tools Reference
-
-This skill primarily uses:
-- `execute_playbook` (ansible-mcp-server) - Submit playbook for execution
-- `get_job_status` (ansible-mcp-server) - Track execution progress
-
-All tools are provided by the ansible-mcp-server MCP server configured in `.mcp.json`.
+1. **Always save playbook to /tmp** - Required for container volume mount access (mount: `/tmp:/playbooks:Z`)
+2. **Convert paths correctly** - Host path `/tmp/file.yml` → Container path `/playbooks/file.yml` before calling execute_playbook
+3. **Require user confirmation** - ALWAYS get explicit "yes" or "execute" before submitting playbook (HITL requirement)
+4. **Poll status efficiently** - 2-second intervals balance responsiveness and overhead
+5. **Handle all status transitions** - PENDING → RUNNING → COMPLETED (mock implementation)
+6. **Cleanup temp files** - Remove after successful completion from `/tmp/` on host
+7. **Provide progress updates** - Keep user informed during polling with status messages
+8. **Link to verification** - Always suggest remediation-verifier skill after execution completes
+9. **Keep temp files on failure** - Useful for debugging failed executions
+10. **Use unique temp filenames** - Include CVE ID or timestamp to avoid conflicts (e.g., `remediation-CVE-2024-1234-{timestamp}.yml`)
 
 ## Integration with Other Skills
 
@@ -365,19 +452,14 @@ All tools are provided by the ansible-mcp-server MCP server configured in `.mcp.
 
 **Orchestration Example** (from remediator agent):
 1. Agent invokes playbook-generator skill → Creates playbook YAML
-2. Agent asks user for confirmation: "Execute this playbook?"
-3. User approves
-4. Agent invokes playbook-executor skill → Saves to temp file, executes, monitors
-5. Agent reports: "Playbook executed successfully"
+2. playbook-generator skill asks for confirmation → User approves playbook content
+3. Agent invokes playbook-executor skill → Skill asks for execution confirmation
+4. User approves execution → Skill saves to temp file, executes, monitors
+5. Skill reports: "Playbook executed successfully"
 6. Agent invokes remediation-verifier skill → Confirms CVE resolved
 
-**Execution-First Principle**:
-```
-Always confirm before execution:
-1. Show playbook preview to user
-2. Ask: "Execute this playbook?"
-3. Wait for user approval
-4. Then invoke playbook-executor skill
+**Note**: Both playbook-generator and playbook-executor require separate confirmations:
+- playbook-generator: Confirms playbook content is acceptable
+- playbook-executor: Confirms execution on production systems is approved
 
-This ensures user awareness and control over infrastructure changes.
-```
+This two-step approval ensures user control over both what to run and when to run it.
