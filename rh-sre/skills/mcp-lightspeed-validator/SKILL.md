@@ -141,9 +141,9 @@ echo $LIGHTSPEED_CLIENT_SECRET
 
 **If missing**: Proceed to Human Notification Protocol (Step 4)
 
-### Step 3: Test MCP Server Connection (Optional)
+### Step 3: Test MCP Server Connection (REQUIRED)
 
-**Note**: This step attempts to verify server connectivity by listing available MCP tools. If tool invocation is not possible, skip to Step 5 with a PARTIAL validation result.
+**Note**: This step verifies actual server connectivity by listing available MCP tools. This is MANDATORY - without successful connectivity testing, the validator cannot confirm the service is available.
 
 **Action**: List available MCP tools from lightspeed-mcp server and validate required tools exist
 
@@ -195,13 +195,11 @@ for tool in required_tools:
 - ✓ "Successfully connected to lightspeed-mcp server"
 - ✓ "All required MCP tools are available (5/5 tools validated)"
 - ⚠ "Successfully connected but some tools are missing: `get_cves`, `create_vulnerability_playbook` (3/5 tools available)"
-- ⚠ "Server connectivity test unavailable (cannot invoke MCP tools directly)"
 - ✗ "Cannot connect to lightspeed-mcp server (check container status)"
 
 **If all tools present**: Report SUCCESS
 **If some tools missing**: Report PARTIAL with warning about missing tools
 **If connection fails**: Proceed to Human Notification Protocol (Step 4)
-**If test unavailable**: Skip to Step 5 with PARTIAL result
 
 ### Step 4: Human Notification Protocol
 
@@ -304,21 +302,7 @@ Configuration:
 Ready to execute Lightspeed MCP operations.
 ```
 
-**Partial success case 1** (connectivity test unavailable):
-```
-⚠ Lightspeed MCP Validation: PARTIAL
-
-Configuration:
-✓ MCP server configured in .mcp.json
-✓ Environment variable LIGHTSPEED_CLIENT_ID is set
-✓ Environment variable LIGHTSPEED_CLIENT_SECRET is set
-⚠ Server connectivity test unavailable (cannot invoke MCP tools directly)
-
-Note: Configuration appears correct, but connectivity could not be tested.
-You may proceed with caution - operations may fail if server is not running.
-```
-
-**Partial success case 2** (some tools missing):
+**Partial success case** (some tools missing):
 ```
 ⚠ Lightspeed MCP Validation: PARTIAL
 
@@ -372,16 +356,17 @@ Checking environment variables...
 ✓ Environment variable LIGHTSPEED_CLIENT_SECRET is set
 
 Testing server connectivity...
-⚠ Server connectivity test unavailable (cannot invoke MCP tools directly)
+✓ Successfully connected to lightspeed-mcp server
+✓ All required MCP tools are available (5/5 tools validated)
 
-✓ Lightspeed MCP Validation: PARTIAL
+✓ Lightspeed MCP Validation: PASSED
 
 Configuration:
 ✓ MCP server configured in .mcp.json
 ✓ Environment variables are set
-⚠ Server connectivity could not be tested
+✓ Server connectivity verified
 
-Your Lightspeed MCP configuration appears correct. You can proceed with CVE operations.
+Your Lightspeed MCP configuration is ready. You can proceed with CVE operations.
 ```
 
 ### Example 2: Validation Failure - Missing Environment Variables
