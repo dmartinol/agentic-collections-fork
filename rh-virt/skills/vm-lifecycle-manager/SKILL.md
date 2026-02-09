@@ -75,21 +75,39 @@ When prerequisites fail:
 ❌ Cannot execute vm-lifecycle-manager: MCP server 'openshift-virtualization' is not available
 
 📋 Setup Instructions:
-1. Add openshift-virtualization to .mcp.json:
+1. Build the OpenShift MCP server container image locally:
+   git clone https://github.com/openshift/openshift-mcp-server.git
+   cd openshift-mcp-server
+   podman build -t localhost/openshift-mcp-server:latest -f Dockerfile .
+
+2. Add openshift-virtualization to .mcp.json:
    {
      "mcpServers": {
        "openshift-virtualization": {
-         "command": "npx",
-         "args": ["-y", "@openshift/openshift-mcp-server", "--toolset", "kubevirt"],
+         "command": "podman",
+         "args": [
+           "run",
+           "--rm",
+           "-i",
+           "--network=host",
+           "--userns=keep-id:uid=65532,gid=65532",
+           "-v", "${KUBECONFIG}:/kubeconfig:ro,Z",
+           "--entrypoint", "/app/kubernetes-mcp-server",
+           "localhost/openshift-mcp-server:latest",
+           "--kubeconfig", "/kubeconfig",
+           "--toolsets", "core,kubevirt"
+         ],
          "env": {
            "KUBECONFIG": "${KUBECONFIG}"
          }
        }
      }
    }
-2. Set KUBECONFIG environment variable:
+
+3. Set KUBECONFIG environment variable:
    export KUBECONFIG="/path/to/your/kubeconfig"
-3. Restart Claude Code to reload MCP servers
+
+4. Restart Claude Code to reload MCP servers
 
 🔗 Documentation: https://github.com/openshift/openshift-mcp-server
 
@@ -389,8 +407,7 @@ When you execute lifecycle actions, the VM's `runStrategy` changes:
 **RunStrategy Values:**
 - `Always` - VM should always be running (restarts automatically on crash)
 - `Halted` - VM should be stopped (stays off)
-- `Manual` - VM controlled manually (not modified by this skill)
-- `RerunOnFailure` - Restart only on failure (not used by this skill)
+- `Restart` - VM should be stopped and then started again
 
 **Note**: This skill sets `Always` for start/restart and `Halted` for stop.
 
@@ -459,7 +476,7 @@ User: "Start web-server if it's not running"
 ## Security Considerations
 
 - VM lifecycle changes require RBAC permissions (update VirtualMachine resources)
-- Stop operations gracefully shut down VMs (no data loss)
+- Stop operations attempt a graceful shutdown of VMs; guest OS and application data consistency depends on the workload and is not fully guaranteed
 - Start operations consume cluster resources (quota limits apply)
 - All operations audited in Kubernetes API logs
 - KUBECONFIG credentials never exposed in output
