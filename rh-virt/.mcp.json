@@ -1,10 +1,27 @@
 {
   "mcpServers": {
     "openshift-virtualization": {
-      "command": "npx",
-      "args": ["-y", "@openshift/openshift-mcp-server", "--toolset", "kubevirt"],
+      "command": "podman",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--network=host",
+        "--userns=keep-id:uid=65532,gid=65532",
+        "-v", "${KUBECONFIG}:/kubeconfig:ro,Z",
+        "--entrypoint", "/app/kubernetes-mcp-server",
+        "localhost/openshift-mcp-server:latest",
+        "--kubeconfig", "/kubeconfig",
+        "--toolsets", "core,kubevirt"
+      ],
       "env": {
         "KUBECONFIG": "${KUBECONFIG}"
+      },
+      "description": "Red Hat Openshift MCP server for interacting with Openshift Container Platform clusters and its operators",
+      "security": {
+        "isolation": "container",
+        "network": "local",
+        "credentials": "env-only"
       }
     }
   }

@@ -21,11 +21,11 @@ Create virtual machines in OpenShift Virtualization using the `vm_create` tool f
 
 **IMPORTANT:** This skill requires explicit user confirmation before creating VMs. You MUST:
 
-1. **Wait for user confirmation** on all VM configuration parameters before executing `vm_create`
-2. **Do NOT proceed** with VM creation until the user explicitly approves the configuration
-3. **Present configuration clearly** in a table format and wait for user response
-4. **Never auto-execute** VM creation without user approval - creating VMs is a destructive operation that consumes cluster resources
-5. **Allow modifications** - If user wants to change parameters, update and re-confirm before proceeding
+1. **Wait for user confirmation** on all VM configuration parameters before executing `vm_create`.
+2. **Do NOT proceed** with VM creation until the user explicitly approves the configuration.
+3. **Present configuration clearly** in a table format and wait for user response.
+4. **Never auto-execute** VM creation without user approval - creating VMs is a additive operation that consumes cluster resources, affects quotas and may incur cost.
+5. **Allow modifications** - If user wants to change parameters, update and re-confirm before proceeding.
 
 If the user says "no" or wants modifications, address their concerns before proceeding.
 
@@ -75,21 +75,39 @@ When prerequisites fail:
 ❌ Cannot execute vm-creator: MCP server 'openshift-virtualization' is not available
 
 📋 Setup Instructions:
-1. Add openshift-virtualization to .mcp.json:
+1. Build the OpenShift MCP server container image locally:
+   git clone https://github.com/openshift/openshift-mcp-server.git
+   cd openshift-mcp-server
+   podman build -t localhost/openshift-mcp-server:latest -f Dockerfile .
+
+2. Add openshift-virtualization to .mcp.json:
    {
      "mcpServers": {
        "openshift-virtualization": {
-         "command": "npx",
-         "args": ["-y", "@openshift/openshift-mcp-server", "--toolset", "kubevirt"],
+         "command": "podman",
+         "args": [
+           "run",
+           "--rm",
+           "-i",
+           "--network=host",
+           "--userns=keep-id:uid=65532,gid=65532",
+           "-v", "${KUBECONFIG}:/kubeconfig:ro,Z",
+           "--entrypoint", "/app/kubernetes-mcp-server",
+           "localhost/openshift-mcp-server:latest",
+           "--kubeconfig", "/kubeconfig",
+           "--toolsets", "core,kubevirt"
+         ],
          "env": {
            "KUBECONFIG": "${KUBECONFIG}"
          }
        }
      }
    }
-2. Set KUBECONFIG environment variable:
+
+3. Set KUBECONFIG environment variable:
    export KUBECONFIG="/path/to/your/kubeconfig"
-3. Restart Claude Code to reload MCP servers
+
+4. Restart Claude Code to reload MCP servers
 
 🔗 Documentation: https://github.com/openshift/openshift-mcp-server
 
@@ -196,7 +214,7 @@ Call `vm_create` with the confirmed parameters from Step 1.
   "namespace": "<namespace>",           // REQUIRED
   "name": "<vm-name>",                  // REQUIRED
   "workload": "<os-choice>",            // OPTIONAL (default: "fedora")
-  "size": "<small|medium|large>",       // OPTIONAL
+  "size": "<small|medium|large|xlarge>",// OPTIONAL
   "storage": "<disk-size>",             // OPTIONAL (default: "30Gi")
   "autostart": <true|false>             // OPTIONAL (default: false)
 }

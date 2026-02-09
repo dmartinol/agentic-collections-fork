@@ -22,8 +22,13 @@ List and inspect virtual machines in OpenShift Virtualization clusters. This ski
 **Required MCP Server**: `openshift-virtualization` ([OpenShift MCP Server](https://github.com/openshift/openshift-mcp-server))
 
 **Required MCP Tools**:
-- Kubernetes API access for VirtualMachine resources (via MCP server)
-- Standard Kubernetes resource listing and retrieval capabilities
+- `resources_list` (from openshift-virtualization) - List Kubernetes resources including VirtualMachines
+- `resources_get` (from openshift-virtualization) - Get specific Kubernetes resource details
+
+**Fallback CLI Commands** (if MCP tools are unavailable):
+- `oc get virtualmachines` - List VirtualMachines using OpenShift CLI
+- `oc get vm` - Shorthand for listing VirtualMachines
+- `oc get vm <name> -n <namespace> -o yaml` - Get VM details in YAML format
 
 **Required Environment Variables**:
 - `KUBECONFIG` - Path to Kubernetes configuration file with cluster access
@@ -57,27 +62,46 @@ When prerequisites fail:
 ❌ Cannot execute vm-inventory: MCP server 'openshift-virtualization' is not available
 
 📋 Setup Instructions:
-1. Add openshift-virtualization to .mcp.json:
+1. Build the OpenShift MCP server container image locally:
+   git clone https://github.com/openshift/openshift-mcp-server.git
+   cd openshift-mcp-server
+   podman build -t localhost/openshift-mcp-server:latest -f Dockerfile .
+
+2. Add openshift-virtualization to .mcp.json:
    {
      "mcpServers": {
        "openshift-virtualization": {
-         "command": "npx",
-         "args": ["-y", "@openshift/openshift-mcp-server", "--toolset", "kubevirt"],
+         "command": "podman",
+         "args": [
+           "run",
+           "--rm",
+           "-i",
+           "--network=host",
+           "--userns=keep-id:uid=65532,gid=65532",
+           "-v", "${KUBECONFIG}:/kubeconfig:ro,Z",
+           "--entrypoint", "/app/kubernetes-mcp-server",
+           "localhost/openshift-mcp-server:latest",
+           "--kubeconfig", "/kubeconfig",
+           "--toolsets", "core,kubevirt"
+         ],
          "env": {
            "KUBECONFIG": "${KUBECONFIG}"
          }
        }
      }
    }
-2. Set KUBECONFIG environment variable:
+
+3. Set KUBECONFIG environment variable:
    export KUBECONFIG="/path/to/your/kubeconfig"
-3. Restart Claude Code to reload MCP servers
+
+4. Restart Claude Code to reload MCP servers
 
 🔗 Documentation: https://github.com/openshift/openshift-mcp-server
 
 ❓ How would you like to proceed?
 Options:
 - "setup" - Help configure the MCP server now
+- "cli" - Use OpenShift CLI commands as fallback (requires KUBECONFIG)
 - "skip" - Skip this skill
 - "abort" - Stop workflow
 
@@ -85,6 +109,11 @@ Please respond with your choice.
 ```
 
 ⚠️ **SECURITY**: Never display actual KUBECONFIG path or credential values in output.
+
+**Note on Fallback Behavior**:
+- If MCP server is unavailable but KUBECONFIG is set, the skill CAN proceed with CLI commands
+- Always offer the user the choice between setup (MCP) or CLI fallback
+- CLI fallback requires explicit user confirmation before executing any commands
 
 ## When to Use This Skill
 
@@ -110,23 +139,70 @@ Please respond with your choice.
 
 ## Workflow
 
+**CRITICAL EXECUTION PATTERN**:
+1. **ALWAYS attempt MCP server tools FIRST** - Try `resources_list` or `resources_get` from the openshift-virtualization MCP server
+2. **If MCP tools fail or are unavailable** - Propose to user to use CLI commands (`oc get vm`, `oc get virtualmachines`)
+3. **Never skip MCP attempt** - Even if you suspect they might not be available, always try them first
+
+**Tool Execution Priority**:
+- **Primary**: MCP tools (`resources_list`, `resources_get`) from openshift-virtualization server
+- **Fallback**: CLI commands (`oc`) - Only after MCP tools fail and with user confirmation
+
+**MCP Tool Reference**:
+- Tool source: https://github.com/openshift/openshift-mcp-server/blob/main/pkg/toolsets/core/resources.go
+- Tool names: `resources_list`, `resources_get`
+- These tools provide direct access to Kubernetes resources through the MCP protocol
+
 ### Workflow A: List All VMs (Across All Namespaces)
 
-**Step 1: Query VirtualMachine Resources**
+**Step 1: Query VirtualMachine Resources Using MCP Tool**
 
-Use Kubernetes API to list all VirtualMachine resources across namespaces.
+**PRIMARY: MCP Tool**: `resources_list` (from openshift-virtualization)
 
-**Implementation approach:**
+**Parameters**:
+```json
+{
+  "apiVersion": "kubevirt.io/v1",
+  "kind": "VirtualMachine",
+  "allNamespaces": true
+}
 ```
-oc get virtualmachines -A
-# or
-kubectl get vms -A
-```
 
-**Via MCP**: Use standard Kubernetes resource listing with:
-- `apiVersion`: `kubevirt.io/v1`
-- `kind`: `VirtualMachine`
-- No namespace specified (all namespaces)
+**Expected Output**: List of VirtualMachine resources with:
+- Name
+- Namespace
+- Status (Running/Stopped/Pending/Error)
+- Resource specifications (vCPU, memory)
+- Age
+- Node assignment (for running VMs)
+
+**Error Handling**:
+If the MCP tool call fails (tool not found, connection error, etc.):
+
+1. **Report to user**:
+   ```
+   ⚠️ MCP tool 'resources_list' is not available or failed to execute.
+
+   📋 I can use the OpenShift CLI instead to list VMs.
+
+   Would you like me to proceed with: `oc get virtualmachines -A`?
+
+   (Respond "yes" to proceed with CLI, or "setup" to configure MCP server)
+   ```
+
+2. **Wait for user confirmation**
+
+3. **If user approves**, execute CLI fallback:
+   ```bash
+   oc get virtualmachines -A -o json
+   ```
+
+**CLI Fallback Command**:
+```bash
+oc get virtualmachines --all-namespaces -o json
+# or shorthand:
+oc get vm -A -o json
+```
 
 **Step 2: Format and Display Results**
 
@@ -163,15 +239,46 @@ Present VMs organized by namespace with key information:
 
 Ask user for namespace if not provided in the request.
 
-**Step 2: Query VMs in Namespace**
+**Step 2: Query VMs in Namespace Using MCP Tool**
 
-Use Kubernetes API to list VirtualMachines in the specified namespace.
+**PRIMARY: MCP Tool**: `resources_list` (from openshift-virtualization)
 
-**Implementation:**
+**Parameters**:
+```json
+{
+  "apiVersion": "kubevirt.io/v1",
+  "kind": "VirtualMachine",
+  "namespace": "<namespace>"  // REQUIRED - user-provided namespace
+}
 ```
-oc get virtualmachines -n <namespace>
-# or
-kubectl get vms -n <namespace>
+
+**Expected Output**: List of VirtualMachine resources in the specified namespace with status and configuration details
+
+**Error Handling**:
+If the MCP tool call fails:
+
+1. **Report to user**:
+   ```
+   ⚠️ MCP tool 'resources_list' failed.
+
+   📋 Fallback option: Use OpenShift CLI command:
+   `oc get virtualmachines -n <namespace>`
+
+   Would you like me to proceed with the CLI command?
+   ```
+
+2. **Wait for user confirmation**
+
+3. **If approved**, execute CLI fallback:
+   ```bash
+   oc get virtualmachines -n <namespace> -o json
+   ```
+
+**CLI Fallback Command**:
+```bash
+oc get virtualmachines -n <namespace> -o json
+# or shorthand:
+oc get vm -n <namespace> -o json
 ```
 
 **Step 3: Display Namespace-Specific Results**
@@ -196,15 +303,50 @@ Required:
 - VM name
 - Namespace (ask if not provided)
 
-**Step 2: Retrieve VM Resource Details**
+**Step 2: Retrieve VM Resource Details Using MCP Tool**
 
-Use Kubernetes API to get the specific VirtualMachine resource.
+**PRIMARY: MCP Tool**: `resources_get` (from openshift-virtualization)
 
-**Implementation:**
+**Parameters**:
+```json
+{
+  "apiVersion": "kubevirt.io/v1",
+  "kind": "VirtualMachine",
+  "namespace": "<namespace>",  // REQUIRED - user-provided or prompted
+  "name": "<vm-name>"          // REQUIRED - user-provided
+}
 ```
+
+**Expected Output**: Complete VirtualMachine resource specification including:
+- Metadata (name, namespace, labels, annotations, creation timestamp)
+- Spec (instance type, workload, run strategy, resource requirements, volumes, networks)
+- Status (conditions, phase, ready state, node assignment, pod IP, guest agent info)
+
+**Error Handling**:
+If the MCP tool call fails:
+
+1. **Report to user**:
+   ```
+   ⚠️ MCP tool 'resources_get' failed.
+
+   📋 Fallback option: Use OpenShift CLI command:
+   `oc get vm <vm-name> -n <namespace> -o yaml`
+
+   Would you like me to proceed with the CLI command?
+   ```
+
+2. **Wait for user confirmation**
+
+3. **If approved**, execute CLI fallback:
+   ```bash
+   oc get virtualmachine <vm-name> -n <namespace> -o yaml
+   ```
+
+**CLI Fallback Command**:
+```bash
 oc get virtualmachine <vm-name> -n <namespace> -o yaml
-# or
-kubectl get vm <vm-name> -n <namespace> -o yaml
+# or shorthand:
+oc get vm <vm-name> -n <namespace> -o yaml
 ```
 
 **Step 3: Display Detailed Information**
@@ -256,23 +398,66 @@ kubectl get vm <vm-name> -n <namespace> -o yaml
 
 ### Workflow D: Filter VMs by Criteria
 
+**Step 1: Query VMs with Filters Using MCP Tool**
+
+**PRIMARY: MCP Tool**: `resources_list` (from openshift-virtualization)
+
+**Parameters** (with label selector):
+```json
+{
+  "apiVersion": "kubevirt.io/v1",
+  "kind": "VirtualMachine",
+  "allNamespaces": true,           // or specify "namespace": "<namespace>"
+  "labelSelector": "app=web"       // OPTIONAL - filter by labels (e.g., "app=web", "env=production")
+}
+```
+
+**Error Handling**:
+If the MCP tool call fails:
+
+1. **Report to user**:
+   ```
+   ⚠️ MCP tool 'resources_list' failed.
+
+   📋 Fallback: Use OpenShift CLI with label selector:
+   `oc get virtualmachines -A -l app=web`
+
+   Would you like me to proceed with the CLI command?
+   ```
+
+2. **Wait for user confirmation**
+
+3. **If approved**, execute CLI fallback:
+   ```bash
+   oc get virtualmachines -A -l <labelSelector> -o json
+   ```
+
+**CLI Fallback Command**:
+```bash
+# With label selector
+oc get virtualmachines --all-namespaces -l <labelSelector> -o json
+# Example:
+oc get vm -A -l app=web -o json
+```
+
 **Filtering options:**
 
-1. **By Status**:
-   - Running VMs only
-   - Stopped VMs only
-   - VMs in error state
+1. **By Labels** (via labelSelector parameter):
+   - `"app=web"` - Single label match
+   - `"app=web,env=production"` - Multiple labels (AND logic)
+   - `"tier in (frontend,backend)"` - Set-based selector
 
-2. **By Labels**:
-   ```
-   User: "Show me all VMs with label app=web"
+2. **By Status** (post-processing after retrieval):
+   - Filter returned results by status field
+   - Running VMs: `status.printableStatus == "Running"`
+   - Stopped VMs: `status.printableStatus == "Stopped"`
+   - VMs in error state: Check status.conditions for errors
 
-   Filter: -l app=web
-   ```
+3. **By Resource Size** (post-processing after retrieval):
+   - Parse instance type or resource specs from returned VMs
+   - Filter based on vCPU/memory requirements
 
-3. **By Resource Size**:
-   - Large VMs (> 8 vCPU)
-   - Small VMs (< 4 vCPU)
+**Step 2: Display Filtered Results**
 
 **Display filtered results with explanation:**
 ```markdown
@@ -483,11 +668,24 @@ No VMs were found in this namespace.
 ## Dependencies
 
 ### Required MCP Servers
-- `openshift-virtualization` - OpenShift MCP server with KubeVirt toolset
+- `openshift-virtualization` - OpenShift MCP server (https://github.com/openshift/openshift-mcp-server)
 
-### Required MCP Tools
-- Kubernetes API access for VirtualMachine resources
-- Standard resource listing and retrieval capabilities
+### Required MCP Tools (PRIMARY - Always try these first)
+- `resources_list` (from openshift-virtualization) - List Kubernetes resources including VirtualMachines
+  - Parameters: apiVersion, kind, namespace (optional), allNamespaces (optional), labelSelector (optional)
+  - Source: https://github.com/openshift/openshift-mcp-server/blob/main/pkg/toolsets/core/resources.go
+- `resources_get` (from openshift-virtualization) - Get specific Kubernetes resource details
+  - Parameters: apiVersion, kind, namespace, name
+  - Source: https://github.com/openshift/openshift-mcp-server/blob/main/pkg/toolsets/core/resources.go
+
+### CLI Fallback Commands (Use only if MCP tools fail)
+- `oc get virtualmachines` or `oc get vm` - List VirtualMachines
+- `oc get vm <name> -n <namespace>` - Get specific VM
+- `oc get vm -A` - List VMs across all namespaces
+- `oc get vm -n <namespace>` - List VMs in specific namespace
+- `oc get vm -l <selector>` - Filter VMs by label selector
+
+**Important**: Always attempt MCP tools first. Only use CLI commands after MCP tool failure and with user confirmation.
 
 ### Related Skills
 - `vm-creator` - Create VMs after checking inventory
@@ -511,13 +709,14 @@ No VMs were found in this namespace.
 
 ## Example Usage
 
-**Example 1: List all VMs**
+**Example 1: List all VMs (using MCP tool)**
 
 ```
 User: "List all VMs"
 
 Agent: [Invokes /vm-inventory skill]
-       [Queries all VirtualMachine resources across namespaces]
+       [Attempts MCP tool: resources_list with apiVersion="kubevirt.io/v1", kind="VirtualMachine", allNamespaces=true]
+       [Tool succeeds]
 
 ## 📋 Virtual Machines (All Namespaces)
 
@@ -532,13 +731,39 @@ Namespace: development
 Summary: 4 VMs (3 running, 1 stopped)
 ```
 
+**Example 1b: List all VMs (MCP tool unavailable, CLI fallback)**
+
+```
+User: "List all VMs"
+
+Agent: [Invokes /vm-inventory skill]
+       [Attempts MCP tool: resources_list]
+       [Tool fails - not available]
+
+⚠️ MCP tool 'resources_list' is not available.
+
+📋 Fallback option: Use OpenShift CLI command:
+`oc get virtualmachines -A`
+
+Would you like me to proceed with the CLI command?
+
+User: "yes"
+
+Agent: [Executes: oc get virtualmachines -A -o json]
+
+## 📋 Virtual Machines (All Namespaces)
+
+[Same output as above]
+```
+
 **Example 2: Get details of specific VM**
 
 ```
 User: "Show me details of web-server-01 in production"
 
 Agent: [Invokes /vm-inventory skill]
-       [Retrieves specific VirtualMachine resource]
+       [Attempts MCP tool: resources_get with apiVersion="kubevirt.io/v1", kind="VirtualMachine", namespace="production", name="web-server-01"]
+       [Tool succeeds]
 
 ## 🖥️ Virtual Machine Details
 
@@ -566,7 +791,8 @@ Uptime: 12 days
 User: "What VMs are in the development namespace?"
 
 Agent: [Invokes /vm-inventory skill]
-       [Queries VMs in development namespace]
+       [Attempts MCP tool: resources_list with apiVersion="kubevirt.io/v1", kind="VirtualMachine", namespace="development"]
+       [Tool succeeds]
 
 ## 📋 VMs in 'development' namespace
 
@@ -584,7 +810,8 @@ Summary: 2 VMs (1 running, 1 stopped)
 User: "List VMs in namespace test"
 
 Agent: [Invokes /vm-inventory skill]
-       [Queries VMs in test namespace]
+       [Attempts MCP tool: resources_list with apiVersion="kubevirt.io/v1", kind="VirtualMachine", namespace="test"]
+       [Returns empty list]
 
 ## No Virtual Machines Found
 
