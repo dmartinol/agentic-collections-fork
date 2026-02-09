@@ -333,3 +333,8 @@ Your application is now live!
 | Replicas | Yes (default: 1) | Optional |
 | Create Route | Yes (default: yes) | Yes |
 | Namespace | Yes (from kubeconfig) | Yes |
+
+## Reference Documentation
+
+For detailed guidance, see:
+- [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (oc), cluster access verification

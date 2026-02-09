@@ -595,3 +595,12 @@ All tools from child skills:
 | Deploy | `resources_create_or_update`, `pod_list`, `pod_logs` |
 | Helm | `helm_install`, `helm_upgrade`, `helm_status`, `helm_list`, `pods_list` |
 | Rollback | `resources_delete`, `helm_uninstall`, `helm_rollback` |
+
+## Reference Documentation
+
+For detailed guidance, see:
+- [docs/builder-images.md](../docs/builder-images.md) - Language detection, S2I builder images
+- [docs/image-selection-criteria.md](../docs/image-selection-criteria.md) - Image variant selection, LTS timelines
+- [docs/python-s2i-entrypoints.md](../docs/python-s2i-entrypoints.md) - Python S2I configuration
+- [docs/rhel-deployment.md](../docs/rhel-deployment.md) - RHEL host deployment (when delegating to /rhel-deploy)
+- [docs/prerequisites.md](../docs/prerequisites.md) - All required tools by skill

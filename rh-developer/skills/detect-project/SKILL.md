@@ -299,3 +299,10 @@ Returns: Actual file content as text
 
 ### Terminal (fallback)
 - `run_terminal_cmd` - Only if user selects "Clone & Inspect" for private repos
+
+## Reference Documentation
+
+For detailed guidance, see:
+- [docs/builder-images.md](../docs/builder-images.md) - Language detection matrix, version-to-image mapping, S2I builder selection
+- [docs/python-s2i-entrypoints.md](../docs/python-s2i-entrypoints.md) - Python entry point detection, APP_MODULE configuration
+- [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (git)
