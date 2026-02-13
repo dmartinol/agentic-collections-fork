@@ -201,12 +201,12 @@ Args: playbook-yaml-content CVE-ID
 ```
 
 The skill will:
-- Save playbook YAML to temporary file in `/tmp/` directory (e.g., `/tmp/remediation-CVE-2024-1234.yml`)
-- Convert host path to container path (e.g., `/tmp/file.yml` → `/playbooks/file.yml`)
-- Execute playbook using `execute_playbook` with container path (ansible-mcp-server)
-- Receive job_id and initial status (PENDING)
-- Poll job status using `get_job_status` every 2 seconds
-- Track status transitions: PENDING → RUNNING → COMPLETED
+- Create job template in AAP (if not already exists) using `job-template-creator` skill
+- Launch job from template using `job_templates_launch_retrieve` (aap-mcp-job-management)
+- Receive job_id and initial status
+- Poll job status using `jobs_retrieve` periodically
+- Track status transitions until completion
+- Alternative: Use `playbook-executor` skill for direct execution (requires separate configuration)
 - Report execution results with job details (duration, timestamps)
 - Clean up temporary playbook file from `/tmp/` after completion
 - Suggest verification using remediation-verifier skill

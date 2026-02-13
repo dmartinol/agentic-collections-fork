@@ -1,13 +1,15 @@
 {
   "mcpServers": {
-  "lightspeed-mcp": {
+    "lightspeed-mcp": {
       "command": "podman",
       "args": [
         "run",
         "--rm",
         "-i",
-        "--env", "LIGHTSPEED_CLIENT_ID",
-        "--env", "LIGHTSPEED_CLIENT_SECRET",
+        "--env",
+        "LIGHTSPEED_CLIENT_ID",
+        "--env",
+        "LIGHTSPEED_CLIENT_SECRET",
         "quay.io/redhat-services-prod/insights-management-tenant/insights-mcp/red-hat-lightspeed-mcp:latest"
       ],
       "env": {
@@ -21,20 +23,26 @@
         "credentials": "env-only"
       }
     },
-    "ansible-mcp-server": {
-      "command": "podman",
-      "args": [
-        "run",
-        "--rm",
-        "-i",
-        "-v", "/tmp:/playbooks",
-        "quay.io/dmartino/mock-ansible-mcp-server:latest"
-      ],
-      "description": "Mock Ansible MCP server for playbook execution and job status tracking (accessible only through remediation agent and skills)",
-      "security": {
-        "isolation": "container",
-        "network": "local",
-        "credentials": "none"
+    "aap-mcp-job-management": {
+      "type": "http",
+      "url": "https://${AAP_SERVER}/job_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${AAP_API_TOKEN}"
+      },
+      "env": {
+        "AAP_SERVER": "${AAP_SERVER}",
+        "AAP_API_TOKEN": "${AAP_API_TOKEN}"
+      }
+    },
+    "aap-mcp-inventory-management": {
+      "type": "http",
+      "url": "https://${AAP_SERVER}/inventory_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${AAP_API_TOKEN}"
+      },
+      "env": {
+        "AAP_SERVER": "${AAP_SERVER}",
+        "AAP_API_TOKEN": "${AAP_API_TOKEN}"
       }
     }
   }

@@ -1,7 +1,7 @@
 {
-  "name": "Red Hat SRE Agentic Skills Collection",
+  "name": "Red Hat Support Engineer Agentic Collection",
   "version": "1.0.0",
-  "description": "Site reliability engineering tools and automation for managing Red Hat platforms and infrastructure.",
+  "description": "Technical support and troubleshooting tools for Red Hat products and platforms.",
   "author": {
     "name": "Red Hat Ecosystem Engineering",
     "email": "eco-engineering@redhat.com"
@@ -9,5 +9,5 @@
   "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
   "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
   "license": "Apache-2.0",
-  "keywords": ["sre", "red-hat", "platforms", "products", "automation"]
+  "keywords": ["red-hat", "support", "troubleshooting", "engineering"]
 }

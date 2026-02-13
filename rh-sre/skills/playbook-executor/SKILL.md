@@ -424,7 +424,7 @@ Troubleshooting:
   - Note: Mock implementation simulates job lifecycle
 
 ### Related Skills
-- `mcp-ansible-validator` - **PREREQUISITE** - Validates Ansible MCP server before execution (invoke in Step 0 if not validated in session)
+- `mcp-ansible-validator` - **PREREQUISITE** - Validates ansible-mcp-server before execution (invoke in Step 0 if not validated in session)
 - `playbook-generator` - Generates playbooks that this skill executes
 - `remediation-verifier` - Verifies success after this skill completes execution
 

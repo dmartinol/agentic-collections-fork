@@ -8,14 +8,14 @@ Site Reliability Engineering tools and automation for managing Red Hat platforms
 ## Overview
 
 The rh-sre collection is a reference implementation demonstrating the full agentic architecture with:
-- **10 specialized skills** for discrete SRE tasks
+- **12 specialized skills** for discrete SRE tasks
 - **1 orchestration agent** for complex workflows
 - **AI-optimized documentation** with semantic indexing
-- **2 MCP server integrations** for Red Hat platform access
+- **3 MCP server integrations** (Red Hat Lightspeed, AAP Job Management, AAP Inventory Management)
 
 ## Why Use This Agentic Collection Instead of Raw MCP Tools?
 
-While you could use the underlying MCP servers (`lightspeed-mcp`, `ansible-mcp-server`) directly, the agentic collection provides critical advantages that significantly improve reliability, safety, and user experience:
+While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP servers) directly, the agentic collection provides critical advantages that significantly improve reliability, safety, and user experience:
 
 ### 🎯 **Reliability & Error Prevention**
 
@@ -162,7 +162,7 @@ claude plugin list --json | jq '[.[] | select(.id | contains("redhat"))]'
 
 ## Skills
 
-The pack provides 10 specialized skills for common SRE operations:
+The pack provides 12 specialized skills for common SRE operations:
 
 ### 1. **fleet-inventory** - System Discovery and Fleet Management
 Query and display Red Hat Lightspeed managed system inventory.
@@ -233,7 +233,7 @@ Generate Ansible remediation playbooks following Red Hat best practices.
 - Follows Red Hat standards
 
 ### 6. **playbook-executor** - Ansible Playbook Execution
-Execute Ansible playbooks and track job status.
+Execute Ansible playbooks and track job status (requires separate ansible-mcp-server configuration).
 
 **Use when:**
 - "Execute this remediation playbook"
@@ -241,9 +241,11 @@ Execute Ansible playbooks and track job status.
 
 **What it does:**
 - Saves playbook to `/tmp` directory
-- Executes via ansible-mcp-server
+- Executes via direct Ansible invocation (not configured by default)
 - Monitors job status (PENDING → RUNNING → COMPLETED)
 - Reports execution results
+
+**Note**: This skill requires separate configuration (not included by default in this collection). For AAP-based playbook execution, use the `job-template-creator` skill to create job templates in AAP instead.
 
 ### 7. **remediation-verifier** - Remediation Verification
 Verify that CVE remediations were successfully applied.
@@ -272,19 +274,20 @@ Validate Red Hat Lightspeed MCP server configuration and connectivity.
 - Tests server connectivity and tool availability
 - Reports validation status (PASSED/PARTIAL/FAILED)
 
-### 9. **mcp-ansible-validator** - Ansible MCP Server Validation
-Validate Ansible MCP server configuration (mock implementation).
+### 9. **mcp-aap-validator** - AAP MCP Server Validation
+Validate AAP (Ansible Automation Platform) MCP server configuration and connectivity.
 
 **Use when:**
-- "Validate Ansible MCP"
-- "Check ansible-mcp-server"
-- "Verify playbook execution setup"
+- "Validate AAP MCP"
+- "Check if AAP is configured"
+- "Verify AAP connection"
+- Other skills need to verify AAP MCP server availability
 
 **What it does:**
-- Checks ansible-mcp-server configuration
-- Verifies volume mount setup (/tmp:/playbooks)
-- Tests mock server connectivity
-- Reports validation status
+- Checks both AAP MCP servers (job-management, inventory-management)
+- Verifies environment variables (AAP_SERVER, AAP_API_TOKEN)
+- Tests server connectivity and authentication
+- Reports validation status (PASSED/PARTIAL/FAILED)
 
 ### 10. **execution-summary** - Workflow Execution Report
 Generate concise execution reports for audit and learning purposes.
@@ -300,6 +303,20 @@ Generate concise execution reports for audit and learning purposes.
 - Extracts agents, skills, tools, and docs used
 - Formats in machine-readable format
 - Provides audit trail for workflows
+
+### 11. **job-template-creator** - AAP Job Template Creation
+Create AAP job templates for executing Ansible playbooks through Ansible Automation Platform.
+
+**Use when:**
+- "Create a job template for this playbook"
+- "Set up a template to run remediation playbooks"
+- "Configure AAP to execute this playbook"
+
+**What it does:**
+- Lists available projects and inventories
+- Provides instructions for template creation (Web UI or API)
+- Verifies template creation
+- Prepares for AAP-based playbook execution
 
 ## Agent
 
@@ -334,6 +351,8 @@ The remediator agent orchestrates the CVE-related skills to provide complete CVE
 | "What are the critical CVEs?" | **cve-impact skill** | CVE listing |
 | "Is CVE-X valid?" | **cve-validation skill** | Single validation |
 | "Validate Lightspeed MCP" | **mcp-lightspeed-validator skill** | MCP server validation |
+| "Validate AAP MCP" | **mcp-aap-validator skill** | AAP MCP validation |
+| "Create job template" | **job-template-creator skill** | AAP template setup |
 | "Generate execution summary" | **execution-summary skill** | Audit trail reporting |
 | "Remediate CVE-2024-1234" | **remediator agent** | Multi-step workflow |
 | "Create playbook for CVE-X" | **remediator agent** | Orchestration needed |
@@ -363,7 +382,7 @@ See [docs/INDEX.md](docs/INDEX.md) for the complete documentation map.
 
 ## MCP Server Integrations
 
-The pack integrates with two MCP servers (configured in `.mcp.json`):
+The pack integrates with three MCP servers (configured in `.mcp.json`):
 
 ### 1. **lightspeed-mcp** - Red Hat Lightspeed Platform
 - CVE data and vulnerability management
@@ -373,13 +392,21 @@ The pack integrates with two MCP servers (configured in `.mcp.json`):
 
 **Repository**: https://github.com/redhat/lightspeed-mcp
 
-### 2. **ansible-mcp-server** - Ansible Execution (Mock)
-- Playbook execution and job tracking
-- Status monitoring (PENDING → RUNNING → COMPLETED)
-- Container-isolated execution
-- Volume mount: `/tmp:/playbooks:Z`
+### 2. **aap-mcp-job-management** - AAP Job Management
+- Job template management (list, retrieve, launch)
+- Job execution tracking and monitoring
+- Workflow job management
+- Requires: `AAP_SERVER`, `AAP_API_TOKEN`
 
-**Repository**: https://github.com/dmartinol/mock-ansible-mcp-server
+**Type**: HTTP MCP server
+
+### 3. **aap-mcp-inventory-management** - AAP Inventory Management
+- Inventory and host management
+- Group and variable management
+- System discovery and targeting
+- Requires: `AAP_SERVER`, `AAP_API_TOKEN`
+
+**Type**: HTTP MCP server
 
 ## Sample Workflows
 
@@ -451,20 +478,26 @@ MCP servers are configured in `.mcp.json`:
         "LIGHTSPEED_CLIENT_SECRET": "${LIGHTSPEED_CLIENT_SECRET}"
       }
     },
-    "ansible-mcp-server": {
-      "command": "podman",
-      "args": ["run", "--rm", "-i",
-               "-v", "/tmp:/playbooks:Z",
-               "quay.io/dmartino/mock-ansible-mcp-server:latest"]
+    "aap-mcp-job-management": {
+      "url": "https://${AAP_SERVER}/job_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${AAP_API_TOKEN}"
+      }
+    },
+    "aap-mcp-inventory-management": {
+      "url": "https://${AAP_SERVER}/inventory_management/mcp",
+      "headers": {
+        "Authorization": "Bearer ${AAP_API_TOKEN}"
+      }
     }
   }
 }
 ```
 
 **Key Configuration Notes**:
-- Volume mount: `/tmp:/playbooks:Z` (SELinux label required on RHEL/Fedora)
-- Playbooks saved to `/tmp` on host → `/playbooks` in container
-- Environment variables injected at runtime
+- HTTP MCP servers for AAP use URL-based connections with Bearer token authentication
+- Environment variables (`AAP_SERVER`, `AAP_API_TOKEN`) injected at runtime
+- Container-based server (lightspeed-mcp) uses Podman with environment variable injection
 
 ## Troubleshooting
 
@@ -493,18 +526,28 @@ MCP servers are configured in `.mcp.json`:
    - Inventory Hosts viewer
 3. Regenerate service account secret if expired
 
-### Ansible Playbook Execution Issues
+### AAP MCP Connection Issues
 
-**Problem**: ansible-mcp-server fails to execute playbooks
+**Problem**: AAP MCP servers fail to connect or authenticate
 
 **Solutions**:
-1. Verify container image: `podman pull quay.io/dmartino/mock-ansible-mcp-server:latest`
-2. Check playbook exists: `ls -l /tmp/remediation-*.yml`
-3. Verify volume mount in `.mcp.json`: Should have `"-v", "/tmp:/playbooks:Z"`
-4. Test volume mount:
+1. Verify AAP server is accessible:
    ```bash
-   echo "test" > /tmp/test.yml
-   podman run --rm -v /tmp:/playbooks:Z alpine ls -l /playbooks/test.yml
+   curl -I ${AAP_SERVER}
+   ```
+2. Check API token validity:
+   - Log in to AAP Web UI
+   - Navigate to Users → [Your User] → Tokens
+   - Verify token is not expired
+3. Test API authentication:
+   ```bash
+   curl -H "Authorization: Bearer ${AAP_API_TOKEN}" \
+        ${AAP_SERVER}/api/controller/v2/ping/
+   ```
+4. Verify environment variables are set:
+   ```bash
+   echo $AAP_SERVER
+   echo $AAP_API_TOKEN  # Should show token value
    ```
 
 ### Skills Not Triggering
@@ -539,7 +582,8 @@ rh-sre/
 │   ├── playbook-executor/SKILL.md
 │   ├── remediation-verifier/SKILL.md
 │   ├── mcp-lightspeed-validator/SKILL.md
-│   ├── mcp-ansible-validator/SKILL.md
+│   ├── mcp-aap-validator/SKILL.md
+│   ├── job-template-creator/SKILL.md
 │   └── execution-summary/SKILL.md
 └── docs/                        # AI-optimized documentation
     ├── INDEX.md
@@ -569,7 +613,8 @@ See main repository [CLAUDE.md](../CLAUDE.md) for:
 
 - [Red Hat Lightspeed](https://console.redhat.com/insights)
 - [lightspeed-mcp GitHub](https://github.com/redhat/lightspeed-mcp)
-- [mock-ansible-mcp-server GitHub](https://github.com/dmartinol/mock-ansible-mcp-server)
+- [Ansible Automation Platform](https://www.redhat.com/en/technologies/management/ansible)
+- [AAP REST API Documentation](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/)
 - [Claude Code Documentation](https://docs.anthropic.com/claude-code)
 - [MCP Protocol Specification](https://modelcontextprotocol.io/)
 - [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections)

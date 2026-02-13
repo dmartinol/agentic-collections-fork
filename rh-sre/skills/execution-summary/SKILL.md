@@ -44,7 +44,7 @@ Do NOT use when:
 3. **MCP Tools called** - Look for MCP tool invocations
    - Example: `get_host_details` → `lightspeed-mcp:get_host_details`
    - Example: `vulnerability__get_cve` → `lightspeed-mcp:vulnerability__get_cve`
-   - Example: `execute_playbook` → `ansible-mcp-server:execute_playbook`
+   - Example: `job_templates_launch_retrieve` → `aap-mcp-job-management:job_templates_launch_retrieve`
    - Include server prefix
 
 4. **Documentation consulted** - Look for Read tool calls on documentation files
@@ -109,7 +109,7 @@ Docs: <doc1>,<doc2>,...
 3. **Tool names**: Include MCP server prefix
    - Format: `server-name:tool-name`
    - Example: `lightspeed-mcp:get_host_details`
-   - Example: `ansible-mcp-server:execute_playbook`
+   - Example: `aap-mcp-job-management:job_templates_list`
    - Separate with commas: `lightspeed-mcp:get_cve,lightspeed-mcp:get_host_details`
 
 4. **Doc names**: Path from `docs/` onwards
@@ -133,8 +133,8 @@ I've generated the execution summary for this workflow:
 
 **** EXECUTION SUMMARY START ****
 Agents: rh-sre:remediator
-Skills: rh-sre:fleet-inventory,rh-sre:cve-impact,rh-sre:playbook-generator
-Tools: lightspeed-mcp:get_host_details,lightspeed-mcp:get_cve,ansible-mcp-server:execute_playbook
+Skills: rh-sre:fleet-inventory,rh-sre:cve-impact,rh-sre:playbook-generator,rh-sre:job-template-creator
+Tools: lightspeed-mcp:get_host_details,lightspeed-mcp:get_cve,aap-mcp-job-management:job_templates_list
 Docs: docs/ansible/cve-remediation-templates.md,docs/insights/vulnerability-logic.md,skills/fleet-inventory/SKILL.md
 **** EXECUTION SUMMARY END ****
 
@@ -199,8 +199,8 @@ I've generated the execution summary for this workflow:
 
 **** EXECUTION SUMMARY START ****
 Agents: rh-sre:remediator
-Skills: rh-sre:cve-validation,rh-sre:cve-impact,rh-sre:system-context,rh-sre:playbook-generator,rh-sre:playbook-executor
-Tools: lightspeed-mcp:get_cve,lightspeed-mcp:get_cve_systems,lightspeed-mcp:get_host_details,lightspeed-mcp:create_vulnerability_playbook,ansible-mcp-server:execute_playbook
+Skills: rh-sre:cve-validation,rh-sre:cve-impact,rh-sre:system-context,rh-sre:playbook-generator,rh-sre:job-template-creator
+Tools: lightspeed-mcp:get_cve,lightspeed-mcp:get_cve_systems,lightspeed-mcp:get_host_details,lightspeed-mcp:create_vulnerability_playbook,aap-mcp-job-management:job_templates_launch_retrieve
 Docs: docs/references/cvss-scoring.md,docs/ansible/cve-remediation-templates.md,docs/insights/vulnerability-logic.md,skills/playbook-generator/SKILL.md
 **** EXECUTION SUMMARY END ****
 
