@@ -135,6 +135,15 @@ function createPackCard(pack) {
     
     div.appendChild(h3);
 
+    // Owner subtitle
+    const owner = document.createElement('p');
+    owner.className = 'pack-owner';
+    owner.textContent = 'By Red Hat';
+    owner.style.color = 'var(--text-muted)';
+    owner.style.fontSize = '0.85rem';
+    owner.style.marginTop = '0.25rem';
+    div.appendChild(owner);
+
     // Version
     const version = document.createElement('p');
     version.className = 'version';
@@ -179,11 +188,16 @@ function createPackCard(pack) {
 
     div.appendChild(stats);
 
-    // View button
-    const button = document.createElement('button');
-    button.textContent = 'View Details';
-    button.onclick = () => showPackDetails(pack.name);
-    div.appendChild(button);
+    // View details link
+    const link = document.createElement('a');
+    link.className = 'card-link';
+    link.textContent = 'View details';
+    link.href = '#';
+    link.onclick = (e) => {
+        e.preventDefault();
+        showPackDetails(pack.name);
+    };
+    div.appendChild(link);
 
     return div;
 }
@@ -292,8 +306,8 @@ function createMCPCard(server) {
         // HTTP remote server
         connectionInfo.textContent = `Type: HTTP Remote`;
     } else {
-        // Command-based server
-        connectionInfo.textContent = `Container: ${server.command}`;
+        // Container-based server
+        connectionInfo.textContent = `Type: Container`;
     }
 
     div.appendChild(connectionInfo);
@@ -314,12 +328,17 @@ function createMCPCard(server) {
         div.appendChild(toolsInfo);
     }
 
-    // Details button
-    const detailsButton = document.createElement('button');
-    detailsButton.textContent = 'Details';
-    detailsButton.onclick = () => showMCPDetails(server.name, server.pack);
-    detailsButton.style.marginTop = 'auto';
-    div.appendChild(detailsButton);
+    // View details link
+    const link = document.createElement('a');
+    link.className = 'card-link';
+    link.textContent = 'View details';
+    link.href = '#';
+    link.style.marginTop = 'auto';
+    link.onclick = (e) => {
+        e.preventDefault();
+        showMCPDetails(server.name, server.pack);
+    };
+    div.appendChild(link);
 
     return div;
 }
@@ -434,6 +453,15 @@ function showPackDetails(packName) {
     const h2 = document.createElement('h2');
     h2.textContent = pack.plugin.name || pack.name;
     titleGroup.appendChild(h2);
+
+    // Owner subtitle
+    const ownerSubtitle = document.createElement('div');
+    ownerSubtitle.className = 'pack-owner-subtitle';
+    ownerSubtitle.textContent = 'By Red Hat';
+    ownerSubtitle.style.color = 'var(--text-muted)';
+    ownerSubtitle.style.fontSize = '0.95rem';
+    ownerSubtitle.style.marginTop = '0.5rem';
+    titleGroup.appendChild(ownerSubtitle);
 
     // Counts (skills + agents + MCPs)
     const counts = document.createElement('div');

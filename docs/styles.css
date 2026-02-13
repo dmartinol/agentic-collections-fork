@@ -338,23 +338,20 @@ section.collapsed .grid {
     font-size: 0.85rem;
 }
 
-.card button {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius);
+.card-link {
+    color: var(--primary);
+    text-decoration: none;
     cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 500;
     transition: all var(--transition-speed) ease;
     margin-top: auto;
+    display: inline-block;
 }
 
-.card button:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(238, 0, 0, 0.3);
+.card-link:hover {
+    text-decoration: underline;
+    color: var(--primary-dark);
 }
 
 /* README badge in top-right corner of MCP cards */
