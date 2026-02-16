@@ -526,6 +526,53 @@ sudo rm /etc/systemd/system/[app-name].service
 Your application is live!
 ```
 
+### Phase 5a: Handle Deployment Failure
+
+If the service fails to start or is not accessible:
+
+```markdown
+## Deployment Failed
+
+The service did not start successfully.
+
+**Service Status:**
+```
+[systemctl status output showing failure]
+```
+
+**Recent Errors:**
+| Time | Error |
+|------|-------|
+| [time] | [error from journalctl] |
+
+---
+
+**Would you like me to diagnose the issue?**
+
+1. **Debug RHEL** (`/debug-rhel`) - Full system diagnosis
+   - Analyzes systemd status, journal logs, SELinux denials, firewall rules
+   - Identifies root cause and suggests remediation
+
+2. **Debug Container** (`/debug-container`) - If using container deployment
+   - Analyzes container state, logs, exit codes
+
+3. **View full logs** - Show complete journalctl output
+
+4. **Check SELinux** - Quick SELinux denial check
+
+5. **Check firewall** - Quick firewall port check
+
+6. **Stop and clean up**
+
+Select an option:
+```
+
+**WAIT for user to select an option.**
+
+- If user selects "Debug RHEL" → Invoke `/debug-rhel` skill
+- If user selects "Debug Container" → Invoke `/debug-container` skill
+- After debugging → Offer to retry deployment
+
 ## Delegated Skills
 
 This skill delegates to other skills when needed:
@@ -539,8 +586,17 @@ When delegating to `/recommend-image`:
 2. Receive back: `BUILDER_IMAGE`, `IMAGE_VARIANT`, `SELECTION_RATIONALE`
 3. Use `BUILDER_IMAGE` as the FROM image in generated Containerfile
 
+## Related Skills
+
+| Skill | Use When |
+|-------|----------|
+| `/debug-rhel` | systemd failures, SELinux denials, firewall blocking |
+| `/debug-container` | Container startup issues on RHEL host |
+
 ## Reference Documentation
 
 For detailed guidance, see:
 - [docs/rhel-deployment.md](../docs/rhel-deployment.md) - Comprehensive RHEL deployment reference: systemd unit templates, SELinux configuration, firewall commands, runtime package mapping
+- [docs/selinux-troubleshooting.md](../docs/selinux-troubleshooting.md) - SELinux denial analysis and fixes
+- [docs/debugging-patterns.md](../docs/debugging-patterns.md) - Common error patterns and troubleshooting
 - [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (ssh, podman)
