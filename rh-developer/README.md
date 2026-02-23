@@ -14,6 +14,22 @@ A Claude Code plugin for building and deploying applications on Red Hat platform
 | `/rhel-deploy`         | Deploy to standalone RHEL/Fedora systems via SSH                                           |
 | `/containerize-deploy` | End-to-end workflow from source to running app (use if not sure which strategy to choose)) |
 
+### Troubleshooting
+
+| Command              | Description                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| `/debug-pod`         | Diagnose pod failures on OpenShift (CrashLoopBackOff, ImagePullBackOff, OOMKilled, pending pods) |
+| `/debug-build`       | Diagnose OpenShift build failures (S2I builds, Docker/Podman builds, BuildConfig issues)   |
+| `/debug-network`     | Diagnose OpenShift service connectivity (DNS, endpoints, routes, network policies)          |
+| `/debug-container`   | Diagnose local Podman/Docker container issues (startup failures, OOM kills, image pull errors) |
+| `/debug-rhel`        | Diagnose RHEL system issues (systemd failures, SELinux denials, firewall blocking)         |
+
+### Environment
+
+| Command                  | Description                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| `/validate-environment`  | Check required tools and environment setup (oc, helm, podman, git, cluster connectivity) |
+
 ## Prerequisites
 
 - OpenShift cluster access (for S2I and OpenShift deployments)
