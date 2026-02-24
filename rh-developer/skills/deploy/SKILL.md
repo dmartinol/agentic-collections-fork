@@ -273,6 +273,54 @@ Waiting for pods to be ready...
 [Poll until ready or timeout after 5 minutes]
 ```
 
+### Step 6a: Handle Deployment Failure
+
+If pods do not become ready within the timeout period, or pods are in error states (CrashLoopBackOff, ImagePullBackOff, Pending):
+
+```markdown
+## Deployment Failed
+
+**Status:** Rollout did not complete successfully
+
+**Pod Status:**
+| Pod | Status | Ready | Restarts | Reason |
+|-----|--------|-------|----------|--------|
+| [app-name]-xxx-yyy | [CrashLoopBackOff/ImagePullBackOff/Pending] | 0/1 | [count] | [reason] |
+
+**Events:**
+| Time | Type | Message |
+|------|------|---------|
+| [time] | Warning | [event message] |
+
+---
+
+**Would you like me to diagnose the issue?**
+
+1. **Debug Pod** - Investigate pod failures (runs `/debug-pod`)
+   - Analyzes pod status, events, logs, and resource constraints
+   - Identifies root cause (OOM, image pull issues, crashes, etc.)
+
+2. **Debug Network** - Investigate connectivity issues (runs `/debug-network`)
+   - Checks service endpoints, route status, network policies
+   - Useful if pods are running but service is unreachable
+
+3. **View logs manually** - Show pod logs without full diagnosis
+
+4. **Rollback deployment** - Delete created resources and stop
+
+5. **Continue waiting** - Wait another 5 minutes for rollout
+
+Select an option:
+```
+
+**WAIT for user to select an option.**
+
+- If user selects "Debug Pod" → Invoke `/debug-pod` skill with pod name
+- If user selects "Debug Network" → Invoke `/debug-network` skill with service name
+- If user selects "View logs" → Show pod logs using `pod_logs`
+- If user selects "Rollback" → Delete Deployment, Service, Route
+- If user selects "Continue" → Wait another polling cycle
+
 ### Step 7: Deployment Complete
 
 ```markdown
@@ -334,7 +382,16 @@ Your application is now live!
 | Create Route | Yes (default: yes) | Yes |
 | Namespace | Yes (from kubeconfig) | Yes |
 
+## Related Skills
+
+| Skill | Use When |
+|-------|----------|
+| `/debug-pod` | Pod failures (CrashLoopBackOff, OOMKilled, ImagePullBackOff) |
+| `/debug-network` | Service connectivity issues (no endpoints, 503 errors) |
+| `/debug-build` | Build failures before deployment |
+
 ## Reference Documentation
 
 For detailed guidance, see:
 - [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (oc), cluster access verification
+- [docs/debugging-patterns.md](../docs/debugging-patterns.md) - Common error patterns and troubleshooting

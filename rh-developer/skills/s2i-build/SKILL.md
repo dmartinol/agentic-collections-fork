@@ -376,13 +376,19 @@ If build fails:
 - [relevant troubleshooting tips]
 
 **Options:**
-1. View full build logs
-2. Delete failed build and retry
-3. Update BuildConfig and retry
-4. Cancel and troubleshoot
+1. **Debug Build** (`/debug-build`) - Full build diagnosis
+   - Analyzes BuildConfig, build logs, source access, registry auth
+   - Identifies root cause and suggests remediation
+2. View full build logs
+3. Delete failed build and retry
+4. Update BuildConfig and retry
+5. Cancel and troubleshoot
 
 What would you like to do?
 ```
+
+- If user selects "Debug Build" → Invoke `/debug-build` skill with build name
+- After debugging → Offer to retry build
 
 ## MCP Tools Used
 
@@ -415,9 +421,17 @@ On success, these values are available for `/deploy`:
 | `IMAGESTREAM_TAG` | `[app]:latest` |
 | `BUILD_NAME` | `[app]-1` |
 
+## Related Skills
+
+| Skill | Use When |
+|-------|----------|
+| `/debug-build` | Build failures (source access, dependencies, registry issues) |
+| `/deploy` | After successful build, to deploy the image |
+
 ## Reference Documentation
 
 For detailed guidance, see:
 - [docs/builder-images.md](../docs/builder-images.md) - S2I builder image selection, version mapping
 - [docs/python-s2i-entrypoints.md](../docs/python-s2i-entrypoints.md) - Python APP_MODULE configuration, entry point troubleshooting
+- [docs/debugging-patterns.md](../docs/debugging-patterns.md) - Common build error patterns and troubleshooting
 - [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (oc)

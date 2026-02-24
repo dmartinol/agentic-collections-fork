@@ -475,6 +475,34 @@ Continue to deployment? (yes/no)
 Rollout complete!
 ```
 
+**If rollout fails** (pods not ready, CrashLoopBackOff, ImagePullBackOff, etc.):
+
+```markdown
+## Deployment Failed
+
+The deployment did not complete successfully.
+
+**Pod Status:**
+| Pod | Status | Ready | Restarts |
+|-----|--------|-------|----------|
+| [app-name]-xxx-yyy | [status] | 0/1 | [count] |
+
+---
+
+**Would you like me to diagnose the issue?**
+
+1. **Debug Pod** (`/debug-pod`) - Investigate pod failures
+2. **Debug Network** (`/debug-network`) - Check service/route connectivity
+3. **Debug Build** (`/debug-build`) - Re-check build if image issues
+4. **View logs manually**
+5. **Rollback and stop**
+
+Select an option:
+```
+
+- If user selects a debug option → Invoke the corresponding skill
+- After debugging → Offer to retry deployment
+
 ---
 
 ## HELM PATH (If DEPLOYMENT_STRATEGY is "Helm")
@@ -596,6 +624,15 @@ All tools from child skills:
 | Helm | `helm_install`, `helm_upgrade`, `helm_status`, `helm_list`, `pods_list` |
 | Rollback | `resources_delete`, `helm_uninstall`, `helm_rollback` |
 
+## Related Skills
+
+| Skill | Use When |
+|-------|----------|
+| `/debug-pod` | Pod failures (CrashLoopBackOff, OOMKilled, ImagePullBackOff) |
+| `/debug-build` | S2I or Podman build failures |
+| `/debug-network` | Service connectivity issues (no endpoints, 503 errors) |
+| `/debug-rhel` | RHEL deployment failures (systemd, SELinux, firewall) |
+
 ## Reference Documentation
 
 For detailed guidance, see:
@@ -603,4 +640,5 @@ For detailed guidance, see:
 - [docs/image-selection-criteria.md](../docs/image-selection-criteria.md) - Image variant selection, LTS timelines
 - [docs/python-s2i-entrypoints.md](../docs/python-s2i-entrypoints.md) - Python S2I configuration
 - [docs/rhel-deployment.md](../docs/rhel-deployment.md) - RHEL host deployment (when delegating to /rhel-deploy)
+- [docs/debugging-patterns.md](../docs/debugging-patterns.md) - Common error patterns and troubleshooting
 - [docs/prerequisites.md](../docs/prerequisites.md) - All required tools by skill
