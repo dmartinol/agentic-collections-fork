@@ -2,7 +2,8 @@
 name: debug-rhel
 description: |
   Diagnose RHEL system issues including systemd service failures, SELinux denials, firewall blocking, and system resource problems. Automates multi-step diagnosis: journalctl log analysis, SELinux denial detection (ausearch), firewall rule inspection, and systemd unit status. Use this skill when applications fail on standalone RHEL/Fedora/CentOS hosts deployed via /rhel-deploy. Triggers on /debug-rhel command or phrases like "service won't start on RHEL", "SELinux blocking", "systemd failed", "firewall blocking".
-user_invocable: true
+metadata:
+  user_invocable: "true"
 ---
 
 # /debug-rhel Skill
