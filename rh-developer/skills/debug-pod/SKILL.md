@@ -2,7 +2,8 @@
 name: debug-pod
 description: |
   Diagnose pod failures on OpenShift including CrashLoopBackOff, ImagePullBackOff, OOMKilled, and pending pods. Automates multi-step diagnosis: pod status, events, logs (current + previous), and resource constraint analysis. Use this skill when pods are not running, restarting frequently, or stuck in non-ready states. Triggers on /debug-pod command or phrases like "my pod is crashing", "pod won't start", "CrashLoopBackOff", "ImagePullBackOff", "OOMKilled".
-user_invocable: true
+metadata:
+  user_invocable: "true"
 ---
 
 # /debug-pod Skill
