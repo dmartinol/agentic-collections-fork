@@ -291,7 +291,7 @@ Continue to full diagnosis summary? (yes/no)
 After fixing the issue:
 ```bash
 # Rerun using the same PipelineRun spec
-oc create -f <(oc get pipelinerun [name] -o json | jq 'del(.metadata.resourceVersion, .metadata.uid, .metadata.creationTimestamp, .status) | .metadata.name = .metadata.name + "-retry"') -n [namespace]
+oc create -f <(oc get pipelinerun [name] -n [namespace] -o json | jq 'del(.metadata.resourceVersion, .metadata.uid, .metadata.creationTimestamp, .status) | .metadata.name = .metadata.name + "-retry"') -n [namespace]
 
 # Or using tkn CLI (if available)
 tkn pipeline start [pipeline-name] --use-pipelinerun [pipelinerun-name] -n [namespace]
