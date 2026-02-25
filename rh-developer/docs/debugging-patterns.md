@@ -423,7 +423,7 @@ oc logs build/[build-name]
 ### Pipeline/Tekton Debugging
 
 ```bash
-# List PipelineRuns (latest first)
+# List PipelineRuns (oldest first)
 oc get pipelinerun --sort-by='.metadata.creationTimestamp'
 
 # Get PipelineRun details
