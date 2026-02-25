@@ -248,7 +248,7 @@ Example timeline:
 
 **Format**:
 ```
-https://{AAP_SERVER}/#/jobs/playbook/{JOB_ID}
+https://{your-aap-instance}/#/jobs/playbook/{JOB_ID}
 ```
 
 **Example**:
@@ -268,7 +268,7 @@ https://aap.example.com/#/jobs/playbook/1235
 
 **Format**:
 ```
-https://{AAP_SERVER}/#/templates/job_template/{TEMPLATE_ID}/details
+https://{your-aap-instance}/#/templates/job_template/{TEMPLATE_ID}/details
 ```
 
 **Example**:
@@ -280,7 +280,7 @@ https://aap.example.com/#/templates/job_template/10/details
 
 **Format**:
 ```
-https://{AAP_SERVER}/#/projects/{PROJECT_ID}/details
+https://{your-aap-instance}/#/projects/{PROJECT_ID}/details
 ```
 
 ## Troubleshooting Common Execution Failures

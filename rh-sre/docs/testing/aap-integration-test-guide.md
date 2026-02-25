@@ -30,7 +30,7 @@ This guide provides a comprehensive testing plan for the AAP MCP integration, co
 
 2. **Environment Variables**:
    ```bash
-   export AAP_SERVER="https://your-aap-server.com"
+   export AAP_MCP_SERVER="https://your-aap-mcp-endpoint.com"
    export AAP_API_TOKEN="your-api-token"
    ```
 
@@ -49,7 +49,7 @@ This guide provides a comprehensive testing plan for the AAP MCP integration, co
 
 Before starting tests, verify:
 
-- [ ] AAP Web UI accessible at `${AAP_SERVER}`
+- [ ] AAP Web UI accessible (your AAP instance URL)
 - [ ] Can log in with your credentials
 - [ ] API token has been generated
 - [ ] Environment variables are set (run: `env | grep AAP`)
@@ -99,7 +99,7 @@ Test Phase 4: Performance Testing
 Configuration:
 ✓ MCP server aap-mcp-job-management configured
 ✓ MCP server aap-mcp-inventory-management configured
-✓ Environment variable AAP_SERVER is set
+✓ Environment variable AAP_MCP_SERVER is set
 ✓ Environment variable AAP_API_TOKEN is set
 ✓ Job management server connectivity verified
 ✓ Inventory management server connectivity verified
@@ -587,7 +587,7 @@ Date: YYYY-MM-DD
 **Symptoms**: Validation fails with connection errors
 
 **Solutions**:
-1. Verify `AAP_SERVER` environment variable is correct
+1. Verify `AAP_MCP_SERVER` environment variable is correct (must point to the MCP endpoint of the AAP server)
 2. Check API token is valid and not expired
 3. Ensure AAP server is accessible from your network
 4. Review AAP MCP server logs for errors

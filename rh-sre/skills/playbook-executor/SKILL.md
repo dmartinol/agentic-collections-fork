@@ -23,6 +23,7 @@ This skill executes Ansible remediation playbooks through AAP (Ansible Automatio
 **Required MCP Tools**:
 - `job_templates_list` (from aap-mcp-job-management) - List job templates
 - `job_templates_retrieve` (from aap-mcp-job-management) - Get template details
+- `projects_list` (from aap-mcp-job-management) - Get project name and scm_url for Git Flow
 - `job_templates_launch_retrieve` (from aap-mcp-job-management) - Launch jobs
 - `jobs_retrieve` (from aap-mcp-job-management) - Get job status
 - `jobs_stdout_retrieve` (from aap-mcp-job-management) - Get console output
@@ -32,7 +33,7 @@ This skill executes Ansible remediation playbooks through AAP (Ansible Automatio
 - `hosts_list` (from aap-mcp-inventory-management) - List inventory hosts
 
 **Required Environment Variables**:
-- `AAP_SERVER` - AAP server URL
+- `AAP_MCP_SERVER` - Base URL for the MCP endpoint of the AAP server (must point to the AAP MCP gateway)
 - `AAP_API_TOKEN` - AAP API authentication token
 
 ### Prerequisite Validation
@@ -55,7 +56,7 @@ Use the Skill tool:
 **Human Notification on Failure**:
 If prerequisites are not met:
 - ❌ "Cannot proceed: AAP MCP servers are not available"
-- 📋 "Setup required: Configure AAP_SERVER and AAP_API_TOKEN environment variables"
+- 📋 "Setup required: Configure AAP_MCP_SERVER and AAP_API_TOKEN environment variables"
 - ❓ "How would you like to proceed? (setup now / skip / abort)"
 - ⏸️ Wait for user decision
 
@@ -94,11 +95,19 @@ Use the Skill tool:
 - **If validation PARTIAL**: Warn user and ask to proceed
 - **If validation FAILED**: Stop execution, user must set up AAP MCP servers
 
-### Phase 1: Job Template Selection/Creation
+### Phase 1: Job Template Selection and Playbook Preparation
 
-**Goal**: Identify or create an AAP job template suitable for executing the remediation playbook.
+**Goal**: Identify an AAP job template suitable for executing the remediation playbook, or prepare the playbook for execution via git override or template creation.
 
-#### Step 1.1: List Available Job Templates
+**Input**: Playbook content and metadata from playbook-generator (filename, CVE ID, target systems). Playbook path is derived from metadata: `playbooks/remediation/<filename>` (e.g., `playbooks/remediation/remediation-CVE-2025-49794.yml` or `playbooks/remediation/remediation-CVE-2025-49794-playbook.yml`).
+
+#### Step 1.1: Derive Playbook Path
+
+From playbook metadata (filename from playbook-generator):
+- Use convention `playbooks/remediation/<filename>`
+- Support both `remediation-CVE-*.yml` and `remediation-CVE-*-playbook.yml` patterns.
+
+#### Step 1.2: List and Filter Templates
 
 **MCP Tool**: `job_templates_list` (from aap-mcp-job-management)
 
@@ -106,144 +115,83 @@ Use the Skill tool:
 - `page_size`: 50 (retrieve up to 50 templates)
 - `search`: "" (search for all templates)
 
-**Expected Output**:
-```json
-{
-  "count": 3,
-  "results": [
-    {
-      "id": 10,
-      "name": "CVE Remediation Template",
-      "project": 5,
-      "inventory": 1,
-      "playbook": "playbooks/remediation/remediation-template.yml"
-    }
-  ]
-}
+For each template in results, call `job_templates_retrieve(id)` to get full details. Apply [job-template-remediation-validator](../job-template-remediation-validator/SKILL.md) criteria (inventory, project, playbook, credentials, become_enabled). Build two lists:
+- **exact_match**: `template.playbook` equals `our_playbook_path` (normalize slashes; match if equal or basenames match)
+- **compatible_other**: Passes validation but different playbook path
+
+**Path normalization**: Normalize slashes, handle `playbooks/remediation/` prefix. Match if `template.playbook` equals `our_playbook_path` or if basenames match.
+
+#### Step 1.3: Scenario Selection
+
+**Scenario 1 - Same playbook path** (exact_match not empty):
+
+Prompt:
+```
+Found template [name] (ID: X) with matching playbook path. The project may need to be updated with the latest playbook.
+
+Options:
+(A) Override: I'll add the playbook to the project via git. You sync the AAP project, then confirm.
+(B) Manual: You add the playbook and sync. Confirm when done.
+
+❓ Choose (A) or (B):
 ```
 
-#### Step 1.2: Filter Compatible Templates
+- **If A**: Execute Git Flow (see Git Flow section below). Wait for user: "Sync complete" or "done".
+- **If B**: Wait for user confirmation.
 
-For each template, check if it satisfies remediation requirements:
+**Scenario 2 - Different playbook path** (compatible_other not empty, exact_match empty):
 
-**Requirements**:
-1. **Inventory Match**: Inventory contains target systems from CVE analysis
-2. **Project Suitability**: Project contains or can contain remediation playbooks
-3. **Credentials Configured**: Has machine credentials (SSH) and privilege escalation enabled
-4. **Launch-Time Flexibility**: Supports prompt on launch for variables and/or limit (optional but recommended)
-
-**Filtering Logic**:
+Prompt:
 ```
-For each template:
-  1. Get template details with job_templates_retrieve(id=template_id)
-  2. Check if template.inventory matches target systems
-  3. Check if template.project is suitable for remediation playbooks
-  4. Check if template has credentials configured
-  5. Score template based on matches (0-4 points)
-```
+Found template [name] (ID: X) pointing to [template.playbook]. We can use it by replacing that playbook with our content.
 
-**Result**: List of compatible templates ranked by suitability score.
+Note: Template name may not match the CVE being remediated.
 
-#### Step 1.3: User Selection
-
-**If compatible templates found**:
-```
-Found N compatible job template(s):
-
-1. "CVE Remediation Template" (ID: 10)
-   - Inventory: Production Servers (1)
-   - Project: Remediation Playbooks (5)
-   - Credentials: ✓ Configured
-   - Launch flexibility: ✓ Variables and limit
-
-2. "Dynamic Remediation" (ID: 15)
-   - Inventory: All Systems (2)
-   - Project: Remediation Playbooks (5)
-   - Credentials: ✓ Configured
-   - Launch flexibility: ✓ Variables only
-
-❓ Which template would you like to use?
-- Enter template number (1-N)
-- "create" - Create new template via Web UI
-- "abort" - Cancel execution
+❓ Proceed with override?
+- "yes" or "proceed" - Replace playbook and continue
+- "no" - Skip to template creation (invoke job-template-creator)
 
 Please respond with your choice.
 ```
 
-**If no compatible templates found**:
-```
-⚠️ No suitable job templates found for this remediation.
+- **If yes**: Git Flow - write playbook content to `template.playbook` path in repo. Commit, push. Wait for sync confirmation.
+- **If no**: Fall through to Scenario 3.
 
-Required:
-- Inventory containing target systems
-- Project for remediation playbooks
-- Machine credentials (SSH + sudo)
+**Scenario 3 - No suitable template** (exact_match and compatible_other both empty, or user chose "no" in Scenario 2):
 
-Options:
-1. Create new template via AAP Web UI (I'll guide you)
-2. Modify existing template to add requirements
-3. Abort execution
-
-Please choose an option (1-3):
-```
-
-#### Step 1.4: Create Template (If Needed)
-
-If user chooses to create a new template, invoke the **job-template-creator** skill:
-
+Invoke the **job-template-creator** skill:
 ```
 Skill: job-template-creator
-Args: playbook-name target-systems
+Instruction: "Create a job template for this remediation playbook. Playbook: [content]. Filename: [filename]. Path: [our_playbook_path]. CVE: [cve_id]. Target systems: [list]."
 ```
 
-The job-template-creator skill will guide the user through:
-- Adding playbook to Git repository
-- Creating job template via AAP Web UI
-- Verifying template is ready
+The job-template-creator skill guides the user through: (1) Adding playbook to Git repository, (2) Syncing AAP project, (3) Creating job template via AAP Web UI with correct path, inventory, credentials, privilege escalation.
 
-**Wait for template creation to complete** before proceeding to Phase 2.
+After job-template-creator completes, retrieve the template ID (from skill output or user confirmation). Invoke job-template-remediation-validator to validate the newly created template. If passed, proceed to Phase 3 (Dry-Run). If failed, report issues and ask user to fix in AAP Web UI.
 
-### Phase 2: Playbook Preparation
+**Multiple matches**: If multiple exact matches, present list and ask user to choose by number. If multiple different-path matches, prefer by project name containing "remediation" or "CVE", else first.
 
-**Goal**: Ensure the generated playbook is available in the AAP project.
+#### Git Flow (for Scenario 1 Override and Scenario 2)
 
-#### Step 2.1: Add Playbook to Git Repository
+**Prerequisite**: Ask user for the local path to the Git repository for the selected project. Use `projects_list` to get project name and `scm_url` for the template's project; display these to help user identify the correct repo:
+```
+What is the local path to the Git repository for project [Project Name] (scm_url)?
+```
 
-**Options**:
-
-**Option A: User has existing Git repository configured in AAP**
-1. Ask user for Git repository location
-2. Provide commands to add playbook to repository:
-   ```bash
-   cd /path/to/playbooks-repo
-   mkdir -p playbooks/remediation
-   cat > playbooks/remediation/remediation-CVE-YYYY-NNNNN.yml << 'EOF'
-   [playbook content]
-   EOF
-   git add playbooks/remediation/remediation-CVE-YYYY-NNNNN.yml
-   git commit -m "Add remediation playbook for CVE-YYYY-NNNNN"
-   git push origin main
+**Steps**:
+1. Write playbook content to `<user_provided_path>/<target_path>`
+2. Use Run tool: `git add <target_path>`
+3. **Checkpoint**: Display summary of changes (file path, diff or file size) and ask:
    ```
-3. Instruct user to sync AAP project:
-   - Navigate to AAP Web UI → Automation Execution → Projects
-   - Find project and click Sync button (🔄)
-   - Wait for sync to complete
+   Ready to commit and push these changes?
+   Reply 'yes' or 'proceed' to continue, or 'abort' to cancel.
+   ```
+4. If confirmed: `git commit -m "Add/update remediation playbook for CVE-YYYY-NNNNN"`
+5. `git push origin main` (or branch from project's scm_branch if available from projects_list)
 
-**Option B: Temporary playbook testing**
-1. Explain that playbook can be added to an existing AAP project playbook
-2. User manually copies playbook to AAP project location
-3. User syncs project
+**Note**: Git must be configured (user, remote). Use Run tool for git commands.
 
-#### Step 2.2: Verify Playbook Available
-
-After Git sync, verify playbook appears in project:
-```
-✓ Playbook added to Git repository
-✓ AAP project synced successfully
-✓ Playbook path: playbooks/remediation/remediation-CVE-YYYY-NNNNN.yml
-
-Ready to proceed to execution.
-```
+**After push**: "I've pushed the playbook. Sync the AAP project: Automation Execution > Projects > [Project] > Sync. Reply 'sync complete' when done."
 
 ### Phase 3: Dry-Run Execution (Recommended)
 
@@ -930,6 +878,7 @@ AAP URL: https://aap.example.com/#/jobs/playbook/1235
 ### Required MCP Tools
 - `job_templates_list` (from aap-mcp-job-management) - List templates
 - `job_templates_retrieve` (from aap-mcp-job-management) - Get template details
+- `projects_list` (from aap-mcp-job-management) - Get project name and scm_url for Git Flow
 - `job_templates_launch_retrieve` (from aap-mcp-job-management) - Launch jobs
 - `jobs_retrieve` (from aap-mcp-job-management) - Get job status
 - `jobs_stdout_retrieve` (from aap-mcp-job-management) - Get console output
@@ -940,6 +889,7 @@ AAP URL: https://aap.example.com/#/jobs/playbook/1235
 
 ### Related Skills
 - `mcp-aap-validator` - **PREREQUISITE** - Validates AAP MCP servers (invoke in Phase 0)
+- `job-template-remediation-validator` - Validates job template meets remediation requirements before execution
 - `job-template-creator` - Creates/guides AAP job template setup
 - `playbook-generator` - Generates playbooks for execution
 - `remediation-verifier` - Verifies success after execution
@@ -951,6 +901,11 @@ AAP URL: https://aap.example.com/#/jobs/playbook/1235
 ## Critical: Human-in-the-Loop Requirements
 
 This skill executes code on production systems. **Explicit user confirmation is REQUIRED** at multiple stages.
+
+**Before Git commit/push** (Scenario 1 Override, Scenario 2):
+1. **Display change summary**: File path, diff or file size
+2. **Ask for confirmation**: "Ready to commit and push these changes? Reply 'yes' or 'proceed' to continue, or 'abort' to cancel."
+3. **Wait for explicit "yes" or "proceed"**: Do not commit/push without confirmation
 
 **Before Dry-Run Execution** (if user chooses dry-run):
 1. **Display Playbook Preview**: Show tasks and explain changes

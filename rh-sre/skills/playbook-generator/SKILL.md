@@ -272,6 +272,7 @@ This skill generates code that will execute on production systems. **Explicit us
 # Playbook metadata to return:
 playbook:
   file: remediation-CVE-YYYY-NNNNN.yml
+  path: playbooks/remediation/remediation-CVE-YYYY-NNNNN.yml  # Full path for playbook-executor template matching
   content: |
     [Complete YAML playbook]
 

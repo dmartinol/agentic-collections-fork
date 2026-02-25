@@ -232,15 +232,17 @@ Invoke the `/playbook-generator` skill with the instruction:
 
 **🔧 ACTION REQUIRED: Execute the `/playbook-executor` skill**
 
-Invoke the `/playbook-executor` skill with the instruction:
+Invoke the `/playbook-executor` skill with the instruction. Pass playbook metadata so the skill can derive the playbook path and match templates:
 ```
-"Execute the generated playbook for CVE-XXXX-YYYY on target systems using AAP job template [ID]. Start with dry-run (check mode) if user requested it. Monitor job status until completion and report results."
+"Execute the generated playbook for CVE-XXXX-YYYY. Playbook file: [filename from playbook-generator]. Content: [in context from playbook-generator output]. Target systems: [list of system UUIDs from system-context]. Start with dry-run (check mode) if user requested it. Monitor job status until completion and report results."
 ```
+
+**Important**: Ensure playbook content and filename are in context when invoking. The playbook-executor derives the path as `playbooks/remediation/<filename>` and uses it to match job templates.
 
 **Expected behavior**: The skill will:
 - Validate AAP MCP server availability (via mcp-aap-validator)
-- Select or guide creation of suitable job template
-- Add playbook to AAP project repository
+- Match templates by playbook path (exact match, different path with override, or invoke job-template-creator if none found)
+- Add playbook to AAP project via git when override chosen (with commit/push confirmation)
 - Offer dry-run execution (job_type="check")
 - If approved, launch actual execution (job_type="run")
 - Poll job status with `jobs_retrieve`

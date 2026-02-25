@@ -162,7 +162,7 @@ git push origin main
 **Via AAP API** (if available):
 ```bash
 curl -X POST \
-  "${AAP_SERVER}/api/controller/v2/projects/${PROJECT_ID}/update/" \
+  "${AAP_MCP_SERVER}/api/controller/v2/projects/${PROJECT_ID}/update/" \
   -H "Authorization: Bearer ${AAP_API_TOKEN}"
 ```
 
