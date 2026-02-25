@@ -103,7 +103,7 @@ Same YAML frontmatter requirement (`name` + `description`). Agents orchestrate s
 1. Create `<pack-name>/` directory with `README.md`.
 2. Add `skills/` and optionally `agents/`, `.mcp.json`, `.claude-plugin/plugin.json`.
 3. Add the new pack name to `PACK_DIRS` in `scripts/validate_structure.py`.
-4. Run `make validate && make generate` and commit `docs/data.json`.
+4. Run `make validate && make generate` to regenerate docs locally for testing; do **not** commit `docs/data.json` (it is generated during deployment).
 
 ## Adding a New Skill
 
