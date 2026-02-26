@@ -106,8 +106,8 @@ description: |
   - "List high-severity CVEs"
 
   NOT for remediation actions (use remediator agent instead).
-model: inherit        # Root: Runtime - host needs before skill runs
-color: blue           # Root: UX - IDE sidebar/terminal theme
+  model: inherit        # Root: Runtime configuration required before skill execution
+  color: blue           # Root: UX - IDE sidebar/terminal theme
 ---
 ```
 
