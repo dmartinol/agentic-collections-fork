@@ -553,7 +553,7 @@ Use the following color codes based on operation characteristics:
 | **blue** | Reversible state changes | vm-lifecycle-manager, vm-clone |
 | **yellow** | Destructive but recoverable operations | vm-snapshot-delete |
 | **red** | Irreversible/critical operations (data loss risk) | vm-delete, vm-snapshot-restore |
-| **magenta** | Creative, generation tasks | content generation, templating |
+| **magenta** | Creative, generation | content generation, templating |
 
 ---
 
