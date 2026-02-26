@@ -64,7 +64,7 @@ For more details, see [docs/README.md](docs/README.md).
 
 ### Skill Design Validation
 
-The `validate-skill-design` and `validate-skill-design-changed` targets check skills against the [Design Principles](SKILL_DESIGN_PRINCIPLES.md) referenced from CLAUDE.md. **CI runs this validation automatically** on pull requests and pushes to main, but only for changed skills. For local development, use `validate-skill-design-changed` to validate only your modified skills (staged + unstaged). Use `validate-skill-design` for full validation or a specific pack. Ensure compliance with:
+Use the `validate-skill-design` and `validate-skill-design-changed` targets to check skills against the [Design Principles](SKILL_DESIGN_PRINCIPLES.md) referenced from CLAUDE.md. **CI runs this validation automatically** on pull requests and pushes to main, but only for changed skills. For local development, run `validate-skill-design-changed` to validate only your modified skills (staged + unstaged). To perform full validation or validate a specific pack, run `validate-skill-design`. Ensure compliance with:
 
 - Document consultation transparency (DP1)
 - Parameter specification and ordering (DP2)
