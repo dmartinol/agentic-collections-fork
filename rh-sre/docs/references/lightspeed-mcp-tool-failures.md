@@ -18,6 +18,20 @@ When Lightspeed MCP tools fail with cryptic backend errors (e.g. KeyError, missi
 
 ## Known Failures and Workarounds
 
+### vulnerability__get_cves — `limit_` Unexpected keyword argument
+
+**Error**: `1 validation error for call[get_cves] limit_ Unexpected keyword argument [type=unexpected_keyword_argument]`
+
+**Cause**: Some MCP clients incorrectly serialize the `limit` parameter as `limit_`. The Lightspeed MCP server expects `limit` (no underscore).
+
+**Workaround**: For connectivity tests, call with **no parameters**—the tool uses default `limit=10`:
+```
+vulnerability__get_cves()
+```
+Or pass only parameters that don't trigger the bug (e.g. `impact`, `sort`, `advisory_available`). Avoid passing `limit` when the client may serialize it as `limit_`.
+
+**Skills affected**: mcp-lightspeed-validator (connectivity test), cve-impact (account-level CVE queries).
+
 ### vulnerability__explain_cves — `'dnf_modules'` (or similar KeyError)
 
 **Error**: `Error calling tool 'explain_cves': 'dnf_modules'`

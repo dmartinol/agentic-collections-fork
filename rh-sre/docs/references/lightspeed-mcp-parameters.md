@@ -50,11 +50,13 @@ Do not mix parameter names between servers.
 
 **Purpose**: List CVEs affecting the account with filtering.
 
+**⚠️ Known issue**: Some MCP clients serialize `limit` as `limit_`, causing "Unexpected keyword argument" errors. For connectivity tests, call with no parameters. For CVE queries, if you see this error, omit `limit` (default 10) or use other parameters only.
+
 | Parameter | Type | Example | Notes |
 |-----------|------|---------|-------|
 | `impact` | string | `"7,6"` | Comma-separated impact IDs: 7=Critical, 6=High, 5=Important, 4=Moderate |
 | `sort` | string | `"-cvss_score"` | Use `-` prefix for descending |
-| `limit` | integer | `20` | Max records per page |
+| `limit` | integer | `20` | Max records per page. **Note**: Some clients bug: pass as `limit`; if error, omit (default 10) |
 | `advisory_available` | string | `"true"` | Filter remediatable CVEs: `"true"` = only with available advisory, `"true,false"` = all |
 
 **For remediatable CVEs** (user asks "which CVEs can I remediate?"):

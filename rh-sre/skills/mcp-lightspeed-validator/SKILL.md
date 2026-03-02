@@ -16,7 +16,7 @@ Use when validating Lightspeed MCP before CVE operations, troubleshooting connec
 
 ## Workflow
 
-1. **Test connectivity**: Call `vulnerability__get_cves` (or `get_cves`) with `limit: 1` to verify the server responds.
+1. **Test connectivity**: Call `vulnerability__get_cves` with **no parameters** (uses default limit=10). Do NOT pass `limit`—some MCP clients incorrectly serialize it as `limit_`, causing validation errors.
 2. **If it fails**: Provide a comprehensive message with possible root causes (see below).
 3. **Report**: Output a table with validated servers and outcome (emojis).
 
