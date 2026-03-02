@@ -5,8 +5,8 @@ sources:
   - title: Red Hat Product Documentation
     url: https://docs.redhat.com
     sections: RHEL, OpenShift, Ansible Automation Platform, Red Hat Lightspeed
-    date_accessed: 2026-01-20
-last_updated: 2026-01-20
+    date_accessed: 2026-02-24
+last_updated: 2026-02-24
 ---
 
 # Red Hat Remediation Agent - Documentation Index
@@ -288,7 +288,7 @@ See [SOURCES.md](SOURCES.md) for complete source attribution table including:
 
 **License**: Content derived from Red Hat documentation licensed under CC BY-SA 4.0 or similar. All credit to Red Hat, Inc.
 
-**Verification**: All sources verified active and current as of 2026-01-20.
+**Verification**: All sources verified active and current as of 2026-02-24.
 
 ## AI Inference Optimization
 

@@ -3,7 +3,7 @@ title: AAP Integration Test Guide
 category: testing
 sources:
   - title: Internal Testing Documentation
-    date_accessed: 2024-01-20
+    date_accessed: 2026-02-24
 tags: [testing, aap-integration, workflow-verification, remediation-testing]
 semantic_keywords: [aap integration testing, workflow verification, remediation test]
 use_cases: [remediation, playbook-executor]

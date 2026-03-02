@@ -11,8 +11,8 @@ Read this reference when generating Phase 5 execution reports or output template
   "id": 1235,
   "name": "CVE Remediation Template",
   "status": "successful",
-  "started": "2024-01-20T15:35:02Z",
-  "finished": "2024-01-20T15:40:25Z",
+  "started": "2026-02-24T15:35:02Z",
+  "finished": "2026-02-24T15:40:25Z",
   "elapsed": 323.45,
   "job_template": 10,
   "inventory": 1,
@@ -60,8 +60,8 @@ Read this reference when generating Phase 5 execution reports or output template
 **Job ID**: 1235
 **Status**: ✅ Successful
 **Duration**: 5m 23s
-**Started**: 2024-01-20 15:35:02 UTC
-**Completed**: 2024-01-20 15:40:25 UTC
+**Started**: 2026-02-24 15:35:02 UTC
+**Completed**: 2026-02-24 15:40:25 UTC
 **Job Template**: CVE Remediation Template
 **Playbook**: playbooks/remediation/remediation-CVE-2025-49794.yml
 **AAP URL**: [View in AAP](https://aap.example.com/#/jobs/playbook/1235)

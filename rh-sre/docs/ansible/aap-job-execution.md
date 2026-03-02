@@ -4,15 +4,15 @@ category: ansible
 sources:
   - title: Red Hat Ansible Automation Platform Documentation
     url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6
-    date_accessed: 2024-01-20
+    date_accessed: 2026-02-24
   - title: AAP Job Templates
     url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/using_automation_execution/controller-job-templates
-    date_accessed: 2024-01-20
+    date_accessed: 2026-02-24
 tags: [aap, job-execution, playbook, dry-run, check-mode]
 semantic_keywords: [aap job execution, ansible check mode, dry-run remediation, job template requirements, aap url structure]
 use_cases: [playbook-executor, remediation]
 related_docs: [playbook-integration-aap.md, cve-remediation-templates.md]
-last_updated: 2024-01-20
+last_updated: 2026-02-24
 ---
 
 # AAP Job Execution Guide

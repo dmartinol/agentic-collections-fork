@@ -298,7 +298,7 @@ recommended_checks.append(("Ask Inventory on Launch", template.get("ask_inventor
 # Job Template Remediation Validation Report
 
 **Template**: CVE Remediation Template (ID: 42)
-**Validated**: 2025-02-25
+**Validated**: 2026-02-24
 
 ## Required Checks
 | Requirement | Status | Details |
@@ -332,7 +332,7 @@ Template is ready for remediation playbook execution.
 # Job Template Remediation Validation Report
 
 **Template**: CVE Remediation (ID: 20)
-**Validated**: 2025-02-25
+**Validated**: 2026-02-24
 
 ## Required Checks
 | Requirement | Status | Details |
@@ -363,7 +363,7 @@ To fix: AAP Web UI → Templates → [Template] → Edit → Options → ✓ Pro
 # Job Template Remediation Validation Report
 
 **Template**: General Playbook Runner (ID: 15)
-**Validated**: 2025-02-25
+**Validated**: 2026-02-24
 
 ## Required Checks
 | Requirement | Status | Details |

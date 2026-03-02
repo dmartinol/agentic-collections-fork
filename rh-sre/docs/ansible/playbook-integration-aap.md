@@ -4,15 +4,15 @@ category: ansible
 sources:
   - title: Red Hat Ansible Automation Platform Documentation
     url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6
-    date_accessed: 2024-01-20
+    date_accessed: 2026-02-24
   - title: AAP Projects
     url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/using_automation_execution/controller-projects
-    date_accessed: 2024-01-20
+    date_accessed: 2026-02-24
 tags: [aap, playbooks, git-integration, project-sync, version-control]
 semantic_keywords: [aap project integration, playbook git workflow, project sync process, playbook versioning]
 use_cases: [playbook-executor, job-template-creator]
 related_docs: [aap-job-execution.md, cve-remediation-templates.md]
-last_updated: 2024-01-20
+last_updated: 2026-02-24
 ---
 
 # Playbook Integration with AAP
