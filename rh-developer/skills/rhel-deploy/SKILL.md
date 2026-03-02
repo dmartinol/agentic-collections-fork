@@ -35,6 +35,10 @@ Deploy applications to standalone RHEL systems using Podman containers or native
 3. For container deployments: Podman installed on target
 4. For native deployments: Required development tools available via dnf
 
+## When to Use This Skill
+
+Use `/rhel-deploy` when deploying applications to standalone RHEL, Fedora, or CentOS systems via SSH. This skill handles Podman container or native dnf deployments with systemd service management, SELinux, and firewall configuration.
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -462,17 +466,17 @@ Select an option:
 - If user selects "Debug Container" → Invoke `/debug-container` skill
 - After debugging → Offer to retry deployment
 
-## Related Skills
+## Dependencies
 
-| Skill | Use When |
-|-------|----------|
-| `/debug-rhel` | systemd failures, SELinux denials, firewall blocking, Insights CVE/advisor analysis |
-| `/debug-container` | Container startup issues on RHEL host |
+### Required MCP Servers
+- `lightspeed-mcp` (optional) - Red Hat Insights pre-deploy checks
 
-## Reference Documentation
+### Related Skills
+- `/debug-rhel` - systemd failures, SELinux denials, firewall blocking
+- `/debug-container` - Container startup issues on RHEL host
 
-For detailed guidance, see:
-- [docs/rhel-deployment.md](../../docs/rhel-deployment.md) - Comprehensive RHEL deployment reference: systemd unit templates, SELinux configuration, firewall commands, runtime package mapping
+### Reference Documentation
+- [docs/rhel-deployment.md](../../docs/rhel-deployment.md) - Systemd templates, SELinux, firewall, runtime packages
 - [docs/selinux-troubleshooting.md](../../docs/selinux-troubleshooting.md) - SELinux denial analysis and fixes
 - [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting
 - [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (ssh, podman)

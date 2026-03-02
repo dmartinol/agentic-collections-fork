@@ -19,6 +19,10 @@ Provide a complete, guided workflow from local source code to running applicatio
                                                └─→ [RHEL: /rhel-deploy] ──────────┘
 ```
 
+## When to Use This Skill
+
+Use `/containerize-deploy` when a user wants a complete guided workflow from source code to running application on OpenShift or standalone RHEL systems. This skill orchestrates project detection, build strategy selection, and deployment with user confirmation at each phase.
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -453,21 +457,21 @@ Present a summary including:
 - Quick commands: view logs, scale, rebuild, delete
 - Next steps: open app URL, set up webhooks, add env vars, configure autoscaling
 
-## Related Skills
+## Dependencies
 
-| Skill | Use When |
-|-------|----------|
-| `/debug-pod` | Pod failures (CrashLoopBackOff, OOMKilled, ImagePullBackOff) |
-| `/debug-build` | S2I or Podman build failures |
-| `/debug-network` | Service connectivity issues (no endpoints, 503 errors) |
-| `/debug-rhel` | RHEL deployment failures (systemd, SELinux, firewall) |
+### Required MCP Servers
+- `openshift` - cluster resource management for OpenShift deployments
 
-## Reference Documentation
+### Related Skills
+- `/debug-pod` - Pod failures (CrashLoopBackOff, OOMKilled, ImagePullBackOff)
+- `/debug-build` - S2I or Podman build failures
+- `/debug-network` - Service connectivity issues (no endpoints, 503 errors)
+- `/debug-rhel` - RHEL deployment failures (systemd, SELinux, firewall)
 
-For detailed guidance, see:
+### Reference Documentation
 - [docs/builder-images.md](../../docs/builder-images.md) - Language detection, S2I builder images
 - [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md) - Image variant selection, LTS timelines
 - [docs/python-s2i-entrypoints.md](../../docs/python-s2i-entrypoints.md) - Python S2I configuration
-- [docs/rhel-deployment.md](../../docs/rhel-deployment.md) - RHEL host deployment (when delegating to /rhel-deploy)
+- [docs/rhel-deployment.md](../../docs/rhel-deployment.md) - RHEL host deployment
 - [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting
 - [docs/prerequisites.md](../../docs/prerequisites.md) - All required tools by skill

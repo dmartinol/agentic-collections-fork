@@ -12,6 +12,12 @@ metadata:
 
 Check that required tools and environment are properly configured.
 
+## When to Use This Skill
+
+- User wants to verify their environment before running deployment skills
+- User encounters tool-related errors and needs a diagnostic check
+- First-time setup or after environment changes to confirm readiness
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -21,7 +27,7 @@ See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandat
 2. Present results clearly and ask if user wants to proceed with fixes
 3. Never auto-fix issues without user approval
 
-## Execution Flow
+## Workflow
 
 ### Step 1: Determine Validation Scope
 
@@ -212,7 +218,15 @@ Options:
 
 ---
 
-## Reference Documentation
+## Dependencies
 
-For detailed guidance, see:
+### Required MCP Servers
+- None required (uses Bash to check tool availability and cluster connectivity)
+
+### Related Skills
+- `/containerize-deploy` - End-to-end deployment workflow (validate environment first)
+- `/s2i-build` - S2I build requiring oc and cluster access
+- `/deploy` - Deployment requiring oc and cluster access
+
+### Reference Documentation
 - [docs/prerequisites.md](../../docs/prerequisites.md) - Comprehensive tool requirements by skill, installation commands, cluster access verification

@@ -18,6 +18,12 @@ Deploy applications to OpenShift using Helm charts. Supports existing charts or 
 2. Helm chart exists OR user wants to create one
 3. Container image available (from registry or will be built)
 
+## When to Use This Skill
+
+- User wants to deploy an application using Helm charts on OpenShift
+- A Helm chart is detected in the project (Chart.yaml found)
+- User invokes `/helm-deploy` or asks about Helm-based deployment
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -334,9 +340,17 @@ oc logs -l app.kubernetes.io/instance=[release-name] -n [namespace] -f
 Your application is live!
 ```
 
-## Reference Documentation
+## Dependencies
 
-For detailed guidance, see:
+### Required MCP Servers
+- `openshift` - Helm install, upgrade, list, and uninstall operations
+
+### Related Skills
+- `/deploy` - Alternative deployment without Helm charts
+- `/debug-pod` - Troubleshoot pods after Helm deployment
+- `/debug-network` - Diagnose networking issues with deployed services
+
+### Reference Documentation
 - [docs/builder-images.md](../../docs/builder-images.md) - Container image references for chart values
 - [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md) - Image variant selection for production deployments
 - [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc, helm)

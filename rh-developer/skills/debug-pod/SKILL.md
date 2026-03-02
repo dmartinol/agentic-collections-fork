@@ -19,6 +19,10 @@ Before running this skill:
 2. User has access to the target namespace
 3. Pod or deployment name is known (or can be identified from recent deployments)
 
+## When to Use This Skill
+
+Use this skill when pods are not running, restarting frequently, or stuck in non-ready states such as CrashLoopBackOff, ImagePullBackOff, OOMKilled, or Pending. It automates gathering pod status, events, logs, and resource constraints to identify the root cause.
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -241,10 +245,16 @@ Select an option:
 
 For pod failure categories and exit code reference, see [debugging-patterns.md](../../docs/debugging-patterns.md).
 
-## Reference Documentation
+## Dependencies
 
-- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting trees
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
+### Required MCP Servers
+- `openshift` - Kubernetes/OpenShift resource access for pod status, events, and logs
+
+### Related Skills
 - `/debug-build` - If pod failure is due to bad image from build
 - `/debug-network` - If pod is running but service connectivity fails
 - `/deploy` - To redeploy after fixing issues
+
+### Reference Documentation
+- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting trees
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification

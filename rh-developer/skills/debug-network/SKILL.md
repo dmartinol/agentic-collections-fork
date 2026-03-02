@@ -19,6 +19,10 @@ Before running this skill:
 2. User has access to the target namespace
 3. Service, Route, or application name is known
 
+## When to Use This Skill
+
+Use this skill when services cannot communicate, routes return 503/502 errors, or external access fails. It automates checking service endpoints, pod selector matching, route status, and network policy analysis to pinpoint connectivity issues.
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -313,9 +317,15 @@ Select an option:
 
 For detailed diagnosis and fix tables covering service, route, and network policy issues, see [docs/debugging-patterns.md](../../docs/debugging-patterns.md).
 
-## Reference Documentation
+## Dependencies
 
-- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
+### Required MCP Servers
+- `openshift` - Kubernetes/OpenShift resource access for services, routes, endpoints, and network policies
+
+### Related Skills
 - `/debug-pod` - To debug specific backend pods
 - `/deploy` - To fix and redeploy the service
+
+### Reference Documentation
+- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification

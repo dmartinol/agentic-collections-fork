@@ -19,6 +19,10 @@ Before running this skill:
 2. User has access to the target namespace
 3. Build or BuildConfig name is known (or can be identified from recent builds)
 
+## When to Use This Skill
+
+Use this skill when OpenShift builds fail, hang, or produce unexpected results. It diagnoses S2I builds, Docker/Podman builds, and BuildConfig issues by analyzing build pod logs, registry authentication, and source repository access.
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -294,15 +298,18 @@ Select an option:
 
 For S2I build phase failures, common error patterns (Node.js, Python, Java), and troubleshooting decision trees, see [docs/debugging-patterns.md](../../docs/debugging-patterns.md).
 
-## Reference Documentation
+## Dependencies
 
-For detailed guidance, see:
+### Required MCP Servers
+- `openshift` - Kubernetes/OpenShift resource access for builds, BuildConfigs, and build pod logs
+
+### Related Skills
+- `/s2i-build` - To retry build after fixing issues
+- `/debug-pod` - To debug the builder pod directly
+- `/deploy` - To deploy after a successful build
+
+### Reference Documentation
 - [docs/builder-images.md](../../docs/builder-images.md) - S2I builder image selection, version mapping
 - [docs/python-s2i-entrypoints.md](../../docs/python-s2i-entrypoints.md) - Python APP_MODULE configuration
 - [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns
 - [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
-
-**Related Skills:**
-- `/s2i-build` - To retry build after fixing issues
-- `/debug-pod` - To debug the builder pod directly
-- `/detect-project` - To re-analyze project and builder image selection

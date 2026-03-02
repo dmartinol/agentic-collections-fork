@@ -39,6 +39,10 @@ See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandat
 
 This skill operates on **remote RHEL hosts** via SSH, not local MCP servers. Unlike OpenShift/Podman skills, direct Bash commands with SSH are the correct approach here since MCP servers run locally and cannot access remote systems.
 
+## When to Use This Skill
+
+Use `/debug-rhel` when applications fail on standalone RHEL, Fedora, or CentOS hosts. This skill automates multi-step diagnosis of systemd service failures, SELinux denials, firewall blocking, and system resource problems via SSH.
+
 ## Workflow
 
 ### Phase 1: SSH Connection
@@ -435,14 +439,17 @@ Select an option:
 
 For common RHEL issues (systemd exit codes, SELinux denials, firewall), see [debugging-patterns.md](../../docs/debugging-patterns.md) and [selinux-troubleshooting.md](../../docs/selinux-troubleshooting.md).
 
-## Reference Documentation
+## Dependencies
 
-For detailed guidance, see:
+### Required MCP Servers
+- `lightspeed-mcp` (optional) - Red Hat Insights CVE and advisor checks in Phase 7
+
+### Related Skills
+- `/rhel-deploy` - redeploy after fixing issues
+- `/debug-container` - debug Podman containers on the host
+
+### Reference Documentation
 - [docs/selinux-troubleshooting.md](../../docs/selinux-troubleshooting.md) - SELinux denial analysis
 - [docs/rhel-deployment.md](../../docs/rhel-deployment.md) - RHEL deployment patterns
 - [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns
 - [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools and setup
-
-**Related Skills:**
-- `/rhel-deploy` - To redeploy after fixing issues
-- `/debug-container` - To debug Podman containers on the host

@@ -19,6 +19,10 @@ Before running this skill, ensure:
 2. Target namespace/project exists or can be created
 3. Git repository URL is available (or will use binary build)
 
+## When to Use This Skill
+
+Use this skill after `/detect-project` to build container images from source code on OpenShift using Source-to-Image. It creates BuildConfig and ImageStream resources, triggers the build, and monitors progress with log streaming.
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -371,14 +375,17 @@ What would you like to do?
 - If user selects "Debug Build" → Invoke `/debug-build` skill with build name
 - After debugging → Offer to retry build
 
-## Reference Documentation
+## Dependencies
 
-For detailed guidance, see:
+### Required MCP Servers
+- `openshift` - Kubernetes/OpenShift resource access for BuildConfigs, ImageStreams, and build monitoring
+
+### Related Skills
+- `/debug-build` - Build failures (source access, dependencies, registry issues)
+- `/deploy` - After successful build, to deploy the image
+
+### Reference Documentation
 - [docs/builder-images.md](../../docs/builder-images.md) - S2I builder image selection, version mapping
 - [docs/python-s2i-entrypoints.md](../../docs/python-s2i-entrypoints.md) - Python APP_MODULE configuration, entry point troubleshooting
 - [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common build error patterns and troubleshooting
 - [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc)
-
-**Related Skills:**
-- `/debug-build` - Build failures (source access, dependencies, registry issues)
-- `/deploy` - After successful build, to deploy the image

@@ -266,9 +266,16 @@ Return to Step 2 with new inputs.
 
 > **See [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md)** for comprehensive image size references, LTS timelines, decision trees, and framework-specific recommendations (Quarkus, Spring Boot, Next.js, Django/Flask).
 
-## Reference Documentation
+## Dependencies
 
-For detailed guidance, see:
+### Required MCP Servers
+- None required (uses Bash for skopeo image inspection)
+
+### Related Skills
+- `/detect-project` - Provides language/framework detection input for recommendations
+- `/s2i-build` - Build with the recommended image
+
+### Reference Documentation
 - [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md) - Comprehensive scoring matrices, image size reference, LTS timelines, decision trees
 - [docs/builder-images.md](../../docs/builder-images.md) - UBI image registry, framework-specific recommendations, variant availability
 - [docs/dynamic-validation.md](../../docs/dynamic-validation.md) - Skopeo commands, Red Hat Security Data API, image verification patterns

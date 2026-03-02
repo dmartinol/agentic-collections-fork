@@ -35,6 +35,10 @@ Tekton resources are standard Kubernetes CRDs. Use the generic MCP tools with th
 | TriggerTemplate | `TriggerTemplate` | `triggers.tekton.dev/v1beta1` |
 | TriggerBinding | `TriggerBinding` | `triggers.tekton.dev/v1beta1` |
 
+## When to Use This Skill
+
+Use this skill when OpenShift Pipelines (Tekton) fail, hang, or produce unexpected results. It diagnoses PipelineRun failures, TaskRun step errors, workspace/PVC binding issues, and authentication problems by analyzing run status, step container logs, and related resources.
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -286,11 +290,17 @@ Select an option:
 
 For failure categories, error patterns, and troubleshooting decision trees, see [docs/debugging-patterns.md](../../docs/debugging-patterns.md) (sections: Pipeline/Tekton Failure Patterns, Common Tekton Error Messages).
 
-## Reference Documentation
+## Dependencies
 
-- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and pipeline troubleshooting trees
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
+### Required MCP Servers
+- `openshift` - Kubernetes/OpenShift resource access for PipelineRuns, TaskRuns, and Tekton CRDs
+
+### Related Skills
 - `/debug-pod` - To debug TaskRun pods directly
 - `/debug-build` - If the pipeline uses OpenShift Build tasks
 - `/debug-network` - If pipeline tasks fail due to network issues
 - `/validate-environment` - To verify OpenShift and pipeline operator setup
+
+### Reference Documentation
+- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and pipeline troubleshooting trees
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification

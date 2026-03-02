@@ -19,6 +19,10 @@ Before running this skill:
 2. Container image exists (from ImageStream or external registry)
 3. Target namespace exists
 
+## When to Use This Skill
+
+Use `/deploy` after building a container image (via `/s2i-build` or external registry) to create Deployment, Service, and Route resources on OpenShift. This skill handles port detection, replica configuration, rollout monitoring, and rollback on failure.
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -258,16 +262,16 @@ oc delete all -l app=[app-name] -n [namespace]
 Your application is now live!
 ```
 
-## Related Skills
+## Dependencies
 
-| Skill | Use When |
-|-------|----------|
-| `/debug-pod` | Pod failures (CrashLoopBackOff, OOMKilled, ImagePullBackOff) |
-| `/debug-network` | Service connectivity issues (no endpoints, 503 errors) |
-| `/debug-build` | Build failures before deployment |
+### Required MCP Servers
+- `openshift` - cluster resource creation and management
 
-## Reference Documentation
+### Related Skills
+- `/debug-pod` - Pod failures (CrashLoopBackOff, OOMKilled, ImagePullBackOff)
+- `/debug-network` - Service connectivity issues (no endpoints, 503 errors)
+- `/debug-build` - Build failures before deployment
 
-For detailed guidance, see:
+### Reference Documentation
 - [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
 - [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting

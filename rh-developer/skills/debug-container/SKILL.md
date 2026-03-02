@@ -35,6 +35,10 @@ Diagnose local Podman/Docker container issues by automatically gathering contain
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
+## When to Use This Skill
+
+Use `/debug-container` when local Podman or Docker containers fail to run, crash on startup, get OOM killed, or have image pull errors. This skill automates container inspection, log retrieval, image analysis, and resource constraint checking.
+
 ## Workflow
 
 ### Step 1: Identify Target Container
@@ -326,10 +330,15 @@ Select an option:
 
 For exit codes, common container issues, and SELinux volume guidance, see [debugging-patterns.md](../../docs/debugging-patterns.md).
 
-## Reference Documentation
+## Dependencies
 
-For detailed guidance, see:
+### Required MCP Servers
+- `podman` - container inspection, logs, and image analysis
+
+### Related Skills
+- `/debug-rhel` - systemd service issues on RHEL hosts
+- `/recommend-image` - select a better base image
+
+### Reference Documentation
 - [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns, exit codes
 - [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (podman)
-- `/debug-rhel` - For systemd service issues on RHEL hosts
-- `/recommend-image` - To select a better base image

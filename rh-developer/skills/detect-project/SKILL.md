@@ -17,6 +17,12 @@ metadata:
 
 Analyze the project to detect language/framework and recommend a build strategy. This skill handles both local project directories and remote Git repositories.
 
+## When to Use This Skill
+
+- User wants to containerize or deploy an application and needs language/framework detection
+- User asks what tech stack a project uses or needs a build strategy recommendation
+- Run before `/s2i-build`, `/recommend-image`, or `/rhel-deploy` to identify project type
+
 ## Critical: Human-in-the-Loop Requirements
 
 See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
@@ -255,9 +261,17 @@ After successful detection, these values should be available for other skills:
 | `CONTAINER_PORT` | Application listen port | `8080` |
 | `HELM_CHART_PATH` | Path to Helm chart | `./chart` |
 
-## Reference Documentation
+## Dependencies
 
-For detailed guidance, see:
+### Required MCP Servers
+- `github` - Remote repository analysis via GitHub API (for URL-based detection)
+
+### Related Skills
+- `/s2i-build` - Build with the detected S2I builder image
+- `/recommend-image` - Advanced image selection based on detection results
+- `/rhel-deploy` - Deploy to RHEL using detected project info
+
+### Reference Documentation
 - [docs/builder-images.md](../../docs/builder-images.md) - Language detection matrix, version-to-image mapping, S2I builder selection
 - [docs/python-s2i-entrypoints.md](../../docs/python-s2i-entrypoints.md) - Python entry point detection, APP_MODULE configuration
 - [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (git)
