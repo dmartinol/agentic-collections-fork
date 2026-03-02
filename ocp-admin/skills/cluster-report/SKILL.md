@@ -10,6 +10,8 @@ description: |
   - "Multi-cluster status overview"
   - "How are my clusters doing?"
   NOT for single-cluster deep-dives or troubleshooting specific pods.
+model: inherit
+color: cyan
 metadata:
   user_invocable: "true"
 ---
