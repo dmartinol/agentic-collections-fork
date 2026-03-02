@@ -452,7 +452,7 @@ function showPackDetails(packName) {
     titleGroup.className = 'modal-title-group';
 
     const h2 = document.createElement('h2');
-    h2.textContent = pack.plugin.title || pack.plugin.name || pack.name;
+    h2.textContent = pack.plugin?.title || pack.plugin?.name || pack.name;
     titleGroup.appendChild(h2);
 
     // Owner subtitle
