@@ -2,6 +2,8 @@
 name: validate-environment
 description: |
   Check and report the status of required tools and environment for rh-developer skills. Validates tool installation (oc, helm, podman, git, skopeo, etc.), cluster connectivity, and permissions. Use this skill before running other deployment skills to ensure prerequisites are met. Triggers on /validate-environment command or when user asks to check their environment setup.
+model: inherit
+color: cyan
 metadata:
   user_invocable: "true"
 ---
@@ -12,7 +14,7 @@ Check that required tools and environment are properly configured.
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 **Key Rules:**
 1. WAIT for user to select validation scope before running checks
@@ -66,7 +68,7 @@ check_tool() {
 
 **Tools to check:** git, curl, jq, oc, helm, podman, docker, skopeo, ssh
 
-> **See [docs/prerequisites.md](../docs/prerequisites.md)** for the complete tool requirements by skill, check commands, and installation instructions.
+> **See [docs/prerequisites.md](../../docs/prerequisites.md)** for the complete tool requirements by skill, check commands, and installation instructions.
 
 ### Step 3: Check OpenShift Connectivity (if TARGET includes openshift)
 
@@ -186,7 +188,7 @@ Select an option or describe what you'd like to do:
 
 This tool is required for [skill-names].
 
-See [docs/prerequisites.md](../docs/prerequisites.md) for installation commands by OS.
+See [docs/prerequisites.md](../../docs/prerequisites.md) for installation commands by OS.
 ```
 
 ### Cluster Connection Failed
@@ -233,4 +235,4 @@ Options:
 ## Reference Documentation
 
 For detailed guidance, see:
-- [docs/prerequisites.md](../docs/prerequisites.md) - Comprehensive tool requirements by skill, installation commands, cluster access verification
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Comprehensive tool requirements by skill, installation commands, cluster access verification

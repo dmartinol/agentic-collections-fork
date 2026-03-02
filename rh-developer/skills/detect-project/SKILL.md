@@ -2,6 +2,8 @@
 name: detect-project
 description: |
   Analyze a project folder or GitHub repository to detect programming language, framework, and version requirements. Use this skill when containerizing an application, selecting an S2I builder image, deploying to OpenShift or RHEL, or determining a project's tech stack. Supports Node.js, Python, Java, Go, Ruby, .NET, PHP, and Perl. Triggers on /detect-project command or when user needs build strategy recommendations. Run before /s2i-build or /rhel-deploy.
+model: inherit
+color: cyan
 metadata:
    user_invocable: "true"
 ---
@@ -17,7 +19,7 @@ Analyze the project to detect language/framework and recommend a build strategy.
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 **IMPORTANT:** This skill requires user confirmation before proceeding. You MUST:
 1. **Wait for user confirmation** on detected values before saving to session state
@@ -305,6 +307,6 @@ Returns: Actual file content as text
 ## Reference Documentation
 
 For detailed guidance, see:
-- [docs/builder-images.md](../docs/builder-images.md) - Language detection matrix, version-to-image mapping, S2I builder selection
-- [docs/python-s2i-entrypoints.md](../docs/python-s2i-entrypoints.md) - Python entry point detection, APP_MODULE configuration
-- [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (git)
+- [docs/builder-images.md](../../docs/builder-images.md) - Language detection matrix, version-to-image mapping, S2I builder selection
+- [docs/python-s2i-entrypoints.md](../../docs/python-s2i-entrypoints.md) - Python entry point detection, APP_MODULE configuration
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (git)

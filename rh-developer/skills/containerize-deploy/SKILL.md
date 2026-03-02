@@ -2,6 +2,8 @@
 name: containerize-deploy
 description: |
   Complete end-to-end workflow for containerizing and deploying applications to OpenShift or standalone RHEL systems. Orchestrates /detect-project, /s2i-build, /deploy, /helm-deploy, and /rhel-deploy skills with user confirmation checkpoints at each phase. Supports S2I, Podman, Helm deployment strategies for OpenShift, and Podman/native deployments for RHEL hosts. Use this skill when user wants to go from source code to running application in one guided workflow. Supports resume after interruption and rollback on failure. Triggers on /containerize-deploy command.
+model: inherit
+color: green
 metadata:
    user_invocable: "true"
 ---
@@ -35,7 +37,7 @@ Provide a complete, guided workflow from local source code to running applicatio
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 **IMPORTANT:** This skill requires explicit user confirmation at each phase. You MUST:
 
@@ -638,9 +640,9 @@ All tools from child skills:
 ## Reference Documentation
 
 For detailed guidance, see:
-- [docs/builder-images.md](../docs/builder-images.md) - Language detection, S2I builder images
-- [docs/image-selection-criteria.md](../docs/image-selection-criteria.md) - Image variant selection, LTS timelines
-- [docs/python-s2i-entrypoints.md](../docs/python-s2i-entrypoints.md) - Python S2I configuration
-- [docs/rhel-deployment.md](../docs/rhel-deployment.md) - RHEL host deployment (when delegating to /rhel-deploy)
-- [docs/debugging-patterns.md](../docs/debugging-patterns.md) - Common error patterns and troubleshooting
-- [docs/prerequisites.md](../docs/prerequisites.md) - All required tools by skill
+- [docs/builder-images.md](../../docs/builder-images.md) - Language detection, S2I builder images
+- [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md) - Image variant selection, LTS timelines
+- [docs/python-s2i-entrypoints.md](../../docs/python-s2i-entrypoints.md) - Python S2I configuration
+- [docs/rhel-deployment.md](../../docs/rhel-deployment.md) - RHEL host deployment (when delegating to /rhel-deploy)
+- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting
+- [docs/prerequisites.md](../../docs/prerequisites.md) - All required tools by skill

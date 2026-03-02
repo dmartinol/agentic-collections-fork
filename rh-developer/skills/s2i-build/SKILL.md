@@ -2,6 +2,8 @@
 name: s2i-build
 description: |
   Create BuildConfig and ImageStream resources on OpenShift and trigger a Source-to-Image (S2I) build. Use this skill after /detect-project to build container images from source code on the cluster. Handles namespace verification, resource creation with user confirmation, build monitoring with log streaming, and failure recovery. Triggers on /s2i-build command. Run before /deploy.
+model: inherit
+color: green
 metadata:
    user_invocable: "true"
 ---
@@ -19,7 +21,7 @@ Before running this skill, ensure:
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 **IMPORTANT:** This skill requires explicit user confirmation at each step. You MUST:
 1. **Wait for user confirmation** before executing any actions
@@ -433,7 +435,7 @@ On success, these values are available for `/deploy`:
 ## Reference Documentation
 
 For detailed guidance, see:
-- [docs/builder-images.md](../docs/builder-images.md) - S2I builder image selection, version mapping
-- [docs/python-s2i-entrypoints.md](../docs/python-s2i-entrypoints.md) - Python APP_MODULE configuration, entry point troubleshooting
-- [docs/debugging-patterns.md](../docs/debugging-patterns.md) - Common build error patterns and troubleshooting
-- [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (oc)
+- [docs/builder-images.md](../../docs/builder-images.md) - S2I builder image selection, version mapping
+- [docs/python-s2i-entrypoints.md](../../docs/python-s2i-entrypoints.md) - Python APP_MODULE configuration, entry point troubleshooting
+- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common build error patterns and troubleshooting
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc)

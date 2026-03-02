@@ -2,6 +2,8 @@
 name: helm-deploy
 description: |
   Deploy applications to OpenShift using Helm charts. Use this skill when user wants to deploy with Helm, when a Helm chart is detected in the project, or when /helm-deploy command is invoked. Supports both existing charts and chart creation. Handles chart detection, values customization, install/upgrade operations, and rollback. Requires kubernetes MCP Helm tools.
+model: inherit
+color: green
 metadata:
    user_invocable: "true"
 ---
@@ -18,7 +20,7 @@ Deploy applications to OpenShift using Helm charts. Supports existing charts or 
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 **IMPORTANT:** This skill requires explicit user confirmation at each step. You MUST:
 1. **Wait for user confirmation** before executing any actions
@@ -376,6 +378,6 @@ Your application is live!
 ## Reference Documentation
 
 For detailed guidance, see:
-- [docs/builder-images.md](../docs/builder-images.md) - Container image references for chart values
-- [docs/image-selection-criteria.md](../docs/image-selection-criteria.md) - Image variant selection for production deployments
-- [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (oc, helm)
+- [docs/builder-images.md](../../docs/builder-images.md) - Container image references for chart values
+- [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md) - Image variant selection for production deployments
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc, helm)

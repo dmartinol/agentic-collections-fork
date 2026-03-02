@@ -2,6 +2,8 @@
 name: deploy
 description: |
   Create Kubernetes Deployment, Service, and Route resources on OpenShift to deploy and expose an application. Use this skill after /s2i-build to make the built image accessible. Handles port detection, replica configuration, HTTPS route creation, rollout monitoring, and rollback on failure. Triggers on /deploy command when user wants to deploy a container image to OpenShift.
+model: inherit
+color: green
 metadata:
   user_invocable: "true"
 ---
@@ -19,7 +21,7 @@ Before running this skill:
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 **IMPORTANT:** This skill requires explicit user confirmation at each step. You MUST:
 1. **Wait for user confirmation** before executing any actions
@@ -395,5 +397,5 @@ Your application is now live!
 ## Reference Documentation
 
 For detailed guidance, see:
-- [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (oc), cluster access verification
-- [docs/debugging-patterns.md](../docs/debugging-patterns.md) - Common error patterns and troubleshooting
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
+- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting

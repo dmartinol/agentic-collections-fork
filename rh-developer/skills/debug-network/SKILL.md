@@ -2,6 +2,8 @@
 name: debug-network
 description: |
   Diagnose OpenShift service connectivity issues including DNS resolution, service endpoints, route ingress, and network policies. Automates multi-step diagnosis: service endpoint verification, pod selector matching, route status, and network policy analysis. Use this skill when services can't communicate, routes return 503/502 errors, or external access fails. Triggers on /debug-network command or phrases like "can't reach service", "route returning 503", "pods can't communicate", "no endpoints".
+model: inherit
+color: cyan
 metadata:
   user_invocable: "true"
 ---

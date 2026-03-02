@@ -2,6 +2,8 @@
 name: recommend-image
 description: |
   Intelligently recommend the optimal S2I builder image or container base image for a project based on detected language/framework, use-case requirements, security posture, and deployment target. Supports GitHub URLs for remote project analysis (delegates to /detect-project). Use this skill when the user needs a container image recommendation, wants to compare image options, or asks about production vs development images. Triggers on /recommend-image command, or when advanced image selection beyond basic version matching is needed. Supports Node.js, Python, Java, Go, Ruby, .NET, PHP, and Perl on Red Hat UBI.
+model: inherit
+color: cyan
 metadata:
    user_invocable: "true"
 ---
@@ -20,7 +22,7 @@ Provide intelligent, use-case-aware container image recommendations that go beyo
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 **IMPORTANT:** This skill requires user input and confirmation. You MUST:
 1. **Wait for user responses** to all questions before proceeding
@@ -118,7 +120,7 @@ For each language, evaluate available variants against user requirements.
 
 **Key Scoring Factors:** Image size, security posture, build tools availability, startup time, LTS status
 
-> **See [docs/image-selection-criteria.md](../docs/image-selection-criteria.md)** for comprehensive scoring matrices with weighted criteria by environment (production/development/edge/serverless).
+> **See [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md)** for comprehensive scoring matrices with weighted criteria by environment (production/development/edge/serverless).
 
 ### Step 3.5: Dynamic Image Validation
 
@@ -145,7 +147,7 @@ To provide accurate image recommendations, I need `skopeo` to inspect container 
 - Check architecture support (amd64, arm64)
 - Show when the image was last built
 
-**Install skopeo:** See [docs/prerequisites.md](../docs/prerequisites.md) for installation commands by OS.
+**Install skopeo:** See [docs/prerequisites.md](../../docs/prerequisites.md) for installation commands by OS.
 
 After installing, run `/recommend-image` again for enhanced recommendations.
 
@@ -268,7 +270,7 @@ Return to Step 2 with new inputs.
 - **Development** → Full variant
 - **Serverless** → Smallest available (minimal or native binary)
 
-> **See [docs/image-selection-criteria.md](../docs/image-selection-criteria.md)** for comprehensive image size references, LTS timelines, decision trees, and framework-specific recommendations (Quarkus, Spring Boot, Next.js, Django/Flask).
+> **See [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md)** for comprehensive image size references, LTS timelines, decision trees, and framework-specific recommendations (Quarkus, Spring Boot, Next.js, Django/Flask).
 
 ## Output Variables
 
@@ -284,7 +286,7 @@ After successful recommendation:
 ## Reference Documentation
 
 For detailed guidance, see:
-- [docs/image-selection-criteria.md](../docs/image-selection-criteria.md) - Comprehensive scoring matrices, image size reference, LTS timelines, decision trees
-- [docs/builder-images.md](../docs/builder-images.md) - UBI image registry, framework-specific recommendations, variant availability
-- [docs/dynamic-validation.md](../docs/dynamic-validation.md) - Skopeo commands, Red Hat Security Data API, image verification patterns
-- [docs/prerequisites.md](../docs/prerequisites.md) - Skopeo installation instructions
+- [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md) - Comprehensive scoring matrices, image size reference, LTS timelines, decision trees
+- [docs/builder-images.md](../../docs/builder-images.md) - UBI image registry, framework-specific recommendations, variant availability
+- [docs/dynamic-validation.md](../../docs/dynamic-validation.md) - Skopeo commands, Red Hat Security Data API, image verification patterns
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Skopeo installation instructions

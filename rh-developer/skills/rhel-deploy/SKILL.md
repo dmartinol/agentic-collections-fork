@@ -2,6 +2,8 @@
 name: rhel-deploy
 description: |
   CRITICAL: When user types /rhel-deploy, use THIS skill immediately. This skill deploys applications to standalone RHEL/Fedora/CentOS systems (NOT OpenShift) using Podman containers with systemd, or native dnf builds. Handles SSH connectivity, SELinux, firewall-cmd, and systemd unit creation. Triggers: /rhel-deploy command, 'deploy to RHEL', 'deploy to Fedora', 'deploy to my server via SSH'.
+model: inherit
+color: yellow
 metadata:
    user_invocable: "true"
 ---
@@ -35,7 +37,7 @@ Deploy applications to standalone RHEL systems using Podman containers or native
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 **IMPORTANT:** This skill requires explicit user confirmation at each phase. You MUST:
 1. **Wait for user confirmation** before executing any actions
@@ -308,7 +310,7 @@ ssh [target] "podman pull [image-reference]"
 | Environment | [list env vars] |
 | Run Mode | [rootless / rootful] |
 
-**SELinux Volume Labels:** Use `:z` for shared volumes, `:Z` for private volumes. See [docs/rhel-deployment.md](../docs/rhel-deployment.md) for SELinux configuration details.
+**SELinux Volume Labels:** Use `:z` for shared volumes, `:Z` for private volumes. See [docs/rhel-deployment.md](../../docs/rhel-deployment.md) for SELinux configuration details.
 
 Proceed with this configuration? (yes/modify/cancel)
 ```
@@ -408,7 +410,7 @@ Proceed with firewall configuration? (yes/skip)
 
 **Runtime packages for [language]:**
 
-See [docs/rhel-deployment.md](../docs/rhel-deployment.md) for the complete runtime package mapping by language and RHEL version (Node.js, Python, Java, Go, Ruby, PHP).
+See [docs/rhel-deployment.md](../../docs/rhel-deployment.md) for the complete runtime package mapping by language and RHEL version (Node.js, Python, Java, Go, Ruby, PHP).
 
 **Commands to execute:**
 ```bash
@@ -475,7 +477,7 @@ Proceed with deployment? (yes/no)
 | `${PORT}` | [container-port] | Application listen port |
 | `${START_COMMAND}` | [see below] | Language-specific start command |
 
-**Start commands by language:** See [docs/rhel-deployment.md](../docs/rhel-deployment.md) for language-specific systemd unit templates (Node.js, Python, Java, Go).
+**Start commands by language:** See [docs/rhel-deployment.md](../../docs/rhel-deployment.md) for language-specific systemd unit templates (Node.js, Python, Java, Go).
 
 **Target location:** `/etc/systemd/system/[app-name].service`
 
@@ -639,7 +641,7 @@ When delegating to `/recommend-image`:
 ## Reference Documentation
 
 For detailed guidance, see:
-- [docs/rhel-deployment.md](../docs/rhel-deployment.md) - Comprehensive RHEL deployment reference: systemd unit templates, SELinux configuration, firewall commands, runtime package mapping
-- [docs/selinux-troubleshooting.md](../docs/selinux-troubleshooting.md) - SELinux denial analysis and fixes
-- [docs/debugging-patterns.md](../docs/debugging-patterns.md) - Common error patterns and troubleshooting
-- [docs/prerequisites.md](../docs/prerequisites.md) - Required tools (ssh, podman)
+- [docs/rhel-deployment.md](../../docs/rhel-deployment.md) - Comprehensive RHEL deployment reference: systemd unit templates, SELinux configuration, firewall commands, runtime package mapping
+- [docs/selinux-troubleshooting.md](../../docs/selinux-troubleshooting.md) - SELinux denial analysis and fixes
+- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting
+- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (ssh, podman)
