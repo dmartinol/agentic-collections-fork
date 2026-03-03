@@ -19,6 +19,8 @@ agentic-collections/
 
 ### Agentic Pack Architecture
 
+Packs follow the [Lola](https://github.com/RedHatProductSecurity/lola) package manager format. Install via `lola install -f <pack-name>` from the marketplace.
+
 Each pack follows this structure:
 ```
 <pack-name>/
@@ -26,7 +28,7 @@ Each pack follows this structure:
 ├── README.md            # Pack description, persona, target marketplaces
 ├── .claude-plugin/      # Claude Code plugin metadata
 │   └── plugin.json      # Name, version, description, author, license
-├── .mcp.json           # MCP server configurations (uses env vars for credentials)
+├── mcps.json           # MCP server configurations (uses env vars for credentials)
 ├── skills/             # Specialized task executors (including orchestration skills)
 │   └── <skill>/
 │       └── SKILL.md    # Skill definition with YAML frontmatter
@@ -72,7 +74,7 @@ Each pack follows this structure:
 
 ### MCP Server Integration
 
-MCP servers are configured in `<pack>/.mcp.json`:
+MCP servers are configured in `<pack>/mcps.json`:
 ```json
 {
   "mcpServers": {
@@ -154,7 +156,7 @@ last_updated: YYYY-MM-DD
 3. Add `CLAUDE.md` with persona, skill-first rule, intent routing table, MCP servers, and global rules (see [rh-ai-engineer/CLAUDE.md](rh-ai-engineer/CLAUDE.md) for reference)
 4. Create `skills/` directory
 5. Optional: Add `.claude-plugin/plugin.json` for Claude Code
-6. Optional: Add `.mcp.json` for MCP server integrations
+6. Optional: Add `mcps.json` for MCP server integrations
 7. Update main `README.md` table with link
 
 ### Adding a Skill
@@ -244,7 +246,7 @@ When creating new collections, follow the pattern that best matches your needs:
 ### Security & Configuration
 5. **Environment variables for secrets** - Never hardcode credentials
 6. **Never expose credential values** - Check env vars are set, but NEVER print their values in output
-7. **MCP server integration** - Use `.mcp.json` with environment variable references
+7. **MCP server integration** - Use `mcps.json` with environment variable references
 
 ### Documentation & Quality
 8. **Official sources only** - Document all sources in SOURCES.md

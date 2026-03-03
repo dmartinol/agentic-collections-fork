@@ -1,6 +1,37 @@
 # Red Hat Agentic Collections
 
-**Production-ready AI skills and automation for Red Hat platforms** - Install specialized plugins for SREs, developers, platform administrators, and AI engineers working with RHEL, OpenShift, and Red Hat automation platforms.
+**Production-ready AI skills and automation for Red Hat platforms** — install specialized plugins for SREs, developers, platform administrators, and AI engineers working with RHEL, OpenShift, and Red Hat automation platforms.
+
+## Installation (Lola package manager)
+
+Install collections using [Lola](https://github.com/RedHatProductSecurity/lola), the AI skills package manager. **Installation applies to the current folder only** — run commands from your project directory.
+
+### One-time setup: add marketplace
+
+```bash
+lola market add rh-agentic-collections https://raw.githubusercontent.com/RHEcosystemAppEng/agentic-collections/main/marketplace/rh-agentic-collection.yml
+```
+
+### Install individual module
+
+```bash
+lola install -f rh-sre
+```
+
+### Install all modules at once
+
+```bash
+for m in ocp-admin rh-developer rh-sre rh-support-engineer rh-virt; do lola install -f $m; done
+```
+
+### Install to a specific assistant only
+
+Use the `-a` option to target Claude Code or Cursor:
+
+```bash
+lola install -f rh-sre -a claude-code   # Claude Code only
+lola install -f rh-sre -a cursor        # Cursor only
+```
 
 [![Validate Agentic Collections](https://github.com/RHEcosystemAppEng/agentic-collections/actions/workflows/compliance-check.yml/badge.svg)](https://github.com/RHEcosystemAppEng/agentic-collections/actions/workflows/compliance-check.yml)
 [![Skill Specification Linter](https://github.com/RHEcosystemAppEng/agentic-collections/actions/workflows/skill-spec-report.yml/badge.svg)](https://github.com/RHEcosystemAppEng/agentic-collections/actions/workflows/skill-spec-report.yml)
@@ -153,7 +184,7 @@ Generate and view documentation locally:
 # Install dependencies (first time only)
 make install
 
-# Validate pack structure (plugin.json, .mcp.json, frontmatter)
+# Validate pack structure (plugin.json, mcps.json, frontmatter)
 make validate
 
 # Validate skills against Design Principles (SKILL_DESIGN_PRINCIPLES.md)
@@ -219,7 +250,7 @@ scripts/install-hooks.sh
 
 - **API keys**: OpenAI, GitHub, AWS, Google Cloud
 - **Private keys**: SSH, SSL/TLS certificates
-- **Hardcoded credentials** in `.mcp.json` files
+- **Hardcoded credentials** in `mcps.json` files
 - **Database connection strings** with passwords
 - **JWT tokens** and authentication secrets
 
@@ -262,7 +293,7 @@ To add a new MCP server to an agentic pack and display it on the documentation s
 
 ### Step 1: Add MCP Configuration to Pack
 
-Add the server configuration to `<pack>/.mcp.json`:
+Add the server configuration to `<pack>/mcps.json`:
 
 ```json
 {
@@ -326,7 +357,7 @@ make generate
 ```
 
 This will:
-1. Parse the `.mcp.json` file from your pack
+1. Parse the `mcps.json` file from your pack
 2. Merge it with custom data from `docs/mcp.json`
 3. Update `docs/data.json` with the new server
 
@@ -348,7 +379,7 @@ Visit http://localhost:8000 and verify:
 ### Step 5: Commit and Deploy
 
 ```bash
-git add <pack>/.mcp.json docs/mcp.json docs/data.json
+git add <pack>/mcps.json docs/mcp.json docs/data.json
 git commit -m "feat: add <server-name> MCP server to <pack>"
 git push
 ```
@@ -357,7 +388,7 @@ The documentation site will automatically update via GitHub Actions.
 
 ### Example: Adding Red Hat Lightspeed MCP Server
 
-**File: `rh-sre/.mcp.json`**
+**File: `rh-sre/mcps.json`**
 ```json
 {
   "mcpServers": {
@@ -405,7 +436,7 @@ The documentation site will automatically update via GitHub Actions.
 
 **Server not appearing:**
 - Run `make validate` to check for JSON syntax errors
-- Verify `.mcp.json` file is in the pack directory
+- Verify `mcps.json` file is in the pack directory
 - Check that pack directory is listed in `scripts/generate_pack_data.py` PACK_DIRS
 
 **Tools not showing:**
