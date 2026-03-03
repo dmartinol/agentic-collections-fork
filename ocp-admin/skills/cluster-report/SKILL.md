@@ -28,13 +28,13 @@ Generate a unified health and resource report across multiple OpenShift/Kubernet
 **Required MCP Servers**: `openshift` (configured in [.mcp.json](../../.mcp.json))
 
 **Required MCP Tools** (all from `openshift` server):
-- `configuration_contexts_list`
-- `resources_get`
-- `nodes_top`
-- `resources_list`
-- `namespaces_list`
-- `projects_list`
-- `pods_list`
+- `configuration_contexts_list` — list all kubeconfig contexts and server URLs
+- `resources_get` — get a single Kubernetes resource by apiVersion/kind/name
+- `nodes_top` — node CPU and memory usage from Metrics Server
+- `resources_list` — list Kubernetes resources by apiVersion/kind
+- `namespaces_list` — list all namespaces in a cluster
+- `projects_list` — list all OpenShift projects
+- `pods_list` — list all pods across namespaces
 
 **Required Environment Variables**: `KUBECONFIG` — must contain at least one cluster context. Two or more recommended for comparison.
 
@@ -46,6 +46,25 @@ Generate a unified health and resource report across multiple OpenShift/Kubernet
 - **NEVER** read the source code of `aggregate.py` or `assemble.py`
 - **NEVER** write ad-hoc Python to parse or transform MCP output
 - **NEVER** manually reconstruct data already available in MCP output
+
+**Verification Steps:**
+1. Confirm `openshift` MCP server is available in `.mcp.json`
+2. Verify `KUBECONFIG` is set: `test -n "$KUBECONFIG"` (never expose path or contents)
+3. If either check fails → Human Notification Protocol
+
+**Human Notification Protocol:**
+
+When prerequisites fail:
+1. **Stop immediately** — do not make any MCP tool calls
+2. **Report error:**
+   ```
+   Cannot execute skill: [specific failure]
+   Setup: [instructions + link to .mcp.json or KUBECONFIG docs]
+   ```
+3. **Request decision:** "How to proceed? (setup/skip/abort)"
+4. **Wait for user input**
+
+**Security:** Never display KUBECONFIG path, contents, or any credential values.
 
 ## When to Use This Skill
 
@@ -70,6 +89,12 @@ Check that `KUBECONFIG` is set. **Never expose the path or contents** — only c
 **MCP Tool**: `configuration_contexts_list`
 
 Collect all context names and server URLs. Do NOT present results to the user yet.
+
+**Expected Output**: List of context names with associated server URLs.
+
+**Error Handling**:
+- If no contexts found: Stop and instruct user to verify KUBECONFIG points to a valid file with cluster contexts
+- If tool call fails: Report MCP server connectivity issue, suggest checking `.mcp.json` configuration
 
 #### Step 1b: Verify OpenShift Clusters
 
@@ -283,7 +308,19 @@ Would you like to:
 - `openshift` — with multi-cluster support enabled
 
 ### Required MCP Tools
-- `configuration_contexts_list`, `resources_get`, `nodes_top`, `resources_list`, `namespaces_list`, `projects_list`, `pods_list`
+- `configuration_contexts_list` (from openshift) — list all kubeconfig contexts and server URLs
+- `resources_get` (from openshift) — get a single Kubernetes resource by apiVersion/kind/name
+  - Parameters: `apiVersion`, `kind`, `name`, `context`
+- `nodes_top` (from openshift) — node CPU and memory usage from Metrics Server
+  - Parameters: `context`
+- `resources_list` (from openshift) — list Kubernetes resources by apiVersion/kind
+  - Parameters: `apiVersion`, `kind`, `context`
+- `namespaces_list` (from openshift) — list all namespaces in a cluster
+  - Parameters: `context`
+- `projects_list` (from openshift) — list all OpenShift projects
+  - Parameters: `context`
+- `pods_list` (from openshift) — list all pods across namespaces
+  - Parameters: `context`
 
 ### Helper Scripts
 - [`ocp-admin/scripts/cluster-report/assemble.py`](../../scripts/cluster-report/assemble.py)
@@ -312,7 +349,7 @@ Would you like to:
 | No GPUs found | Display 0 (not an error) |
 | Empty cluster | Report with all zeros (valid data) |
 
-## Examples
+## Example Usage
 
 ### Multi-Cluster Report (Default: OpenShift Only)
 
