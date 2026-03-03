@@ -39,16 +39,48 @@ Clone existing virtual machines in OpenShift Virtualization, creating new VMs wi
 
 ### Prerequisite Verification
 
-**Before executing:**
-1. Verify `openshift-virtualization` in `.mcp.json`, `KUBECONFIG` set (never expose value)
-2. Optional: Verify RBAC permissions for VirtualMachine, PVC/DataVolume creation
+**Before executing, verify MCP server availability:**
+
+1. **Check MCP Server Configuration**
+   - Verify `openshift-virtualization` exists in `mcps.json`
+   - If missing → Report to user with setup instructions
+
+2. **Check Environment Variables**
+   - Verify `KUBECONFIG` is set (check presence only, never expose value)
+   - If missing → Report to user
+
+3. **Check RBAC Permissions** (optional verification)
+   - Verify ServiceAccount can create VirtualMachine resources
+   - Verify ServiceAccount can create PVC/DataVolume resources
 
 **When prerequisites fail:**
 ```
 ❌ Cannot execute vm-clone: MCP server 'openshift-virtualization' is not available
 
-Setup: Add openshift-virtualization to .mcp.json (see https://github.com/openshift/openshift-mcp-server)
-Set KUBECONFIG environment variable, restart Claude Code
+📋 Setup Instructions:
+1. Add openshift-virtualization to mcps.json:
+   {
+     "mcpServers": {
+       "openshift-virtualization": {
+         "command": "podman",
+         "args": [
+           "run",
+           "--rm",
+           "-i",
+           "--network=host",
+           "--userns=keep-id:uid=65532,gid=65532",
+           "-v", "${KUBECONFIG}:/kubeconfig:ro,Z",
+           "--entrypoint", "/app/kubernetes-mcp-server",
+           "quay.io/ecosystem-appeng/openshift-mcp-server:latest",
+           "--kubeconfig", "/kubeconfig",
+           "--toolsets", "core,kubevirt"
+         ],
+         "env": {
+           "KUBECONFIG": "${KUBECONFIG}"
+         }
+       }
+     }
+   }
 
 Options: "setup" (configure now), "skip" (skip skill), "abort" (stop workflow)
 ```
