@@ -36,11 +36,18 @@ DEFAULT_OUTPUT = Path("/tmp/cluster-report-kubeconfig")
 
 
 def find_kube_cmd():
-    """Detect oc or kubectl in PATH."""
-    for cmd in ("oc", "kubectl"):
-        if shutil.which(cmd):
-            return cmd
-    print('{"error": "Neither oc nor kubectl found in PATH"}', file=sys.stderr)
+    """Detect oc (preferred) or kubectl in PATH."""
+    if shutil.which("oc"):
+        return "oc"
+    if shutil.which("kubectl"):
+        print("WARNING: 'oc' not found – falling back to 'kubectl'. "
+              "Install the OpenShift CLI (oc) for full compatibility: "
+              "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/",
+              file=sys.stderr)
+        return "kubectl"
+    print('{"error": "Neither oc nor kubectl found in PATH. '
+          'Install oc: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/"}',
+          file=sys.stderr)
     sys.exit(1)
 
 
