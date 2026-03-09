@@ -25,13 +25,16 @@ For running `cluster-report` across many clusters (10–100+), use service accou
 | [`build-kubeconfig.py`](scripts/cluster-report/build-kubeconfig.py) | Builds a merged kubeconfig from SA tokens (`setup` + `build` subcommands) |
 | [`cluster-reporter-rbac.yaml`](scripts/cluster-report/cluster-reporter-rbac.yaml) | Read-only RBAC resources applied once per cluster |
 
-> **Required permissions**: The RBAC setup creates cluster-scoped resources (ClusterRole, ClusterRoleBinding), so the user running `--setup` needs `cluster-admin` privileges. This is a one-time step per cluster.
+> **Required permissions**: The RBAC setup creates cluster-scoped resources (ClusterRole, ClusterRoleBinding), so the user running `setup` needs `cluster-admin` privileges. This is a one-time step per cluster. If RBAC has already been applied, use `--skip-rbac` to skip the apply step and only extract existing SA tokens.
 
 **Quick start:**
 
 ```bash
 # 1. One-time (requires cluster-admin): apply RBAC and extract tokens for all clusters you're logged into
 python3 ocp-admin/scripts/cluster-report/build-kubeconfig.py setup --all-contexts
+
+# If RBAC is already configured, skip the apply step and only extract tokens
+python3 ocp-admin/scripts/cluster-report/build-kubeconfig.py setup --all-contexts --skip-rbac
 
 # 2. Build merged kubeconfig from saved tokens
 python3 ocp-admin/scripts/cluster-report/build-kubeconfig.py \

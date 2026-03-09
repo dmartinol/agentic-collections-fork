@@ -116,16 +116,19 @@ def run_setup(args):
 
         print(f"  Server: {server}")
 
-        print("  Applying RBAC...")
-        try:
-            subprocess.run(
-                [kube_cmd, "apply", "-f", str(RBAC_MANIFEST), "--context", ctx],
-                capture_output=True, text=True, timeout=30, check=True
-            )
-        except subprocess.CalledProcessError as e:
-            results["errors"].append(f"{ctx}: RBAC apply failed: {e.stderr.strip()}")
-            print(f"  FAIL: RBAC apply failed: {e.stderr.strip()}")
-            continue
+        if args.skip_rbac:
+            print("  Skipping RBAC apply (--skip-rbac)")
+        else:
+            print("  Applying RBAC...")
+            try:
+                subprocess.run(
+                    [kube_cmd, "apply", "-f", str(RBAC_MANIFEST), "--context", ctx],
+                    capture_output=True, text=True, timeout=30, check=True
+                )
+            except subprocess.CalledProcessError as e:
+                results["errors"].append(f"{ctx}: RBAC apply failed: {e.stderr.strip()}")
+                print(f"  FAIL: RBAC apply failed: {e.stderr.strip()}")
+                continue
 
         print("  Waiting for token...")
         token = _wait_for_token(kube_cmd, ctx)
@@ -295,7 +298,7 @@ def run_build(args):
                 continue
             try:
                 subprocess.run(
-                    [kube_cmd, "cluster-info", "--context", name],
+                    [kube_cmd, "get", "nodes", "--context", name, "-o", "name", "--no-headers"],
                     capture_output=True, text=True, timeout=15, check=True, env=env
                 )
                 verify_results[name] = "ok"
@@ -369,6 +372,10 @@ def main():
     setup_parser.add_argument(
         "--contexts", type=str, default=None,
         help="Comma-separated list of contexts to setup.",
+    )
+    setup_parser.add_argument(
+        "--skip-rbac", action="store_true",
+        help="Skip RBAC apply and only extract tokens (use when RBAC is already configured).",
     )
     setup_parser.add_argument(
         "--output-inventory", type=str, default=str(DEFAULT_INVENTORY),
