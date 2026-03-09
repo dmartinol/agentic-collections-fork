@@ -62,4 +62,4 @@ Both scripts read from stdin and write to stdout. They are invoked as a pipeline
 
 - **openshift** - OpenShift cluster management with multi-cluster support
 
-> **Container UID mapping**: The openshift MCP server uses `--userns=keep-id:uid=65532,gid=65532` to map the host user to the container's non-root UID (65532). This allows the container to read `chmod 600` files like `KUBECONFIG` without weakening file permissions. **macOS users**: Podman runs inside a VM on macOS — this flag may cause startup failures. If the MCP server fails to start, remove the `--userns` line from `.mcp.json`.
+> **Container UID mapping**: On Linux, the MCP server automatically adds `--userns=keep-id:uid=65532,gid=65532` to map the host user to the container's non-root UID (65532), allowing the container to read `chmod 600` files like `KUBECONFIG` without weakening file permissions. On macOS the flag is omitted automatically since Podman runs inside a VM where `--userns` can cause startup failures.
