@@ -1,5 +1,5 @@
 name: rh-agentic-collections
 version: 1.0.0
 dependencies:
-  rh-sre: file:///Users/dmartino/projects/AI/ai5/agentic-collections/rh-sre
-  rh-developer: file:///Users/dmartino/projects/AI/ai5/agentic-collections/rh-developer
+  rh-sre: RHEcosystemAppEng/agentic-collections/rh-sre#apm
+  rh-developer: RHEcosystemAppEng/agentic-collections/rh-developer#apm
