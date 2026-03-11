@@ -1,5 +1,10 @@
-name: rh-agentic-collections
+name: agentic-collections
 version: 1.0.0
+description: APM project for agentic-collections
+author: Daniele Martinoli
 dependencies:
-  rh-sre: dmartinol/agentic-collections-fork/rh-sre#apm
-  rh-developer: dmartinol/agentic-collections-fork/rh-developer#apm
+  apm:
+    - dmartinol/agentic-collections-fork/rh-sre#apm
+    - dmartinol/agentic-collections-fork/rh-developer#apm
+  mcp: []
+scripts: {}
