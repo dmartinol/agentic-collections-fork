@@ -1,0 +1,303 @@
+id: rh-ai-engineer
+name: Red Hat AI Engineer Agentic Collection
+provider: Red Hat
+version: 1.0.0
+categories:
+- AI/ML
+- OpenShift
+personas:
+- AI/ML Engineer
+marketplaces:
+- Claude Code
+- Cursor
+support_level: Unknown
+description: Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI).
+  Deploy and manage models, pipelines, registries, workbenches, and serving runtimes on OpenShift AI.
+summary: |
+  The rh-ai-engineer collection provides skills for deploying and managing AI/ML models,
+  pipelines, workbenches, and serving runtimes on Red Hat OpenShift AI.
+contents:
+  description: The pack provides 11 skills for deploying and managing AI/ML models on Red Hat OpenShift AI.
+  skills:
+  - name: ds-project-setup
+    description: Data Science Project Setup
+    summary_markdown: |
+      Set up data science projects on OpenShift AI with appropriate configurations and resources.
+
+      **Use when:**
+      - "Create a new data science project"
+      - "Set up project for model development"
+      - "Configure OpenShift AI project"
+
+      **What it does:**
+      - Creates and configures DS projects
+      - Sets up resource quotas
+      - Configures access and permissions
+  - name: workbench-manage
+    description: Workbench Management
+    summary_markdown: |
+      Manage OpenShift AI workbenches for interactive development and experimentation.
+
+      **Use when:**
+      - "Create a workbench"
+      - "Manage my Jupyter workbench"
+      - "Configure development environment"
+
+      **What it does:**
+      - Creates and manages workbenches
+      - Configures notebook environments
+      - Handles resource allocation
+  - name: model-deploy
+    description: Model Deployment
+    summary_markdown: |
+      Deploy AI/ML models to OpenShift AI serving runtimes.
+
+      **Use when:**
+      - "Deploy this model"
+      - "Serve the trained model"
+      - "Create inference endpoint"
+
+      **What it does:**
+      - Deploys models to serving runtimes
+      - Configures inference endpoints
+      - Manages model versions
+  - name: model-registry
+    description: Model Registry
+    summary_markdown: |
+      Register, version, and promote ML models in the Model Registry across environments.
+
+      **Use when:**
+      - "Register a new model in the registry"
+      - "List registered models"
+      - "What versions exist for my model?"
+      - "Promote a model from dev to production"
+
+      **What it does:**
+      - Handles model registration and versioning
+      - Manages metadata and artifact tracking
+      - Supports cross-environment promotion
+  - name: pipeline-manage
+    description: Pipeline Management
+    summary_markdown: |
+      Create, run, schedule, and monitor Data Science Pipelines (Kubeflow Pipelines 2.0).
+
+      **Use when:**
+      - "Run a pipeline in my project"
+      - "Schedule a recurring pipeline"
+      - "Check my pipeline run status"
+      - "List pipeline runs and their logs"
+
+      **What it does:**
+      - Submits pipeline runs from YAML
+      - Schedules recurring runs with cron
+      - Monitors execution and step logs
+  - name: nim-setup
+    description: NIM (NVIDIA Inference Microservices) Setup
+    summary_markdown: |
+      Set up NVIDIA Inference Microservices for GPU-accelerated model serving.
+
+      **Use when:**
+      - "Configure NIM for model serving"
+      - "Set up GPU inference"
+      - "Deploy with NVIDIA NIM"
+
+      **What it does:**
+      - Configures NIM integration
+      - Sets up GPU resources
+      - Manages inference microservices
+  - name: serving-runtime-config
+    description: Serving Runtime Configuration
+    summary_markdown: |
+      Configure serving runtimes for model inference on OpenShift AI.
+
+      **Use when:**
+      - "Configure serving runtime"
+      - "Set up inference configuration"
+      - "Adjust model serving parameters"
+
+      **What it does:**
+      - Configures runtime parameters
+      - Manages resource allocation
+      - Sets up scaling and replicas
+  - name: debug-inference
+    description: Inference Debugging
+    summary_markdown: |
+      Diagnose and troubleshoot model inference issues on OpenShift AI.
+
+      **Use when:**
+      - "Why is inference failing?"
+      - "Debug model serving"
+      - "Inference errors"
+
+      **What it does:**
+      - Analyzes inference logs
+      - Checks endpoint health
+      - Identifies configuration issues
+  - name: ai-observability
+    description: AI Observability
+    summary_markdown: |
+      Monitor and observe AI/ML workloads, model performance, and inference metrics.
+
+      **Use when:**
+      - "Show model performance metrics"
+      - "Monitor inference latency"
+      - "AI workload observability"
+
+      **What it does:**
+      - Collects and displays metrics
+      - Monitors inference performance
+      - Tracks model usage and latency
+  - name: model-monitor
+    description: TrustyAI Model Monitoring
+    summary_markdown: |
+      Configure TrustyAI bias detection (SPD, DIR) and data drift monitoring on deployed InferenceServices.
+
+      **Use when:**
+      - "Monitor my model for bias"
+      - "Set up drift detection on my inference endpoint"
+      - "Configure TrustyAI for my deployed model"
+      - "Check if my model has fairness issues"
+
+      **What it does:**
+      - Deploys TrustyAIService CR
+      - Configures bias metrics (SPD, DIR) and drift metrics
+      - Validates monitoring and threshold tuning
+  - name: guardrails-config
+    description: TrustyAI Guardrails Orchestrator
+    summary_markdown: |
+      Deploy TrustyAI Guardrails Orchestrator with input/output content safety detectors for LLM endpoints.
+
+      **Use when:**
+      - "Add guardrails to my LLM endpoint"
+      - "Set up content safety for my model"
+      - "Configure PII detection on my inference endpoint"
+      - "Block prompt injection attacks"
+
+      **What it does:**
+      - Deploys GuardrailsOrchestrator CR
+      - Configures detectors (content safety, PII, prompt injection, toxicity)
+      - Manages orchestration policies and guarded endpoint validation
+  skills_decision_guide:
+  - user_request: '"Deploy Llama 3 on my cluster" or "Create inference endpoint"'
+    skill_to_use: model-deploy
+    reason: Deploys AI/ML models to OpenShift AI serving runtimes (vLLM, NIM, Caikit+TGIS).
+  - user_request: '"Set up NIM on my cluster" or "Configure NGC credentials for NIM"'
+    skill_to_use: nim-setup
+    reason: Configures NVIDIA NIM platform on OpenShift AI for GPU-accelerated inference.
+  - user_request: '"Why is inference failing?" or "Debug model serving"'
+    skill_to_use: debug-inference
+    reason: Troubleshoots failed or slow InferenceService deployments.
+  - user_request: '"Show model performance metrics" or "Monitor inference latency"'
+    skill_to_use: ai-observability
+    reason: Analyzes model performance, GPU utilization, and cluster health.
+  - user_request: '"Create a new data science project" or "Set up project for model development"'
+    skill_to_use: ds-project-setup
+    reason: Creates and configures Data Science Projects on OpenShift AI.
+  - user_request: '"Monitor my model for bias" or "Set up drift detection"'
+    skill_to_use: model-monitor
+    reason: Configures TrustyAI bias (SPD, DIR) and drift monitoring on deployed InferenceServices.
+  - user_request: '"Add guardrails to my LLM" or "Set up content safety"'
+    skill_to_use: guardrails-config
+    reason: Deploys TrustyAI Guardrails Orchestrator with input/output content safety detectors.
+deploy_and_use: |
+  ### Prerequisites
+
+  - Claude Code CLI or IDE extension
+  - Red Hat OpenShift AI (RHOAI) cluster with model serving capabilities
+  - `oc` CLI and `KUBECONFIG` configured for cluster access
+
+  ### Environment Setup
+
+  Configure OpenShift AI cluster access:
+
+  ```bash
+  export KUBECONFIG="/path/to/your/kubeconfig"
+  ```
+
+  Verify access to OpenShift AI:
+
+  ```bash
+  oc get datascienceprojects -A
+  ```
+
+  ### Installation (Claude Code)
+
+  Install the collection as a Claude Code plugin:
+
+  ```bash
+  claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+  claude plugin install rh-ai-engineer
+  ```
+
+  Or for local development:
+
+  ```bash
+  claude plugin marketplace add /path/to/agentic-collections
+  claude plugin install rh-ai-engineer
+  ```
+
+  ### Installation (Cursor)
+
+  Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
+
+  ```bash
+  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+  cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+  ```
+
+  Or download and extract:
+
+  ```bash
+  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+  cp -r agentic-collections-main/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+  ```
+
+  ### Installation (Open Code)
+
+  Open Code does not support direct marketplace install via CLI. Clone or download the repository:
+
+  ```bash
+  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+  cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+  ```
+
+  Or with wget:
+
+  ```bash
+  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+  cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+  ```
+sample_workflows:
+- name: Deploy a model from registry
+  workflow: |
+    1. Use `/model-registry` to list and select a model version
+    2. Use `/model-deploy` to deploy the selected model to a serving runtime
+    3. Use `/ai-observability` to monitor inference performance
+- name: Set up new data science project
+  workflow: |
+    1. Use `/ds-project-setup` to create project with data connections and pipeline server
+    2. Use `/workbench-manage` to create a Jupyter workbench for development
+    3. Use `/pipeline-manage` to run and monitor pipelines
+resources:
+- title: Main Repository
+  description: agentic-collections
+  url: https://github.com/RHEcosystemAppEng/agentic-collections
+legal_resources:
+  license_agreement_url: https://www.redhat.com/en/about/agreements
+  privacy_policy_url: https://www.redhat.com/en/about/privacy-policy
+author:
+  name: Red Hat Ecosystem Engineering
+  email: eco-engineering@redhat.com
+homepage: https://github.com/RHEcosystemAppEng/agentic-collections
+repository: https://github.com/RHEcosystemAppEng/agentic-collections
+license: Apache-2.0
+keywords:
+- ai-engineer
+- openshift-ai
+- rhoai
+- kserve
+- vllm
+- nvidia-nim
+- model-serving
+- inference
+- gpu
