@@ -9,7 +9,7 @@ OpenShift Virtualization management tools for administering virtual machines on 
 
 The rh-virt collection provides specialized tools for managing virtual machines in OpenShift Virtualization environments:
 
-- **5 specialized skills** for complete VM lifecycle management
+- **10 specialized skills** for complete VM lifecycle management
 - **OpenShift MCP server integration** for KubeVirt operations
 - **Full VM lifecycle coverage** from creation to deletion with safety-first design
 
@@ -96,7 +96,7 @@ claude plugin install openshift-virtualization
 
 ## Skills
 
-The pack provides 5 specialized skills for complete VM lifecycle management:
+The pack provides 10 specialized skills for complete VM lifecycle management:
 
 ### 1. **vm-create** - Virtual Machine Provisioning
 
@@ -211,6 +211,99 @@ Clone existing virtual machines for testing, scaling, or creating VM templates.
 - **Resource impact preview** - shows CPU, memory, storage consumption before cloning
 - **Automatic UUID generation** - generates new firmware UUIDs and MAC addresses for clones
 - Requires explicit user confirmation and storage strategy selection (human-in-the-loop)
+
+### 6. **vm-snapshot-create** - VM Snapshot Creation
+
+Create virtual machine snapshots for backup and recovery.
+
+**Use when:**
+- "Create a snapshot of VM [name]"
+- "Backup VM [name] before upgrade"
+- "Take a snapshot of [vm]"
+
+**MCP Tools Used:**
+- `resources_create_or_update` (core toolset) - Create VirtualMachineSnapshot
+- `resources_get`, `resources_list` (core toolset) - Verify VM exists, list StorageClass
+
+**What it does:**
+- Creates VirtualMachineSnapshot resources
+- Validates storage class snapshot support and CSI driver capabilities
+- Requires explicit user confirmation before creation
+
+### 7. **vm-snapshot-list** - VM Snapshot Discovery
+
+List virtual machine snapshots across namespaces with status, age, and recovery information.
+
+**Use when:**
+- "List snapshots for VM [name]"
+- "Show snapshots in namespace [name]"
+- "What snapshots exist for [vm]?"
+
+**MCP Tools Used:**
+- `resources_list`, `resources_get` (core toolset) - List and get snapshot details
+
+**What it does:**
+- Lists VirtualMachineSnapshot resources
+- Shows snapshot status, age, size, and recovery options
+- Read-only operation (no confirmation required)
+
+### 8. **vm-snapshot-restore** - VM Snapshot Restore
+
+Restore virtual machines from snapshots with strict safety confirmations to prevent data loss.
+
+**Use when:**
+- "Restore VM [name] from snapshot [snapshot-name]"
+- "Roll back VM [name] to snapshot"
+- "Recover VM [name] from backup"
+
+**MCP Tools Used:**
+- `resources_create_or_update` (core toolset) - Create VirtualMachineRestore
+- `resources_get` (core toolset) - Verify VM/snapshot exists, monitor restore
+- `vm_lifecycle` (kubevirt toolset) - Stop VM if running
+
+**What it does:**
+- Creates VirtualMachineRestore resources
+- **CRITICAL**: Replaces current VM state with snapshot data (changes since snapshot are lost)
+- Requires VM to be stopped and typed snapshot name confirmation
+- Requires explicit user confirmation (human-in-the-loop)
+
+### 9. **vm-snapshot-delete** - VM Snapshot Deletion
+
+Permanently delete virtual machine snapshots to free storage space.
+
+**Use when:**
+- "Delete snapshot [snapshot-name]"
+- "Remove old snapshots for VM [name]"
+- "Free up snapshot storage"
+
+**MCP Tools Used:**
+- `resources_get`, `resources_list`, `resources_delete` (core toolset) - Verify, list, delete snapshots
+
+**What it does:**
+- Deletes VirtualMachineSnapshot resources
+- Frees storage but removes recovery points
+- Requires explicit user confirmation before deletion
+
+### 10. **vm-rebalance** - VM Migration and Load Balancing
+
+Orchestrate VM migrations across cluster nodes for load balancing, maintenance, and resource optimization.
+
+**Use when:**
+- "Move VM database-01 to worker-03"
+- "Rebalance VMs to optimize CPU load"
+- "Drain worker-02 for maintenance"
+- "Automatically rebalance the cluster"
+
+**MCP Tools Used:**
+- `resources_list`, `resources_get`, `resources_create_or_update` (core toolset) - List VMs/nodes, create migrations
+- `vm_lifecycle` (kubevirt toolset) - Start/stop VMs for cold migration
+- `nodes_top`, `pods_top` - Monitor resource usage
+
+**What it does:**
+- **Manual mode** - User specifies target node(s) for VM migration
+- **Automatic mode** - AI-driven rebalancing based on node resource usage
+- Supports live migration (zero downtime) and cold migration (brief downtime)
+- Requires explicit user confirmation for migrations
 
 ## MCP Server Integration
 
@@ -525,11 +618,16 @@ rh-virt/
 │       └── .ai-index/           # Semantic indexing for AI discovery
 │           └── semantic-index.json
 └── skills/
-    ├── vm-create/SKILL.md      # VM provisioning with auto-diagnosis
-    ├── vm-lifecycle-manager/SKILL.md  # VM power management
-    ├── vm-inventory/SKILL.md    # VM discovery and status
-    ├── vm-delete/SKILL.md       # VM destruction and cleanup
-    └── vm-clone/SKILL.md        # VM cloning and duplication
+    ├── vm-create/SKILL.md           # VM provisioning with auto-diagnosis
+    ├── vm-lifecycle-manager/SKILL.md # VM power management
+    ├── vm-inventory/SKILL.md         # VM discovery and status
+    ├── vm-delete/SKILL.md            # VM destruction and cleanup
+    ├── vm-clone/SKILL.md             # VM cloning and duplication
+    ├── vm-snapshot-create/SKILL.md    # VM snapshot creation
+    ├── vm-snapshot-list/SKILL.md     # VM snapshot discovery
+    ├── vm-snapshot-restore/SKILL.md  # VM snapshot restore
+    ├── vm-snapshot-delete/SKILL.md   # VM snapshot deletion
+    └── vm-rebalance/SKILL.md        # VM migration and load balancing
 ```
 
 ### Key Patterns

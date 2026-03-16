@@ -161,7 +161,8 @@ function createPackCard(pack) {
     stats.className = 'stats';
 
     const skillSpan = document.createElement('span');
-    skillSpan.textContent = `${pack.skills.length} skill${pack.skills.length !== 1 ? 's' : ''}`;
+    const mainCount = pack.skills.filter(s => !s.is_supporting_skill).length;
+    skillSpan.textContent = `${mainCount} skill${mainCount !== 1 ? 's' : ''}`;
     stats.appendChild(skillSpan);
 
     const agentSpan = document.createElement('span');
@@ -634,42 +635,59 @@ claude plugin install ${pluginName}`;
         body.appendChild(agentsSection);
     }
 
-    // Skills section (shown second)
+    // Skills section (shown second) - split into main and supporting skills
     if (pack.skills.length > 0) {
-        const skillsSection = document.createElement('div');
-        skillsSection.className = 'modal-section';
+        const mainSkills = pack.skills.filter(s => !s.is_supporting_skill);
+        const supportingSkills = pack.skills.filter(s => s.is_supporting_skill);
 
-        const skillsHeader = document.createElement('div');
-        skillsHeader.className = 'modal-section-header';
-        skillsHeader.textContent = 'SKILLS';
-        skillsSection.appendChild(skillsHeader);
+        const renderSkillList = (skills) => {
+            const list = document.createElement('div');
+            list.className = 'item-list';
+            skills.forEach(skill => {
+                const skillDef = document.createElement('div');
+                skillDef.className = 'skill-definition';
 
-        const skillsList = document.createElement('div');
-        skillsList.className = 'item-list';
+                const syntaxBlock = document.createElement('div');
+                syntaxBlock.className = 'definition-syntax';
+                const syntaxCode = document.createElement('code');
+                syntaxCode.textContent = skill.name;
+                syntaxBlock.appendChild(syntaxCode);
+                skillDef.appendChild(syntaxBlock);
 
-        pack.skills.forEach(skill => {
-            const skillDef = document.createElement('div');
-            skillDef.className = 'skill-definition';
+                const desc = document.createElement('div');
+                desc.className = 'definition-description';
+                desc.appendChild(createExpandableText(skill.description, 200));
+                skillDef.appendChild(desc);
 
-            // Skill syntax block
-            const syntaxBlock = document.createElement('div');
-            syntaxBlock.className = 'definition-syntax';
-            const syntaxCode = document.createElement('code');
-            syntaxCode.textContent = skill.name;
-            syntaxBlock.appendChild(syntaxCode);
-            skillDef.appendChild(syntaxBlock);
+                list.appendChild(skillDef);
+            });
+            return list;
+        };
 
-            // Skill description (with expand/collapse for long text)
-            const desc = document.createElement('div');
-            desc.className = 'definition-description';
-            desc.appendChild(createExpandableText(skill.description, 200));
-            skillDef.appendChild(desc);
+        // Main skills section
+        const mainSection = document.createElement('div');
+        mainSection.className = 'modal-section';
 
-            skillsList.appendChild(skillDef);
-        });
+        const mainHeader = document.createElement('div');
+        mainHeader.className = 'modal-section-header';
+        mainHeader.textContent = `SKILLS (${mainSkills.length})`;
+        mainSection.appendChild(mainHeader);
+        mainSection.appendChild(renderSkillList(mainSkills));
+        body.appendChild(mainSection);
 
-        skillsSection.appendChild(skillsList);
-        body.appendChild(skillsSection);
+        // Supporting skills section (only when there are supporting skills)
+        if (supportingSkills.length > 0) {
+            const supportingSection = document.createElement('div');
+            supportingSection.className = 'modal-section';
+
+            const supportingHeader = document.createElement('div');
+            supportingHeader.className = 'modal-section-header';
+            supportingHeader.textContent = `SUPPORTING SKILLS (${supportingSkills.length})`;
+            supportingSection.appendChild(supportingHeader);
+            supportingSection.appendChild(renderSkillList(supportingSkills));
+
+            body.appendChild(supportingSection);
+        }
     }
 
     // Docs section (shown third, if documentation exists)

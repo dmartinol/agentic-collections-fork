@@ -127,7 +127,7 @@ def parse_skills(pack_dir: str) -> List[Dict[str, Any]]:
         pack_dir: Name of the pack directory
 
     Returns:
-        List of skill dictionaries with name, description, file_path
+        List of skill dictionaries with name, description, file_path, is_supporting_skill
     """
     skills = []
     skills_dir = Path(pack_dir) / 'skills'
@@ -147,10 +147,15 @@ def parse_skills(pack_dir: str) -> List[Dict[str, Any]]:
         if isinstance(description, str):
             description = ' '.join(description.split())
 
+        # Extract is_supporting_skill from metadata (default: False - most skills are main)
+        metadata = frontmatter.get('metadata') or {}
+        is_supporting_skill = metadata.get('is_supporting_skill', False)
+
         skills.append({
             'name': name,
             'description': description,
-            'file_path': str(skill_file.relative_to(pack_dir))
+            'file_path': str(skill_file.relative_to(pack_dir)),
+            'is_supporting_skill': is_supporting_skill
         })
 
     return sorted(skills, key=lambda s: s['name'])

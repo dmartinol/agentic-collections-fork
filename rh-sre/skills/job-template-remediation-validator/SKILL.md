@@ -12,6 +12,8 @@ description: |
   NOT for: AAP MCP connectivity (use `/mcp-aap-validator`), creating templates (use `/job-template-creator`).
 model: inherit
 color: blue
+metadata:
+  is_supporting_skill: true
 ---
 
 # AAP Job Template Remediation Validator

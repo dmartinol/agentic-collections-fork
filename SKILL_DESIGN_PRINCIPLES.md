@@ -369,7 +369,9 @@ UI/runtime fields at root; custom fields in `metadata`.
 |------------|----------|----------|
 | Runtime | Root | `model`, `allowed-tools` |
 | UX/UI | Root | `color`, `version` |
-| Custom | `metadata` | `author`, `priority` |
+| Custom | `metadata` | `author`, `priority`, `is_supporting_skill` |
+
+**`is_supporting_skill`** (optional, default `false`): Set to `true` only for supporting skills (e.g. MCP validators, template validators) that are primarily invoked by other skills. Main skills appear first in the pack popup; supporting skills appear in a separate section.
 
 ---
 
@@ -390,8 +392,9 @@ NOT for [use case] (use [skill] instead).
 model: inherit
 color: green
 metadata:
-author: "team"
-version: "1.0"
+  author: "team"
+  version: "1.0"
+  is_supporting_skill: false   # true only for validators, setup helpers
 ---
 
 # /skill-name Skill
