@@ -1,6 +1,6 @@
 # Red Hat AI Engineer Agentic Collection
 
-Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI)—projects, workbenches, model deployment, pipelines, NIM, runtimes, observability, monitoring, and guardrails.
+Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, registries, workbenches, and serving runtimes on OpenShift AI.
 
 **Persona**: AI/ML Engineer
 **Marketplaces**: Claude Code, Cursor
@@ -17,13 +17,20 @@ Deploy and operate models on OpenShift AI with skills for **data science project
 ### Prerequisites
 
 - Claude Code CLI or IDE extension
-- Red Hat OpenShift AI cluster with model serving components available
-- `oc` CLI and `KUBECONFIG` configured for the cluster
+- Red Hat OpenShift AI (RHOAI) cluster with model serving capabilities
+- `oc` CLI and `KUBECONFIG` configured for cluster access
 
 ### Environment Setup
 
+Configure OpenShift AI cluster access:
+
 ```bash
 export KUBECONFIG="/path/to/your/kubeconfig"
+```
+
+Verify access to OpenShift AI:
+
+```bash
 oc get datascienceprojects -A
 ```
 
@@ -31,12 +38,14 @@ Skills rely on **`openshift`** (required), **`rhoai`** (preferred), and optional
 
 ### Installation (Claude Code)
 
+Install the collection as a Claude Code plugin:
+
 ```bash
 claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
 claude plugin install rh-ai-engineer
 ```
 
-Local development:
+Or for local development:
 
 ```bash
 claude plugin marketplace add /path/to/agentic-collections
@@ -45,16 +54,34 @@ claude plugin install rh-ai-engineer
 
 ### Installation (Cursor)
 
+Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
+
 ```bash
 git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
 ```
 
+Or download and extract:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+```
+
 ### Installation (Open Code)
+
+Open Code does not support direct marketplace install via CLI. Clone or download the repository:
 
 ```bash
 git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+```
+
+Or with wget:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
 ```
 
 
@@ -217,6 +244,22 @@ Deploy guardrails orchestrators with PII, toxicity, and prompt-injection detecto
 
 1. **debug-inference** — isolate failing pods, events, or resources.
 2. Re-run **model-deploy** or adjust **serving-runtime-config** based on findings.
+
+
+
+### Deploy a model from registry
+
+1. Use **model-registry** to list and select a model version.
+2. Use **model-deploy** to deploy the selected model to a serving runtime.
+3. Use **ai-observability** to monitor inference performance.
+
+
+
+### Set up a new data science project
+
+1. Use **ds-project-setup** to create the project with data connections and pipeline server.
+2. Use **workbench-manage** to create a Jupyter workbench for development.
+3. Use **pipeline-manage** to run and monitor pipelines.
 
 
 

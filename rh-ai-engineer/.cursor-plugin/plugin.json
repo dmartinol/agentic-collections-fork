@@ -1,7 +1,7 @@
 {
   "name": "rh-ai-engineer",
   "version": "1.0.0",
-  "description": "Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI)\u2014projects, workbenches, model deployment, pipelines, NIM, runtimes, observability, monitoring, and guardrails.",
+  "description": "Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, registries, workbenches, and serving runtimes on OpenShift AI.",
   "author": {
     "name": "Red Hat Ecosystem Engineering",
     "email": "eco-engineering@redhat.com"

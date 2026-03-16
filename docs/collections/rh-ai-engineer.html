@@ -45,7 +45,7 @@
             <div class="toolbar-left">
                 <a href="../index.html" class="collection-back">← Back to Catalog</a>
                 <h1>Red Hat AI Engineer Agentic Collection</h1>
-                <p class="subtitle">Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI)—projects, workbenches, model deployment, </p>
+                <p class="subtitle">Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, reg</p>
             </div>
             <div class="toolbar-right">
                 <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" class="toolbar-button">GitHub</a>
@@ -70,35 +70,49 @@
 <h3>Prerequisites</h3>
 <ul>
 <li>Claude Code CLI or IDE extension</li>
-<li>Red Hat OpenShift AI cluster with model serving components available</li>
-<li><code>oc</code> CLI and <code>KUBECONFIG</code> configured for the cluster</li>
+<li>Red Hat OpenShift AI (RHOAI) cluster with model serving capabilities</li>
+<li><code>oc</code> CLI and <code>KUBECONFIG</code> configured for cluster access</li>
 </ul>
 <h3>Environment Setup</h3>
+<p>Configure OpenShift AI cluster access:</p>
 <pre><code class="language-bash">export KUBECONFIG=&quot;/path/to/your/kubeconfig&quot;
-oc get datascienceprojects -A
+</code></pre>
+<p>Verify access to OpenShift AI:</p>
+<pre><code class="language-bash">oc get datascienceprojects -A
 </code></pre>
 <p>Skills rely on <strong><code>openshift</code></strong> (required), <strong><code>rhoai</code></strong> (preferred), and optional <strong><code>ai-observability</code></strong> MCP servers defined in <code>rh-ai-engineer/.mcp.json</code>. Copy entries into your Claude Code MCP settings; use <code>${...}</code> env placeholders only.</p>
 <div class="install-accordion">
 <details class="install-accordion-item" open>
 <summary class="install-accordion-header">Installation (Claude Code)</summary>
-<div class="install-accordion-body"><pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+<div class="install-accordion-body"><p>Install the collection as a Claude Code plugin:</p>
+<pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
 claude plugin install rh-ai-engineer
 </code></pre>
-<p>Local development:</p>
+<p>Or for local development:</p>
 <pre><code class="language-bash">claude plugin marketplace add /path/to/agentic-collections
 claude plugin install rh-ai-engineer
 </code></pre></div>
 </details>
 <details class="install-accordion-item">
 <summary class="install-accordion-header">Installation (Cursor)</summary>
-<div class="install-accordion-body"><pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+<div class="install-accordion-body"><p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+</code></pre>
+<p>Or download and extract:</p>
+<pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
 </code></pre></div>
 </details>
 <details class="install-accordion-item">
 <summary class="install-accordion-header">Installation (Open Code)</summary>
-<div class="install-accordion-body"><pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+<div class="install-accordion-body"><p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+</code></pre>
+<p>Or with wget:</p>
+<pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
 </code></pre></div>
 </details>
 </div>
@@ -223,6 +237,18 @@ cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
 <ol>
 <li><strong>debug-inference</strong> — isolate failing pods, events, or resources.</li>
 <li>Re-run <strong>model-deploy</strong> or adjust <strong>serving-runtime-config</strong> based on findings.</li>
+</ol>
+<h3>Deploy a model from registry</h3>
+<ol>
+<li>Use <strong>model-registry</strong> to list and select a model version.</li>
+<li>Use <strong>model-deploy</strong> to deploy the selected model to a serving runtime.</li>
+<li>Use <strong>ai-observability</strong> to monitor inference performance.</li>
+</ol>
+<h3>Set up a new data science project</h3>
+<ol>
+<li>Use <strong>ds-project-setup</strong> to create the project with data connections and pipeline server.</li>
+<li>Use <strong>workbench-manage</strong> to create a Jupyter workbench for development.</li>
+<li>Use <strong>pipeline-manage</strong> to run and monitor pipelines.</li>
 </ol>
             </div>
         </div>
