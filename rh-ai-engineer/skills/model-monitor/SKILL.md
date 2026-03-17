@@ -304,7 +304,7 @@ data:
 **Display manifest and explain drift metrics:**
 - **MeanShift**: Detects shift in mean of feature distributions. Threshold = max allowable mean shift.
 - **FourierMMD**: Frequency-domain distribution comparison. Lower threshold = more sensitive.
-- **KS-Test**: Kolmogorov-Smirnov test p-value threshold. Below threshold = distribution has drifted.
+- **KS-Test**: Kolmogorov-Smirnov D statistic. Higher value = greater distribution difference. Alert when value exceeds threshold.
 - **Jensen-Shannon**: Measures divergence between distributions. Lower threshold = more sensitive to drift.
 
 **Ask**: "Proceed with these drift metric configurations? (yes/no/modify)"

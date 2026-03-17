@@ -58,7 +58,7 @@ spec:
 |--------|--------|-------------|
 | `trustyai_meanshift` | `model`, `feature` | Mean shift detection |
 | `trustyai_fouriermmd` | `model`, `feature` | Fourier MMD distribution comparison |
-| `trustyai_kstest` | `model`, `feature` | Kolmogorov-Smirnov test statistic |
+| `trustyai_kstest` | `model`, `feature` | Kolmogorov-Smirnov statistic (D) |
 | `trustyai_jensenshannon` | `model`, `feature` | Jensen-Shannon divergence |
 
 ## Recommended Thresholds
@@ -69,7 +69,7 @@ spec:
 | DIR | 1.0 | 0.8–1.2 | DIR < 0.8 or DIR > 1.2 |
 | MeanShift | 0 | 0.1 | value > 0.1 |
 | FourierMMD | 0 | 0.05 | value > 0.05 |
-| KS-Test | 1.0 (p-value) | 0.05 | p-value < 0.05 |
+| KS-Test (D) | 0 | 0.1 | value > 0.1 |
 | Jensen-Shannon | 0 | 0.1 | value > 0.1 |
 
 ## Minimum Data Requirements
