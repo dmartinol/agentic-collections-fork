@@ -11,6 +11,14 @@ marketplaces:
 - Claude Code
 - Cursor
 support_level: Unknown
+keywords:
+- ansible
+- aap
+- automation
+- red-hat
+- governance
+- troubleshooting
+- execution
 description: Ansible Automation Platform governance, execution safety, and forensic
   troubleshooting tools for Red Hat automation engineers.
 summary: The rh-automation collection provides 11 skills for AAP governance assessment,
