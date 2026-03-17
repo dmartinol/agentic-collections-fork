@@ -290,12 +290,13 @@ data:
   drift-config.json: |
     {
       "modelId": "[isvc-name]",
-      "metrics": ["MEANSHIFT", "FOURIERMMD", "KSTEST"],
+      "metrics": ["MEANSHIFT", "FOURIERMMD", "KSTEST", "JENSENSHANNON"],
       "referenceTag": "TRAINING",
       "thresholds": {
         "MEANSHIFT": 0.1,
         "FOURIERMMD": 0.05,
-        "KSTEST": 0.05
+        "KSTEST": 0.05,
+        "JENSENSHANNON": 0.1
       }
     }
 ```
@@ -304,6 +305,7 @@ data:
 - **MeanShift**: Detects shift in mean of feature distributions. Threshold = max allowable mean shift.
 - **FourierMMD**: Frequency-domain distribution comparison. Lower threshold = more sensitive.
 - **KS-Test**: Kolmogorov-Smirnov test p-value threshold. Below threshold = distribution has drifted.
+- **Jensen-Shannon**: Measures divergence between distributions. Lower threshold = more sensitive to drift.
 
 **Ask**: "Proceed with these drift metric configurations? (yes/no/modify)"
 
