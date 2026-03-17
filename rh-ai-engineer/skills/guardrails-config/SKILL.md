@@ -220,13 +220,21 @@ Verify orchestrator pod is Running. Poll every 15 seconds for up to 5 minutes.
 
 ### Step 7: Validate Guarded Endpoint
 
+First, verify the original model still responds correctly:
+
 **MCP Tool**: `test_model_endpoint` (from rhoai)
 
 **Parameters**:
 - `name`: the original InferenceService name - REQUIRED
 - `namespace`: target namespace - REQUIRED
 
-Test with a safe request first. Then suggest a known-unsafe input (e.g., prompt injection attempt) to verify blocking if policy is "block". Report validation results.
+Then test the **guarded endpoint** directly. The guarded endpoint is a different URL from the original — obtain it from the GuardrailsOrchestrator CR status (Step 6). If the guarded endpoint is only available cluster-internally, set up port-forwarding to the orchestrator service first:
+
+```
+oc port-forward svc/guardrails-[isvc-name] 8080:8080 -n [namespace]
+```
+
+Run a safe request against the guarded endpoint to confirm it proxies correctly, then run an unsafe request (e.g., prompt injection attempt) to verify the detectors are active. Present both results to the user with pass/fail for each test.
 
 ### Step 8: Summary and Next Steps
 
