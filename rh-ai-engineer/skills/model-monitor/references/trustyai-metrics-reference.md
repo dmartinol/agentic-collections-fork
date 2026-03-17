@@ -4,7 +4,7 @@ category: references
 tags: [trustyai, bias, drift, monitoring, metrics, prometheus]
 semantic_keywords: [TrustyAI CRD, bias metric names, drift metric names, prometheus queries, SPD threshold, DIR threshold]
 use_cases: [model-monitor]
-last_updated: 2026-03-16
+last_updated: 2026-03-17
 ---
 
 # TrustyAI Metrics Reference
@@ -71,6 +71,42 @@ spec:
 | FourierMMD | 0 | 0.05 | value > 0.05 |
 | KS-Test (D) | 0 | 0.1 | value > 0.1 |
 | Jensen-Shannon | 0 | 0.1 | value > 0.1 |
+
+## Bias Metric ConfigMap Schema
+
+ConfigMap name pattern: `trustyai-bias-config-[isvc-name]`
+
+Labels: `app.kubernetes.io/part-of: trustyai`, `trustyai.opendatahub.io/target-model: [isvc-name]`
+
+Each metric stored as a JSON entry (`spd-config.json`, `dir-config.json`):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `modelId` | string | InferenceService name |
+| `protectedAttribute` | string | Feature name to check for fairness |
+| `favorableOutcome` | any | Model output value considered "positive" |
+| `outcomeName` | string | Name of the outcome field |
+| `privilegedAttribute` | any | Protected attribute value for privileged group |
+| `unprivilegedAttribute` | any | Protected attribute value for unprivileged group |
+| `metricName` | string | `"SPD"` or `"DIR"` |
+| `thresholdDelta` | float | SPD only: alert when \|SPD\| exceeds this (default: 0.1) |
+| `thresholdLower` | float | DIR only: alert when DIR below this (default: 0.8) |
+| `thresholdUpper` | float | DIR only: alert when DIR above this (default: 1.2) |
+
+## Drift Metric ConfigMap Schema
+
+ConfigMap name pattern: `trustyai-drift-config-[isvc-name]`
+
+Labels: same as bias ConfigMap
+
+Single JSON entry (`drift-config.json`):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `modelId` | string | InferenceService name |
+| `metrics` | string[] | Subset of: `MEANSHIFT`, `FOURIERMMD`, `KSTEST`, `JENSENSHANNON` |
+| `referenceTag` | string | Tag for baseline data (default: `"TRAINING"`) |
+| `thresholds` | object | Map of metric name to threshold value (see Recommended Thresholds) |
 
 ## Minimum Data Requirements
 
