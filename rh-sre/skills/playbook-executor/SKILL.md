@@ -5,6 +5,12 @@ description: |
 
   Execute remediation playbooks with job management, dry-run, and reporting. Use after playbook-generator.
 
+  Use when:
+  - "Execute the remediation playbook"
+  - "Launch the playbook on AAP"
+  - "Run the CVE remediation job"
+  - "Dry-run the playbook first"
+
   **Git Flow**: If template playbook path ≠ generated playbook, perform Git Flow (commit, push, sync) BEFORE launch.
 ---
 
