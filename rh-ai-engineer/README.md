@@ -89,17 +89,20 @@ The pack provides 11 skills for deploying and managing AI/ML models on Red Hat O
 
 ### ds-project-setup - Data Science Project Setup
 
-Set up data science projects on OpenShift AI with appropriate configurations and resources.
+Set up data science projects on OpenShift AI with namespace setup, S3 data connections, pipeline server, and model serving enablement.
 
 **Use when:**
 - "Create a new data science project"
 - "Set up project for model development"
 - "Configure OpenShift AI project"
+- "Add an S3 data connection to my project"
+- "Configure the pipeline server"
 
 **What it does:**
-- Creates and configures DS projects
-- Sets up resource quotas
-- Configures access and permissions
+- Creates and configures DS projects with RHOAI labels
+- Sets up S3-compatible data connections
+- Configures pipeline server and model serving
+- Sets up resource quotas and access permissions
 
 
 

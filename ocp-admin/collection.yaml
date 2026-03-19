@@ -16,13 +16,6 @@ description: Automation capabilities for OpenShift Container Platform cluster ma
 summary: The ocp-admin collection provides skills for openshift tasks.
 contents:
   description: The pack provides 1 skill for OpenShift cluster management.
-  skills_decision_guide:
-  - user_request: '"Show me a report across all clusters" or "Compare cluster health"'
-    skill_to_use: cluster-report
-    reason: Generates consolidated health report across multiple OpenShift clusters.
-  - user_request: '"Multi-cluster status overview" or "How are my clusters doing?"'
-    skill_to_use: cluster-report
-    reason: Single skill for cluster health; verifies kubeconfig contexts and reports node resources, pods, namespaces.
   skills:
   - name: cluster-report
     description: Multi-Cluster Health Report
@@ -40,6 +33,13 @@ contents:
       - Collects node resources (CPU, memory, GPUs)
       - Reports namespace counts and pod status
       - Provides single comparison view across clusters
+  skills_decision_guide:
+  - user_request: '"Show me a report across all clusters" or "Compare cluster health"'
+    skill_to_use: cluster-report
+    reason: Generates consolidated health report across multiple OpenShift clusters.
+  - user_request: '"Multi-cluster status overview" or "How are my clusters doing?"'
+    skill_to_use: cluster-report
+    reason: Single skill for cluster health; verifies kubeconfig contexts and reports node resources, pods, namespaces.
 deploy_and_use: |
   ### Prerequisites
 
