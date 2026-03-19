@@ -70,7 +70,7 @@ cp -r agentic-collections-main/rh-support-engineer ~/.opencode/plugins/rh-suppor
 
 ## Skills
 
-The pack provides skills for technical support and troubleshooting (skills in development).
+The pack will provide skills for technical support and troubleshooting (skills in development).
 
 
 

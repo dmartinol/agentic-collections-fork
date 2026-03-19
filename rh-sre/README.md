@@ -149,7 +149,7 @@ Collect detailed system information from Red Hat Lightspeed.
 
 ### playbook-generator - Ansible Playbook Creation
 
-Generate Ansible remediation playbooks following Red Hat best practices.
+Generate Ansible remediation playbooks following Red Hat best practices. **Only generates playbooks; does not execute them.** Use `/playbook-executor` to run playbooks.
 
 **Use when:**
 - Create a remediation playbook for CVE-X

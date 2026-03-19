@@ -15,7 +15,7 @@ description: Technical support and troubleshooting tools for Red Hat products an
   platforms.
 summary: The rh-support-engineer collection provides skills for development tasks.
 contents:
-  description: The pack provides skills for technical support and troubleshooting (skills in development).
+  description: The pack will provide skills for technical support and troubleshooting (skills in development).
   skills: []
 deploy_and_use: |
   ### Prerequisites

@@ -72,8 +72,10 @@ contents:
       - "Multi-cluster status overview"
 
       **What it does:**
-      - Verifies each context targets OpenShift before reporting
-      - Aggregates nodes, GPUs, namespaces, and pod health
+      - Verifies each kubeconfig context targets OpenShift before reporting
+      - Collects node resources (CPU, memory, GPUs)
+      - Reports namespace counts and pod health
+      - Provides a single comparison view across clusters
 
       **Requires:** `KUBECONFIG` with appropriate cluster access;
       uses **openshift-administration** MCP (see `.mcp.json`).
