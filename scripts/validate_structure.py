@@ -140,11 +140,20 @@ def validate_collection_yaml(pack_dir: str) -> List[str]:
     # resources
     resources = data.get('resources')
     if resources is not None and isinstance(resources, list):
+        pack_root = REPO_ROOT / pack_dir
         for i, entry in enumerate(resources):
             if isinstance(entry, dict):
                 for req in REQUIRED_RESOURCE_ENTRY:
                     if req not in entry:
                         errors.append(f"{pack_dir}: resources[{i}] missing '{req}'")
+                # embedded_doc: path must exist when present
+                embedded = entry.get('embedded_doc')
+                if embedded and isinstance(embedded, str):
+                    doc_path = pack_root / embedded
+                    if not doc_path.exists():
+                        errors.append(
+                            f"{pack_dir}: resources[{i}] embedded_doc '{embedded}' does not exist"
+                        )
 
     return errors
 
