@@ -56,7 +56,7 @@ Packs known to the validator are listed in `scripts/validate_structure.py` (`PAC
 
 ### Collection — `collection.yaml`
 
-Vendor-agnostic catalog definition. Schema in `catalog/schema.yaml`. Run `make generate-catalog` to produce plugin.json, README, and marketplace entries. Required fields: `id`, `name`, `provider`, `version`, `categories`, `personas`, `marketplaces`, `description`, `summary`, `contents`, `deploy_and_use`, `sample_workflows`, `resources`.
+Vendor-agnostic catalog definition. See [COLLECTION_SPEC.md](COLLECTION_SPEC.md) for full structure and generation pipeline. Schema in `catalog/schema.yaml`. Run `make generate-catalog` to produce plugin.json, README, and marketplace entries.
 
 ### Skills — `skills/<name>/SKILL.md`
 
@@ -109,10 +109,11 @@ Same YAML frontmatter requirement (`name` + `description`). Agents orchestrate s
 
 ## Adding a New Pack
 
-1. Create `<pack-name>/` directory with `README.md`.
-2. Add `skills/` and optionally `agents/`, `.mcp.json`, `.claude-plugin/plugin.json`.
-3. Add the new pack name to `PACK_DIRS` in `scripts/validate_structure.py`.
-4. Run `make validate && make generate` to regenerate docs locally for testing; do **not** commit `docs/data.json` (it is generated during deployment).
+1. Create `<pack-name>/` directory with `collection.yaml` (see [COLLECTION_SPEC.md](COLLECTION_SPEC.md)).
+2. Run `make generate-catalog` to generate README, plugin.json, marketplace entries.
+3. Add `skills/` and optionally `agents/`, `.mcp.json`.
+4. Add the new pack name to `PACK_DIRS` in `scripts/validate_structure.py`.
+5. Run `make validate && make generate` to regenerate docs locally for testing.
 
 ## Adding a New Skill
 
