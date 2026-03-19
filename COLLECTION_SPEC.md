@@ -123,6 +123,17 @@ Validates `collection.yaml` structure per pack:
 
 **Not validated:** Cross-check that all `skills/*/SKILL.md` are listed in `collection.yaml`, or that orchestration skills are not duplicated in `skills`.
 
+## AI Assistant Skills
+
+Project skills in `.claude/skills/` (linked by `.cursor/skills/`) help AI assistants work with collections:
+
+| Skill | Use when |
+|-------|----------|
+| **generate-collection** | Create or scaffold `collection.yaml` from `skills/*/SKILL.md` definitions |
+| **collection-compliance** | Validate `collection.yaml` against this spec (structure + cross-checks) |
+
+See [.claude/skills/README.md](.claude/skills/README.md) for the full list.
+
 ## When Adding a Skill
 
 1. Create `skills/<name>/SKILL.md` (see [SKILL_DESIGN_PRINCIPLES.md](SKILL_DESIGN_PRINCIPLES.md))
