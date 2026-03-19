@@ -18,6 +18,9 @@ from jinja2 import Environment, FileSystemLoader
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
+# Packs excluded from collection pages (e.g. WIP)
+EXCLUDE_FROM_PAGES = ["rh-support-engineer"]
+
 
 def load_collection(pack_dir: str) -> Dict[str, Any] | None:
     """Load collection.yaml for a pack."""
@@ -29,10 +32,12 @@ def load_collection(pack_dir: str) -> Dict[str, Any] | None:
 
 
 def discover_collections() -> list[tuple[str, Dict[str, Any]]]:
-    """Find all packs with collection.yaml."""
+    """Find all packs with collection.yaml, excluding WIP packs."""
     result = []
     for item in sorted(REPO_ROOT.iterdir()):
         if not item.is_dir() or item.name.startswith("."):
+            continue
+        if item.name in EXCLUDE_FROM_PAGES:
             continue
         data = load_collection(item.name)
         if data:
@@ -304,6 +309,13 @@ def main(
     template = env.get_template("collection_page.html.j2")
     collections_dir = REPO_ROOT / "docs" / "collections"
     collections_dir.mkdir(parents=True, exist_ok=True)
+
+    # Remove pages for excluded packs (e.g. WIP)
+    for pack_id in EXCLUDE_FROM_PAGES:
+        excluded_path = collections_dir / f"{pack_id}.html"
+        if excluded_path.exists():
+            excluded_path.unlink()
+            print(f"Removed docs/collections/{pack_id}.html (excluded)")
 
     for pack_dir, data in collections:
         mcp_servers = mcp_by_pack.get(pack_dir) or [

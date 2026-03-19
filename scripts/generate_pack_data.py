@@ -11,7 +11,8 @@ from typing import Dict, List, Any
 import yaml
 
 # List of agentic packs to parse
-PACK_DIRS = ['ocp-admin', 'rh-ai-engineer', 'rh-automation', 'rh-developer', 'rh-sre', 'rh-support-engineer', 'rh-virt']
+# Excludes WIP packs (e.g. rh-support-engineer) from docs/data.json and collection pages
+PACK_DIRS = ['ocp-admin', 'rh-ai-engineer', 'rh-automation', 'rh-developer', 'rh-sre', 'rh-virt']
 
 
 def parse_yaml_frontmatter(file_path: Path) -> Dict[str, Any]:
