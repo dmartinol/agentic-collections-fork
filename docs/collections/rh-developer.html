@@ -287,21 +287,12 @@ cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
 <table><thead><tr><th>User request</th><th>Skill to use</th><th>Reason</th></tr></thead><tbody><tr><td>"Containerize and deploy this app" or "Build and deploy to OpenShift"</td><td><code>/containerize-deploy</code></td><td>End-to-end workflow from source to running app; orchestrates detect-project, s2i-build, deploy.</td></tr><tr><td>"What language is this project?" or "Detect framework for this app"</td><td><code>/detect-project</code></td><td>Analyzes project to detect language, framework, and version requirements.</td></tr><tr><td>"Why is this pod failing?" or "Debug CrashLoopBackOff"</td><td><code>/debug-pod</code></td><td>Diagnoses pod failures on OpenShift (CrashLoopBackOff, ImagePullBackOff, OOMKilled).</td></tr><tr><td>"Why did the build fail?" or "Debug S2I build"</td><td><code>/debug-build</code></td><td>Diagnoses OpenShift build failures including S2I builds and BuildConfig issues.</td></tr><tr><td>"What S2I image should I use?" or "Recommend builder for Node.js"</td><td><code>/recommend-image</code></td><td>Recommends optimal S2I builder or base image based on project requirements.</td></tr></tbody></table>
             </div>
             <div id="tab-resources" class="collection-tab-panel" role="tabpanel">
-                <h2>Documentation</h2>
+                <h2>References</h2>
 <ul>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/dynamic-validation.md" target="_blank" rel="noopener">Dynamic Image Validation Reference</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/image-selection-criteria.md" target="_blank" rel="noopener">Image Selection Criteria Reference</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/python-s2i-entrypoints.md" target="_blank" rel="noopener">Python S2I Entry Point Requirements</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/builder-images.md" target="_blank" rel="noopener">S2I Builder Image Reference</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/rhel-deployment.md" target="_blank" rel="noopener">RHEL Deployment Reference</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/human-in-the-loop.md" target="_blank" rel="noopener">Human In The Loop</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/debugging-patterns.md" target="_blank" rel="noopener">Debugging Patterns</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/selinux-troubleshooting.md" target="_blank" rel="noopener">SELinux Troubleshooting</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/prerequisites.md" target="_blank" rel="noopener">Prerequisites</a></li>
-</ul>
-<h2>References</h2>
-<ul>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener">Main Repository</a> - agentic-collections</li>
+<li><a href="https://docs.openshift.com/container-platform/latest/openshift_images/using_images/using-s21-images.html" target="_blank" rel="noopener">OpenShift Source-to-Image (S2I)</a> - S2I builder images and language detection. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/builder-images.md" target="_blank" rel="noopener">[embedded doc]</a></li>
+<li><a href="https://catalog.redhat.com/software/containers/search" target="_blank" rel="noopener">Red Hat Container Catalog</a> - UBI images and S2I builders.</li>
+<li><a href="https://developers.redhat.com/products/rhel/ubi" target="_blank" rel="noopener">Red Hat Universal Base Images</a> - UBI9 images and language runtimes.</li>
+<li><a href="https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html" target="_blank" rel="noopener">OpenShift Deployments</a> - Deployment strategies and application lifecycle.</li>
 </ul>
             </div>
             <div id="tab-agents" class="collection-tab-panel" role="tabpanel">

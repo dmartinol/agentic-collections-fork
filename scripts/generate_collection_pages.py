@@ -3,7 +3,7 @@
 Generate static HTML collection pages with tabbed view.
 
 Creates docs/collections/{id}.html for each pack with collection.yaml.
-Tabs: Overview, Skills, Resources, Agents.
+Tabs: Overview, Skills, Resources (References only), Agents.
 """
 
 import json
@@ -38,30 +38,6 @@ def discover_collections() -> list[tuple[str, Dict[str, Any]]]:
         if data:
             result.append((item.name, data))
     return result
-
-
-def parse_docs(pack_dir: str) -> List[Dict[str, Any]]:
-    """Parse documentation files from pack docs/."""
-    docs = []
-    docs_dir = REPO_ROOT / pack_dir / "docs"
-    if not docs_dir.exists():
-        return docs
-    EXCLUDE = {"README.md", "INDEX.md", "SOURCES.md"}
-    for doc_file in docs_dir.rglob("*.md"):
-        if doc_file.name in EXCLUDE or ".ai-index" in doc_file.parts:
-            continue
-        try:
-            content = doc_file.read_text(encoding="utf-8")
-            match = re.match(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL)
-            title = doc_file.stem.replace("-", " ").title()
-            if match:
-                fm = yaml.safe_load(match.group(1)) or {}
-                title = fm.get("title", title)
-            rel = str(doc_file.relative_to(REPO_ROOT / pack_dir))
-            docs.append({"title": title, "file_path": rel})
-        except Exception:
-            pass
-    return sorted(docs, key=lambda d: d["title"])
 
 
 def parse_mcp_servers(pack_dir: str) -> List[Dict[str, Any]]:
@@ -207,31 +183,28 @@ def build_skills_html(data: Dict[str, Any]) -> str:
     return "\n".join(parts) if parts else "<p>No skills content.</p>"
 
 
-def build_resources_html(data: Dict[str, Any], docs: List[Dict[str, Any]], pack_dir: str) -> str:
-    """Build Resources tab: Documentation, References."""
-    parts = []
-    base_url = "https://github.com/RHEcosystemAppEng/agentic-collections/blob/main"
-    # Documentation
-    if docs:
-        parts.append("<h2>Documentation</h2>")
-        parts.append("<ul>")
-        for d in docs:
-            url = f"{base_url}/{pack_dir}/{d['file_path']}"
-            parts.append(f'<li><a href="{url}" target="_blank" rel="noopener">{d["title"]}</a></li>')
-        parts.append("</ul>")
-    # References
+def build_resources_html(data: Dict[str, Any], pack_dir: str) -> str:
+    """Build Resources tab: References only (from collection.yaml)."""
     resources = data.get("resources", [])
-    if resources:
-        parts.append("<h2>References</h2>")
-        parts.append("<ul>")
-        for r in resources:
-            title = r.get("title", "")
-            url = r.get("url", "#")
-            desc = r.get("description", "")
-            extra = f" - {desc}" if desc else ""
-            parts.append(f'<li><a href="{url}" target="_blank" rel="noopener">{title}</a>{extra}</li>')
-        parts.append("</ul>")
-    return "\n".join(parts) if parts else "<p>No resources.</p>"
+    if not resources:
+        return "<p>No resources.</p>"
+    base_url = "https://github.com/RHEcosystemAppEng/agentic-collections/blob/main"
+    parts = ["<h2>References</h2>", "<ul>"]
+    for r in resources:
+        title = r.get("title", "")
+        url = r.get("url", "#")
+        desc = r.get("description", "")
+        embedded_doc = r.get("embedded_doc", "")
+        extra = f" - {desc}" if desc else ""
+        embedded_link = ""
+        if embedded_doc:
+            doc_url = f"{base_url}/{pack_dir}/{embedded_doc}"
+            embedded_link = f' <a href="{doc_url}" target="_blank" rel="noopener">[embedded doc]</a>'
+        parts.append(
+            f'<li><a href="{url}" target="_blank" rel="noopener">{title}</a>{extra}{embedded_link}</li>'
+        )
+    parts.append("</ul>")
+    return "\n".join(parts)
 
 
 def _escape_html(s: str) -> str:
@@ -311,13 +284,15 @@ def load_mcp_custom() -> Dict[str, Any]:
         return {}
 
 
-def main(pack_data: List[Dict[str, Any]] | None = None, mcp_data: List[Dict[str, Any]] | None = None) -> int:
+def main(
+    pack_data: List[Dict[str, Any]] | None = None,
+    mcp_data: List[Dict[str, Any]] | None = None,
+) -> int:
     collections = discover_collections()
     if not collections:
         print("No collection.yaml files found.")
         return 1
 
-    pack_by_name = {p["name"]: p for p in (pack_data or [])}
     mcp_by_pack: Dict[str, List[Dict]] = {}
     if mcp_data:
         for srv in mcp_data:
@@ -331,8 +306,6 @@ def main(pack_data: List[Dict[str, Any]] | None = None, mcp_data: List[Dict[str,
     collections_dir.mkdir(parents=True, exist_ok=True)
 
     for pack_dir, data in collections:
-        pack_info = pack_by_name.get(pack_dir, {})
-        docs = pack_info.get("docs") or parse_docs(pack_dir)
         mcp_servers = mcp_by_pack.get(pack_dir) or [
             {"name": s["name"], "description": s.get("description", "")}
             for s in parse_mcp_servers(pack_dir)
@@ -340,7 +313,7 @@ def main(pack_data: List[Dict[str, Any]] | None = None, mcp_data: List[Dict[str,
 
         overview_html = build_overview_html(data)
         skills_html = build_skills_html(data)
-        resources_html = build_resources_html(data, docs, pack_dir)
+        resources_html = build_resources_html(data, pack_dir)
         agents_html = build_agents_html(data, mcp_servers, mcp_custom, pack_dir)
 
         collection_id = data.get("id", pack_dir)

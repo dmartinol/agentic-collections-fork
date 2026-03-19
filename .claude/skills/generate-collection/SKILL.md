@@ -6,8 +6,9 @@ description: |
   - "Scaffold collection.yaml for this pack"
   - "Generate collection catalog from SKILL.md files"
   - "Add new skill to collection.yaml"
+  - "Regenerate resources" / "Update resources from docs" / "Extract resources from docs"
 
-  Reads skills/<name>/SKILL.md, extracts frontmatter, and produces contents.skills / contents.orchestration_skills entries per COLLECTION_SPEC.md.
+  Reads skills/<name>/SKILL.md, extracts frontmatter, and produces contents.skills / contents.orchestration_skills entries per COLLECTION_SPEC.md. When regenerating resources, iterates over docs/**/*.md and extracts from frontmatter `sources`.
 allowed-tools: Read Glob Grep
 ---
 
@@ -86,12 +87,35 @@ For each skill, produce a YAML entry:
 
 If SKILL.md has a "When to Use" or "Use when" section, use those prompts. Otherwise derive from the `description` field.
 
-### Step 5: Merge or Create collection.yaml
+### Step 5: Resources Structure
 
-- **If collection.yaml exists:** Preserve top-level metadata (`id`, `name`, `provider`, `version`, `categories`, `personas`, `marketplaces`, `description`, `summary`, `deploy_and_use`, `sample_workflows`, `resources`). Replace only `contents.skills` and `contents.orchestration_skills` with generated entries. Preserve `contents.description` and `contents.skills_decision_guide` unless user asks to regenerate.
+When creating or updating `resources`, each entry has:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `title` | Yes | Display name for the reference |
+| `url` | Yes | External URL (e.g. docs.redhat.com, access.redhat.com) |
+| `description` | No | Short description shown after the link |
+| `embedded_doc` | No | Path to embedded markdown file under the pack (e.g. `docs/rhel/package-management.md`). When present, collection pages show a side link "[embedded doc]" to this file. |
+
+**When regenerating resources** (user asks to "update resources", "regenerate resources", or "extract resources from docs"):
+
+1. **Discover all docs:** List every markdown file under `{pack_dir}/docs/` (e.g. `docs/**/*.md`). Exclude `INDEX.md`, `README.md`, `SOURCES.md` (meta/navigation only).
+2. **For each doc with `sources` in frontmatter:** Read the doc's YAML frontmatter. If it has a `sources` array:
+   - Use the **first source** (primary reference) for `title` and `url`.
+   - Use `sections` from that source (if present) for `description`, or derive from the doc's `title`.
+   - Set `embedded_doc` to the doc path relative to pack root (e.g. `docs/ansible/playbook-integration-aap.md`).
+3. **Deduplicate by URL:** If multiple docs cite the same `url`, keep one resource per unique URL. For `embedded_doc`, prefer the doc most central to the pack's skills (e.g. cve-remediation-templates over a README).
+4. **Add pack-level references:** Include essential external links not derived from docs (e.g. Lightspeed console, MCP server repo) when they support the pack's workflows.
+
+**When only adding a skill** (user did not ask to regenerate resources): Preserve existing `resources`; do not replace them.
+
+### Step 6: Merge or Create collection.yaml
+
+- **If collection.yaml exists:** Preserve top-level metadata (`id`, `name`, `provider`, `version`, `categories`, `personas`, `marketplaces`, `description`, `summary`, `deploy_and_use`, `sample_workflows`, `resources`). Replace only `contents.skills` and `contents.orchestration_skills` with generated entries. Preserve `contents.description`, `contents.skills_decision_guide`, and `resources` unless user asks to regenerate.
 - **If collection.yaml does not exist:** Use [catalog/schema.yaml](../../../catalog/schema.yaml) and an existing pack (e.g. `rh-sre`) as template. Generate full structure with placeholder values for metadata; user must fill in `description`, `summary`, `deploy_and_use`, `sample_workflows`, `resources`.
 
-### Step 6: Validate
+### Step 7: Validate
 
 Run `make validate` to confirm structure. Report any errors and suggest fixes.
 
@@ -118,3 +142,12 @@ Run `make validate` to confirm structure. Report any errors and suggest fixes.
 5. Append new entry to `contents.skills`
 6. Run `make validate`
 7. Present diff for user approval
+
+**User:** "Regenerate resources for rh-sre from docs"
+
+**Workflow:**
+1. List `rh-sre/docs/**/*.md` (exclude INDEX.md, README.md, SOURCES.md)
+2. For each doc with `sources` in frontmatter: extract first source (title, url), add embedded_doc
+3. Deduplicate by URL; add pack-level refs (Lightspeed, lightspeed-mcp)
+4. Replace `resources` in `rh-sre/collection.yaml`
+5. Run `make validate`

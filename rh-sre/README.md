@@ -348,23 +348,32 @@ Add workflows in collection.yaml.
 ## References
 
 
-- [Red Hat Lightspeed](https://console.redhat.com/insights)
+- [Red Hat Lightspeed](https://console.redhat.com/insights) - Red Hat Insights and Lightspeed console for fleet and vulnerability management.
 
 
-- [lightspeed-mcp GitHub](https://github.com/redhat/lightspeed-mcp)
+- [Red Hat Lightspeed Remediations Guide](https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/red_hat_lightspeed_remediations_guide/index) - Creating remediation plans, playbook generation.
 
 
-- [Ansible Automation Platform](https://www.redhat.com/en/technologies/management/ansible)
+- [Red Hat Lightspeed MCP](https://github.com/redhat/lightspeed-mcp) - MCP server used by this collection; parameter reference.
 
 
-- [AAP REST API Documentation](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/)
+- [Assessing and Monitoring Security Vulnerabilities on RHEL Systems](https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview) - CVE identification, classification, threat intelligence.
 
 
-- [Claude Code Documentation](https://docs.anthropic.com/claude-code)
+- [Managing Software with the DNF Tool (RHEL 9)](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/managing_software_with_the_dnf_tool/index) - DNF commands, updating packages, repository management.
 
 
-- [MCP Protocol Specification](https://modelcontextprotocol.io/)
+- [Severity Ratings (Red Hat Customer Portal)](https://access.redhat.com/security/updates/classification) - Red Hat severity ratings, CVSS usage.
 
 
-- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections)
+- [Red Hat Ansible Automation Platform Documentation](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6) - AAP 2.6 docs; projects, job templates, playbook integration.
+
+
+- [AAP Job Execution](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/using_automation_execution/controller-job-templates) - Job templates, check mode, dry-run execution.
+
+
+- [Ansible Automation Platform](https://www.redhat.com/en/technologies/management/ansible) - AAP product overview for playbook execution.
+
+
+- [AAP REST API Documentation](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/) - AAP API reference for job and inventory management.
 

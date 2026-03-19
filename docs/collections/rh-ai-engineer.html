@@ -254,16 +254,11 @@ cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
 <table><thead><tr><th>User request</th><th>Skill to use</th><th>Reason</th></tr></thead><tbody><tr><td>"Deploy Llama 3 on my cluster" or "Create inference endpoint"</td><td><code>/model-deploy</code></td><td>Deploys AI/ML models to OpenShift AI serving runtimes (vLLM, NIM, Caikit+TGIS).</td></tr><tr><td>"Set up NIM on my cluster" or "Configure NGC credentials for NIM"</td><td><code>/nim-setup</code></td><td>Configures NVIDIA NIM platform on OpenShift AI for GPU-accelerated inference.</td></tr><tr><td>"Why is inference failing?" or "Debug model serving"</td><td><code>/debug-inference</code></td><td>Troubleshoots failed or slow InferenceService deployments.</td></tr><tr><td>"Show model performance metrics" or "Monitor inference latency"</td><td><code>/ai-observability</code></td><td>Analyzes model performance, GPU utilization, and cluster health.</td></tr><tr><td>"Create a new data science project" or "Set up project for model development"</td><td><code>/ds-project-setup</code></td><td>Creates and configures Data Science Projects on OpenShift AI.</td></tr><tr><td>"Monitor my model for bias" or "Set up drift detection"</td><td><code>/model-monitor</code></td><td>Configures TrustyAI bias (SPD, DIR) and drift monitoring on deployed InferenceServices.</td></tr><tr><td>"Add guardrails to my LLM" or "Set up content safety"</td><td><code>/guardrails-config</code></td><td>Deploys TrustyAI Guardrails Orchestrator with input/output content safety detectors.</td></tr></tbody></table>
             </div>
             <div id="tab-resources" class="collection-tab-panel" role="tabpanel">
-                <h2>Documentation</h2>
+                <h2>References</h2>
 <ul>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/examples/model-deploy.md" target="_blank" rel="noopener">Model Deploy</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/examples/nim-setup.md" target="_blank" rel="noopener">Nim Setup</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/references/known-model-profiles.md" target="_blank" rel="noopener">Known Model Hardware Profiles</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/references/supported-runtimes.md" target="_blank" rel="noopener">Supported Serving Runtimes</a></li>
-</ul>
-<h2>References</h2>
-<ul>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener">Main Repository</a> - agentic-collections</li>
+<li><a href="https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed" target="_blank" rel="noopener">Red Hat OpenShift AI Documentation</a> - RHOAI product documentation for model serving, pipelines, and workbenches.</li>
+<li><a href="https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed/latest/html-single/red_hat_openshift_ai_self_managed" target="_blank" rel="noopener">OpenShift AI Model Serving</a> - InferenceService, runtimes, and model deployment. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/references/supported-runtimes.md" target="_blank" rel="noopener">[embedded doc]</a></li>
+<li><a href="https://docs.nvidia.com/nim/" target="_blank" rel="noopener">NVIDIA NIM on OpenShift AI</a> - NVIDIA Inference Microservices for GPU-accelerated serving. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/examples/nim-setup.md" target="_blank" rel="noopener">[embedded doc]</a></li>
 </ul>
             </div>
             <div id="tab-agents" class="collection-tab-panel" role="tabpanel">

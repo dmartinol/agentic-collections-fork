@@ -39,7 +39,7 @@ Full schema: [catalog/schema.yaml](catalog/schema.yaml)
 | `contents` | object | Skills and content (see below) |
 | `deploy_and_use` | string | Markdown: prerequisites, env setup, install per marketplace |
 | `sample_workflows` | list | `{ name, workflow }` entries |
-| `resources` | list | `{ title, description, url }` entries |
+| `resources` | list | `{ title, description, url, embedded_doc? }` entries |
 
 ### Contents Structure
 
@@ -89,6 +89,17 @@ Optional array to help users choose the right skill. Rendered as a table in READ
 - `user_request`: Example user prompt or intent
 - `skill_to_use`: Skill name (must exist in `skills` or `orchestration_skills`)
 - `reason`: Why this skill fits
+
+### resources
+
+External references and optional embedded documentation. Each entry has:
+
+- `title` (required): Display name for the reference
+- `url` (required): External URL (e.g. docs.redhat.com)
+- `description` (optional): Short description shown after the link
+- `embedded_doc` (optional): Path to embedded markdown file under the pack (e.g. `docs/rhel/package-management.md`). When present, collection pages show a side link "[embedded doc]" to this file on GitHub.
+
+The Resources tab on collection pages shows only References (from `collection.yaml`); no separate Documentation section.
 
 ## Generation Pipeline
 

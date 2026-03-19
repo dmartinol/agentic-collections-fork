@@ -291,17 +291,20 @@ Use forensic-troubleshooter when a job fails. Extracts events, classifies errors
 ## References
 
 
-- [Red Hat Ansible Automation Platform](https://www.redhat.com/en/technologies/management/ansible)
+- [Red Hat Ansible Automation Platform](https://www.redhat.com/en/technologies/management/ansible) - Product overview and capabilities for AAP.
 
 
-- [AAP 2.5 Security Best Practices](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices)
+- [AAP 2.5 Security Best Practices](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices) - Credential security, RBAC, separation of duties.
 
 
-- [AAP 2.6 Troubleshooting Guide](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs)
+- [AAP 2.6 Troubleshooting Guide (Jobs)](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs) - Job failure analysis, common errors, event interpretation.
 
 
-- [AAP MCP Server](https://github.com/ansible/aap-mcp-server)
+- [AAP 2.5 Job Templates and Configuration](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/automation_controller_user_guide/controller-job-templates) - Job execution, check mode, extra_vars, job slicing.
 
 
-- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections)
+- [AAP 2.6 Troubleshooting Guide](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs) - Error classification taxonomy and resolution paths.
+
+
+- [AAP MCP Server](https://github.com/ansible/aap-mcp-server) - MCP server for AAP API integration used by this collection.
 

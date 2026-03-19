@@ -279,21 +279,16 @@ sample_workflows:
 - name: 'TODO: Add workflow'
   workflow: Extract from README Sample Workflows section.
 resources:
-- title: OpenShift Virtualization Documentation
-  url: https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html
-  description: ''
-- title: KubeVirt User Guide
-  url: https://kubevirt.io/user-guide/
-  description: ''
-- title: OpenShift MCP Server
-  url: https://github.com/openshift/openshift-mcp-server
-  description: ''
-- title: MCP Protocol Specification
-  url: https://modelcontextprotocol.io/
-  description: ''
-- title: Main Repository
-  url: https://github.com/RHEcosystemAppEng/agentic-collections
-  description: ''
+  - title: OpenShift Virtualization Documentation
+    url: https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html
+    description: OpenShift Virtualization overview and VM management.
+  - title: KubeVirt User Guide
+    url: https://kubevirt.io/user-guide/
+    description: KubeVirt VM lifecycle, status conditions, and node placement.
+    embedded_doc: docs/troubleshooting/INDEX.md
+  - title: OpenShift MCP Server
+    url: https://github.com/openshift/openshift-mcp-server
+    description: MCP server for OpenShift/KubeVirt used by this collection.
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy

@@ -63,6 +63,7 @@ resources:
   - title: string
     description: string
     url: string
+    embedded_doc: string  # Optional: path to embedded markdown under pack (e.g. docs/rhel/package-management.md)
 
 # Optional: Legal resources
 legal_resources:

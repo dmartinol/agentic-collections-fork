@@ -133,5 +133,8 @@ Add workflows in collection.yaml.
 ## References
 
 
-- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections) - agentic-collections
+- [OpenShift Container Platform Documentation](https://docs.openshift.com/container-platform/latest/welcome/index.html) - Official OpenShift cluster management and administration docs.
+
+
+- [OpenShift Multi-Cluster Management](https://docs.openshift.com/container-platform/latest/operators/operator_sdk/osdk-cli-managing-multicluster.html) - Managing multiple OpenShift clusters.
 

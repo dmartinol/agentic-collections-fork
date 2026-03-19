@@ -307,9 +307,19 @@ sample_workflows:
 - name: 'TODO: Add workflow'
   workflow: Extract from README Sample Workflows section.
 resources:
-- title: Main Repository
-  description: agentic-collections
-  url: https://github.com/RHEcosystemAppEng/agentic-collections
+  - title: OpenShift Source-to-Image (S2I)
+    url: https://docs.openshift.com/container-platform/latest/openshift_images/using_images/using-s21-images.html
+    description: S2I builder images and language detection.
+    embedded_doc: docs/builder-images.md
+  - title: Red Hat Container Catalog
+    url: https://catalog.redhat.com/software/containers/search
+    description: UBI images and S2I builders.
+  - title: Red Hat Universal Base Images
+    url: https://developers.redhat.com/products/rhel/ubi
+    description: UBI9 images and language runtimes.
+  - title: OpenShift Deployments
+    url: https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html
+    description: Deployment strategies and application lifecycle.
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy

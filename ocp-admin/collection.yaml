@@ -112,9 +112,13 @@ sample_workflows:
 - name: 'TODO: Add workflow'
   workflow: Extract from README Sample Workflows section.
 resources:
-- title: Main Repository
-  description: agentic-collections
-  url: https://github.com/RHEcosystemAppEng/agentic-collections
+  - title: OpenShift Container Platform Documentation
+    url: https://docs.openshift.com/container-platform/latest/welcome/index.html
+    description: Official OpenShift cluster management and administration docs.
+  - title: OpenShift Multi-Cluster Management
+    url: https://docs.openshift.com/container-platform/latest/operators/operator_sdk/osdk-cli-managing-multicluster.html
+    description: Managing multiple OpenShift clusters.
+    embedded_doc: docs/multi-cluster-auth.md
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy

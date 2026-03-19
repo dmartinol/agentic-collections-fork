@@ -312,17 +312,11 @@ Add workflows in collection.yaml.
 ## References
 
 
-- [OpenShift Virtualization Documentation](https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html)
+- [OpenShift Virtualization Documentation](https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html) - OpenShift Virtualization overview and VM management.
 
 
-- [KubeVirt User Guide](https://kubevirt.io/user-guide/)
+- [KubeVirt User Guide](https://kubevirt.io/user-guide/) - KubeVirt VM lifecycle, status conditions, and node placement.
 
 
-- [OpenShift MCP Server](https://github.com/openshift/openshift-mcp-server)
-
-
-- [MCP Protocol Specification](https://modelcontextprotocol.io/)
-
-
-- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections)
+- [OpenShift MCP Server](https://github.com/openshift/openshift-mcp-server) - MCP server for OpenShift/KubeVirt used by this collection.
 

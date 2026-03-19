@@ -316,5 +316,11 @@ Deploy TrustyAI Guardrails Orchestrator with input/output content safety detecto
 ## References
 
 
-- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections) - agentic-collections
+- [Red Hat OpenShift AI Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed) - RHOAI product documentation for model serving, pipelines, and workbenches.
+
+
+- [OpenShift AI Model Serving](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed/latest/html-single/red_hat_openshift_ai_self_managed) - InferenceService, runtimes, and model deployment.
+
+
+- [NVIDIA NIM on OpenShift AI](https://docs.nvidia.com/nim/) - NVIDIA Inference Microservices for GPU-accelerated serving.
 
