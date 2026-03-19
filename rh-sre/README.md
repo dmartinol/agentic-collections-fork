@@ -354,10 +354,10 @@ Add workflows in collection.yaml.
 - [Red Hat Lightspeed Remediations Guide](https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/red_hat_lightspeed_remediations_guide/index) - Creating remediation plans, playbook generation.
 
 
-- [Red Hat Lightspeed MCP](https://github.com/redhat/lightspeed-mcp) - MCP server used by this collection; parameter reference.
+- [Red Hat Lightspeed MCP](https://github.com/RedHatInsights/insights-mcp) - MCP server used by this collection; parameter reference.
 
 
-- [Assessing and Monitoring Security Vulnerabilities on RHEL Systems](https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview) - CVE identification, classification, threat intelligence.
+- [Assessing and Monitoring Security Vulnerabilities on RHEL Systems](https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview) - CVE identification, classification, threat intelligence.
 
 
 - [Managing Software with the DNF Tool (RHEL 9)](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/managing_software_with_the_dnf_tool/index) - DNF commands, updating packages, repository management.

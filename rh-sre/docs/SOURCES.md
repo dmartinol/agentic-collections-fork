@@ -9,16 +9,16 @@ This document provides attribution for all official Red Hat documentation source
 | **RHEL Package Management** | Managing Software with the DNF Tool (RHEL 9) | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/managing_software_with_the_dnf_tool/index) | DNF commands, updating packages, repository management | 2026-01-20 |
 | **RHEL Package Management** | Software Management in RHEL 9 Adoption Guide | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/considerations_in_adopting_rhel_9/assembly_software-management_considerations-in-adopting-rhel-9) | RHEL 7/8/9 compatibility, migration considerations | 2026-01-20 |
 | **RHEL Package Management** | RHEL 9 Release Notes | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/9.4_release_notes/index) | Version-specific package management features | 2026-01-20 |
-| **Ansible CVE Remediation** | Red Hat Lightspeed Remediations Guide | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html-single/red_hat_insights_remediations_guide/index) | Creating remediation plans, playbook generation | 2026-01-20 |
-| **Ansible CVE Remediation** | Creating and Managing Remediation Plans | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/red_hat_insights_remediations_guide/creating-managing-playbooks_red-hat-insights-remediation-guide) | Playbook templates, execution patterns | 2026-01-20 |
+| **Ansible CVE Remediation** | Red Hat Lightspeed Remediations Guide | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/red_hat_lightspeed_remediations_guide/index) | Creating remediation plans, playbook generation | 2026-01-20 |
+| **Ansible CVE Remediation** | Creating and Managing Remediation Plans | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/red_hat_lightspeed_remediations_guide/index) | Playbook templates, execution patterns | 2026-01-20 |
 | **Ansible CVE Remediation** | Automation Controller User Guide (AAP 2.4) | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.4/html/automation_controller_user_guide/controller-setting-up-insights) | Setting up Lightspeed for AAP remediations | 2026-01-20 |
 | **Ansible CVE Remediation** | Creating Remediation Playbooks (RHEL 7 Security Guide) | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/security_guide/creating-a-remediation-ansible-playbook-to-align-the-system-with-baseline_scanning-the-system-for-configuration-compliance-and-vulnerabilities) | Ansible playbook patterns for security compliance | 2026-01-20 |
 | **OpenShift Pod Eviction** | Node Maintenance (OpenShift Virtualization 4.8-4.10) | [docs.redhat.com](https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/html/virtualization/node-maintenance) | Node maintenance operator, draining nodes | 2026-01-20 |
 | **OpenShift Pod Eviction** | Evicting Pods Using the Descheduler | [docs.openshift.com](https://docs.openshift.com/en/container-platform/4.8/nodes/scheduling/nodes-descheduler.html) | Pod eviction strategies, descheduler policies | 2026-01-20 |
 | **OpenShift Pod Eviction** | How to Handle Evicted Pods in OpenShift | [access.redhat.com](https://access.redhat.com/solutions/3521071) | Troubleshooting evicted pods, remediation steps | 2026-01-20 |
 | **OpenShift Pod Eviction** | OpenShift Container Platform 4.16 Nodes | [docs.redhat.com](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/pdf/nodes/OpenShift_Container_Platform-4.16-Nodes-en-US.pdf) | Node management, pod disruption budgets | 2026-01-20 |
-| **Lightspeed CVE Assessment** | Assessing Security Vulnerabilities on RHEL Systems | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview) | CVE identification, classification, threat intelligence | 2026-01-20 |
-| **Lightspeed CVE Assessment** | Generating Vulnerability Service Reports | [access.redhat.com](https://access.redhat.com/documentation/en-us/red_hat_insights/1-latest/html-single/generating_vulnerability_service_reports/index) | Executive reports, CVE reports, data export | 2026-01-20 |
+| **Lightspeed CVE Assessment** | Assessing Security Vulnerabilities on RHEL Systems | [docs.redhat.com](https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview) | CVE identification, classification, threat intelligence | 2026-01-20 |
+| **Lightspeed CVE Assessment** | Generating Vulnerability Service Reports | [access.redhat.com](https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/generating_vulnerability_service_reports/index) | Executive reports, CVE reports, data export | 2026-01-20 |
 | **Lightspeed CVE Assessment** | Red Hat CVE Database | [access.redhat.com](https://access.redhat.com/security/security-updates/cve) | Official CVE entries, security updates | 2026-01-20 |
 | **Lightspeed CVE Assessment** | A Complete View of System Vulnerabilities | [redhat.com/blog](https://www.redhat.com/en/blog/complete-view-system-vulnerabilities-using-red-hat-insights) | Vulnerability service overview, best practices | 2026-01-20 |
 | **CVSS Scoring** | Severity Ratings | [access.redhat.com](https://access.redhat.com/security/updates/classification) | Four-point severity scale, CVSS v3.1 scoring | 2026-01-20 |
@@ -99,6 +99,22 @@ This source list is maintained as part of the Remediation Agent plugin. When doc
 2. Update the YAML frontmatter in affected documentation files
 3. Regenerate the semantic index using `docs/.ai-index/generate-index.py`
 4. Update the "Last Verified" date in the table above
+
+## Broken links in embedded docs
+
+When Red Hat documentation URLs change (e.g. Insights → Lightspeed), update both `collection.yaml` resources and embedded docs. Use this format for tracking:
+
+| File | Link |
+|------|------|
+| `docs/insights/vulnerability-logic.md` | **Broken:** `https://docs.redhat.com/.../red_hat_insights/.../vuln-cves_vuln-overview`<br>**Proposed:** `https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview` |
+| `docs/insights/vulnerability-logic.md` | **Broken:** `https://access.redhat.com/.../red_hat_insights/.../generating_vulnerability_service_reports/index`<br>**Proposed:** `https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/generating_vulnerability_service_reports/index` |
+| `docs/references/lightspeed-mcp-parameters.md` | **Broken:** `https://github.com/redhat/lightspeed-mcp`<br>**Proposed:** `https://github.com/RedHatInsights/insights-mcp` |
+| `docs/ansible/cve-remediation-templates.md` | **Broken:** `https://docs.redhat.com/.../red_hat_insights_remediations_guide/index`<br>**Proposed:** `https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/red_hat_lightspeed_remediations_guide/index` |
+| `docs/ansible/cve-remediation-templates.md` | **Broken:** `https://docs.redhat.com/.../red_hat_insights_remediations_guide/creating-managing-playbooks_...`<br>**Proposed:** `https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/red_hat_lightspeed_remediations_guide/index` |
+| `collection.yaml` (resources) | **Broken:** `https://github.com/redhat/lightspeed-mcp`<br>**Proposed:** `https://github.com/RedHatInsights/insights-mcp` |
+| `collection.yaml` (resources) | **Broken:** `https://docs.redhat.com/.../red_hat_insights/.../vuln-cves_vuln-overview`<br>**Proposed:** `https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview` |
+
+*Note: The above links have been applied. This table serves as a reference for future link migrations.*
 
 ## Contact
 
