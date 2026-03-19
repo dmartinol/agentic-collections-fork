@@ -56,7 +56,15 @@ For each skill in collection.yaml, compare `summary_markdown` with SKILL.md:
 
 Report as PASS (aligned) or WARN (misalignment found). Per COLLECTION_SPEC, summary_markdown "should align" with SKILL.md. This check is mandatory—always perform it for every skill in the pack.
 
-### Step 4: Report Results
+### Step 4: Resources Cross-Check
+
+For each pack, validate `resources`:
+
+1. **Required fields:** Each resource has `title` and `url` (enforced by `make validate`).
+2. **embedded_doc:** When a resource has `embedded_doc`, verify `{pack_dir}/{embedded_doc}` exists on disk. Path is relative to pack root (e.g. `docs/rhel/package-management.md`).
+3. **Report:** PASS if all `embedded_doc` paths exist or none present; WARN if any `embedded_doc` points to a missing file.
+
+### Step 5: Report Results
 
 **Output format:**
 ```
@@ -69,6 +77,7 @@ Report as PASS (aligned) or WARN (misalignment found). Per COLLECTION_SPEC, summ
 - [PASS|FAIL] All skills on disk listed in collection.yaml
 - [PASS|FAIL] No orchestration skills duplicated in skills
 - [PASS|WARN] summary_markdown alignment with SKILL.md
+- [PASS|WARN] resources.embedded_doc paths exist
 
 ### Recommendations
 - <actionable items>
@@ -92,6 +101,7 @@ Report as PASS (aligned) or WARN (misalignment found). Per COLLECTION_SPEC, summ
 | All skills/* in collection.yaml | This skill | Cross-check |
 | Orchestration not in skills | This skill | Cross-check |
 | summary_markdown aligns with SKILL.md | This skill | Required cross-check |
+| resources.embedded_doc paths exist | This skill | Cross-check |
 
 ## Example Usage
 
@@ -102,4 +112,5 @@ Report as PASS (aligned) or WARN (misalignment found). Per COLLECTION_SPEC, summ
 2. List `rh-sre/skills/*` and `rh-sre/collection.yaml` contents
 3. Compare: any missing? duplicates?
 4. Check summary_markdown alignment for all skills
-5. Output compliance report with recommendations
+5. Verify resources.embedded_doc paths exist (if any)
+6. Output compliance report with recommendations

@@ -95,5 +95,8 @@ Add workflows in collection.yaml.
 ## References
 
 
-- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections) - agentic-collections
+- [Red Hat Customer Portal](https://access.redhat.com/) - Knowledge base, support cases, and product documentation.
+
+
+- [Red Hat Product Documentation](https://docs.redhat.com/) - Official Red Hat product documentation hub.
 

@@ -255,18 +255,25 @@ sample_workflows:
 - name: Forensic Troubleshooting
   workflow: Use forensic-troubleshooter when a job fails. Extracts events, classifies errors, correlates host facts, and provides resolution recommendations.
 resources:
-- title: Red Hat Ansible Automation Platform
-  url: https://www.redhat.com/en/technologies/management/ansible
-  description: ''
-- title: AAP 2.5 Security Best Practices
-  url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices
-  description: ''
-- title: AAP 2.6 Troubleshooting Guide
-  url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs
-  description: ''
-- title: AAP MCP Server
-  url: https://github.com/ansible/aap-mcp-server
-  description: ''
-- title: Main Repository
-  url: https://github.com/RHEcosystemAppEng/agentic-collections
-  description: ''
+  - title: Red Hat Ansible Automation Platform
+    url: https://www.redhat.com/en/technologies/management/ansible
+    description: Product overview and capabilities for AAP.
+  - title: AAP 2.5 Security Best Practices
+    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices
+    description: Credential security, RBAC, separation of duties.
+    embedded_doc: docs/aap/governance-readiness.md
+  - title: AAP 2.6 Troubleshooting Guide (Jobs)
+    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs
+    description: Job failure analysis, common errors, event interpretation.
+    embedded_doc: docs/aap/job-troubleshooting.md
+  - title: AAP 2.5 Job Templates and Configuration
+    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/automation_controller_user_guide/controller-job-templates
+    description: Job execution, check mode, extra_vars, job slicing.
+    embedded_doc: docs/aap/execution-governance.md
+  - title: AAP 2.6 Troubleshooting Guide
+    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs
+    description: Error classification taxonomy and resolution paths.
+    embedded_doc: docs/references/error-classification.md
+  - title: AAP MCP Server
+    url: https://github.com/ansible/aap-mcp-server
+    description: MCP server for AAP API integration used by this collection.

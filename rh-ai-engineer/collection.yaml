@@ -239,9 +239,17 @@ sample_workflows:
     2. Use **workbench-manage** to create a Jupyter workbench for development.
     3. Use **pipeline-manage** to run and monitor pipelines.
 resources:
-- title: Main Repository
-  description: agentic-collections
-  url: https://github.com/RHEcosystemAppEng/agentic-collections
+  - title: Red Hat OpenShift AI Documentation
+    url: https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed
+    description: RHOAI product documentation for model serving, pipelines, and workbenches.
+  - title: OpenShift AI Model Serving
+    url: https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed/latest/html-single/red_hat_openshift_ai_self_managed
+    description: InferenceService, runtimes, and model deployment.
+    embedded_doc: docs/references/supported-runtimes.md
+  - title: NVIDIA NIM on OpenShift AI
+    url: https://docs.nvidia.com/nim/
+    description: NVIDIA Inference Microservices for GPU-accelerated serving.
+    embedded_doc: docs/examples/nim-setup.md
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy

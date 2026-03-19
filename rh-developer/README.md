@@ -351,5 +351,14 @@ Add workflows in collection.yaml.
 ## References
 
 
-- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections) - agentic-collections
+- [OpenShift Source-to-Image (S2I)](https://docs.openshift.com/container-platform/latest/openshift_images/using_images/using-s21-images.html) - S2I builder images and language detection.
+
+
+- [Red Hat Container Catalog](https://catalog.redhat.com/software/containers/search) - UBI images and S2I builders.
+
+
+- [Red Hat Universal Base Images](https://developers.redhat.com/products/rhel/ubi) - UBI9 images and language runtimes.
+
+
+- [OpenShift Deployments](https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html) - Deployment strategies and application lifecycle.
 

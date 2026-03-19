@@ -265,21 +265,11 @@ cp -r agentic-collections-main/rh-virt ~/.opencode/plugins/openshift-virtualizat
 <table><thead><tr><th>User request</th><th>Skill to use</th><th>Reason</th></tr></thead><tbody><tr><td>"List all VMs" or "Show VMs in namespace X"</td><td><code>/vm-inventory</code></td><td>Lists and inspects VM status across namespaces.</td></tr><tr><td>"Create a new VM" or "Deploy a virtual machine with RHEL"</td><td><code>/vm-create</code></td><td>Provisions new VMs with instance type resolution and OS selection.</td></tr><tr><td>"Start VM X" or "Stop the virtual machine Y"</td><td><code>/vm-lifecycle-manager</code></td><td>Manages VM power state (start, stop, restart).</td></tr><tr><td>"Clone VM X to Y" or "Create a copy of VM database-01"</td><td><code>/vm-clone</code></td><td>Clones existing VMs for testing, scaling, or templates.</td></tr><tr><td>"Move VM database-01 to worker-03" or "Rebalance VMs"</td><td><code>/vm-rebalance</code></td><td>Orchestrates live migration across nodes for load balancing.</td></tr></tbody></table>
             </div>
             <div id="tab-resources" class="collection-tab-panel" role="tabpanel">
-                <h2>Documentation</h2>
+                <h2>References</h2>
 <ul>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-virt/docs/troubleshooting/lifecycle-errors.md" target="_blank" rel="noopener">VM Lifecycle Errors</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-virt/docs/troubleshooting/network-errors.md" target="_blank" rel="noopener">VM Network Errors</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-virt/docs/troubleshooting/runtime-errors.md" target="_blank" rel="noopener">VM Runtime Errors</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-virt/docs/troubleshooting/scheduling-errors.md" target="_blank" rel="noopener">VM Scheduling Errors</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-virt/docs/troubleshooting/storage-errors.md" target="_blank" rel="noopener">VM Storage Errors</a></li>
-</ul>
-<h2>References</h2>
-<ul>
-<li><a href="https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html" target="_blank" rel="noopener">OpenShift Virtualization Documentation</a></li>
-<li><a href="https://kubevirt.io/user-guide/" target="_blank" rel="noopener">KubeVirt User Guide</a></li>
-<li><a href="https://github.com/openshift/openshift-mcp-server" target="_blank" rel="noopener">OpenShift MCP Server</a></li>
-<li><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">MCP Protocol Specification</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener">Main Repository</a></li>
+<li><a href="https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html" target="_blank" rel="noopener">OpenShift Virtualization Documentation</a> - OpenShift Virtualization overview and VM management.</li>
+<li><a href="https://kubevirt.io/user-guide/" target="_blank" rel="noopener">KubeVirt User Guide</a> - KubeVirt VM lifecycle, status conditions, and node placement. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-virt/docs/troubleshooting/INDEX.md" target="_blank" rel="noopener">[embedded doc]</a></li>
+<li><a href="https://github.com/openshift/openshift-mcp-server" target="_blank" rel="noopener">OpenShift MCP Server</a> - MCP server for OpenShift/KubeVirt used by this collection.</li>
 </ul>
             </div>
             <div id="tab-agents" class="collection-tab-panel" role="tabpanel">

@@ -240,20 +240,14 @@ cp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation
 <table><thead><tr><th>User request</th><th>Skill to use</th><th>Reason</th></tr></thead><tbody><tr><td>"Assess my AAP governance" or "Is my AAP ready for production?"</td><td><code>/governance-assessor</code></td><td>Orchestrates full platform governance audit across 7 domains.</td></tr><tr><td>"Execute the security patch on production" or "Run this job with check mode"</td><td><code>/governance-executor</code></td><td>Orchestrates governed execution with risk analysis and approval.</td></tr><tr><td>"Job #4451 failed. What happened?" or "Troubleshoot this job failure"</td><td><code>/forensic-troubleshooter</code></td><td>Orchestrates failure root cause analysis with error classification.</td></tr><tr><td>"Validate AAP MCP" or "Check AAP connectivity"</td><td><code>/aap-mcp-validator</code></td><td>Direct MCP connectivity validation without full assessment.</td></tr></tbody></table>
             </div>
             <div id="tab-resources" class="collection-tab-panel" role="tabpanel">
-                <h2>Documentation</h2>
+                <h2>References</h2>
 <ul>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/aap/governance-readiness.md" target="_blank" rel="noopener">AAP Governance Readiness Assessment</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/aap/execution-governance.md" target="_blank" rel="noopener">Execution Governance</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/aap/job-troubleshooting.md" target="_blank" rel="noopener">Job Troubleshooting</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/references/error-classification.md" target="_blank" rel="noopener">Error Classification Taxonomy</a></li>
-</ul>
-<h2>References</h2>
-<ul>
-<li><a href="https://www.redhat.com/en/technologies/management/ansible" target="_blank" rel="noopener">Red Hat Ansible Automation Platform</a></li>
-<li><a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices" target="_blank" rel="noopener">AAP 2.5 Security Best Practices</a></li>
-<li><a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs" target="_blank" rel="noopener">AAP 2.6 Troubleshooting Guide</a></li>
-<li><a href="https://github.com/ansible/aap-mcp-server" target="_blank" rel="noopener">AAP MCP Server</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener">Main Repository</a></li>
+<li><a href="https://www.redhat.com/en/technologies/management/ansible" target="_blank" rel="noopener">Red Hat Ansible Automation Platform</a> - Product overview and capabilities for AAP.</li>
+<li><a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices" target="_blank" rel="noopener">AAP 2.5 Security Best Practices</a> - Credential security, RBAC, separation of duties. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/aap/governance-readiness.md" target="_blank" rel="noopener">[embedded doc]</a></li>
+<li><a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs" target="_blank" rel="noopener">AAP 2.6 Troubleshooting Guide (Jobs)</a> - Job failure analysis, common errors, event interpretation. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/aap/job-troubleshooting.md" target="_blank" rel="noopener">[embedded doc]</a></li>
+<li><a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/automation_controller_user_guide/controller-job-templates" target="_blank" rel="noopener">AAP 2.5 Job Templates and Configuration</a> - Job execution, check mode, extra_vars, job slicing. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/aap/execution-governance.md" target="_blank" rel="noopener">[embedded doc]</a></li>
+<li><a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs" target="_blank" rel="noopener">AAP 2.6 Troubleshooting Guide</a> - Error classification taxonomy and resolution paths. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/references/error-classification.md" target="_blank" rel="noopener">[embedded doc]</a></li>
+<li><a href="https://github.com/ansible/aap-mcp-server" target="_blank" rel="noopener">AAP MCP Server</a> - MCP server for AAP API integration used by this collection.</li>
 </ul>
             </div>
             <div id="tab-agents" class="collection-tab-panel" role="tabpanel">

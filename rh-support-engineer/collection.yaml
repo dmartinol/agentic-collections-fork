@@ -77,9 +77,12 @@ sample_workflows:
 - name: 'TODO: Add workflow'
   workflow: Extract from README Sample Workflows section.
 resources:
-- title: Main Repository
-  description: agentic-collections
-  url: https://github.com/RHEcosystemAppEng/agentic-collections
+  - title: Red Hat Customer Portal
+    url: https://access.redhat.com/
+    description: Knowledge base, support cases, and product documentation.
+  - title: Red Hat Product Documentation
+    url: https://docs.redhat.com/
+    description: Official Red Hat product documentation hub.
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy
