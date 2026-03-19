@@ -22,8 +22,10 @@ agentic-collections/
 
 ```
 <pack>/
-├── README.md
-├── .claude-plugin/plugin.json   # Optional: name, version, description, author, license
+├── collection.yaml              # Source of truth: vendor-agnostic catalog definition
+├── README.md                    # Generated from collection.yaml (do not edit manually)
+├── .claude-plugin/plugin.json   # Generated from collection.yaml
+├── .cursor-plugin/plugin.json   # Generated from collection.yaml
 ├── .mcp.json                    # MCP server configs — credentials via env vars ONLY
 ├── agents/<agent>.md            # Workflow orchestrators (YAML frontmatter required)
 └── skills/<skill-name>/SKILL.md # Task executors (YAML frontmatter required)
@@ -41,7 +43,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 |---|---|
 | `make install` | Install Python deps |
 | `make validate` | Validate pack/skill/agent structure (runs in CI) |
-| `make generate` | Rebuild `docs/data.json` |
+| `make generate-catalog` | Generate marketplace, plugins, README from collection.yaml |
+| `make generate` | Generate catalog + `docs/data.json` |
 | `make test` | validate + generate + verify checks |
 | `make serve` | Local site at http://localhost:8000 |
 
@@ -50,6 +53,10 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Packs known to the validator are listed in `scripts/validate_structure.py` (`PACK_DIRS`). Add new packs there when creating them.
 
 ## Key File Formats
+
+### Collection — `collection.yaml`
+
+Vendor-agnostic catalog definition. Schema in `catalog/schema.yaml`. Run `make generate-catalog` to produce plugin.json, README, and marketplace entries. Required fields: `id`, `name`, `provider`, `version`, `categories`, `personas`, `marketplaces`, `description`, `summary`, `contents`, `deploy_and_use`, `sample_workflows`, `resources`.
 
 ### Skills — `skills/<name>/SKILL.md`
 
@@ -113,7 +120,7 @@ Same YAML frontmatter requirement (`name` + `description`). Agents orchestrate s
 2. Follow the mandatory section order: Prerequisites → When to Use → Workflow → Dependencies → (Human-in-the-Loop if needed) → Example Usage.
 3. Run `make validate` to confirm no errors.
 
-See `rh-virt/SKILL_TEMPLATE.md` for the canonical skill template and `rh-sre` as the full reference implementation.
+See [SKILL_DESIGN_PRINCIPLES.md](SKILL_DESIGN_PRINCIPLES.md) for skill design standards and `rh-sre` as the full reference implementation.
 
 ## Security
 

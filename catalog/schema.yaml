@@ -1,0 +1,81 @@
+# Vendor-Agnostic Collection Schema
+# Used as source of truth for generating Claude Code, Cursor, and Open Code artifacts.
+# See: .cursor/plans/vendor-agnostic_catalog_65dd51e9.plan.md
+
+# Required: Plugin identifier for install commands (e.g., claude plugin install <id>)
+# Defaults to pack folder name. Override for rh-virt: openshift-virtualization
+id: string  # kebab-case
+
+# Required: Display name
+name: string
+
+# Required: Provider/organization
+provider: string  # e.g., "Red Hat"
+
+# Required: Semantic version
+version: string  # e.g., "1.0.0"
+
+# Required: Categories for marketplace discovery
+categories: [string]  # e.g., ["Site Reliability", "Security"]
+
+# Required: Target personas
+personas: [string]  # e.g., ["Site Reliability Engineer"]
+
+# Required: Supported marketplaces
+marketplaces: [string]  # e.g., ["Claude Code", "Cursor"]
+
+# Optional: Support level
+support_level: string  # e.g., "Community" | "Supported" | "Unknown"
+
+# Required: Full description
+description: string
+
+# Required: Short markdown summary (bullet points)
+summary: string  # multiline markdown
+
+# Required: Skills and content description (user-oriented for README)
+contents:
+  description: string  # Summary line, e.g. "The pack provides 13 skills for common SRE operations..."
+  skills:  # Regular skills (exclude orchestration skills)
+    - name: string      # Skill identifier (matches skills/<name>/SKILL.md)
+      description: string  # Short title, e.g. "System Discovery and Fleet Management"
+      summary_markdown: string  # Flexible markdown (Use when, What it does, etc.)
+  orchestration_skills:  # Skills that orchestrate other skills (separate section in README)
+    - name: string
+      description: string
+      summary_markdown: string  # Flexible markdown (Use when, Workflow, Capabilities, etc.)
+  skills_decision_guide:  # Optional: helps users choose the right skill
+    - user_request: string   # Example user prompt or intent
+      skill_to_use: string  # Skill name to invoke
+      reason: string        # Why this skill fits the request
+
+# Required: Deploy and use instructions (markdown)
+# Include prerequisites, env setup, install per agent (Claude Code, Cursor, Open Code)
+deploy_and_use: string  # multiline markdown
+
+# Required: Sample workflows
+sample_workflows:
+  - name: string
+    workflow: string  # multiline markdown
+
+# Required: External resources
+resources:
+  - title: string
+    description: string
+    url: string
+
+# Optional: Legal resources
+legal_resources:
+  license_agreement_url: string
+  privacy_policy_url: string
+
+# Optional: Author (for plugin.json generation)
+author:
+  name: string
+  email: string
+
+# Optional: homepage, repository, license, keywords (for plugin.json)
+homepage: string
+repository: string
+license: string  # e.g., "Apache-2.0"
+keywords: [string]

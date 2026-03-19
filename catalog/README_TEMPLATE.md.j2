@@ -1,0 +1,80 @@
+# {{ name }}
+
+{{ description }}
+
+**Persona**: {{ personas | join(", ") }}
+**Marketplaces**: {{ marketplaces | join(", ") }}
+
+## Overview
+
+{{ summary }}
+
+## Quick Start
+
+{{ deploy_and_use }}
+
+## Skills
+
+{{ contents.description }}
+
+{% for skill in contents.skills %}
+### {{ skill.name }} - {{ skill.description }}
+
+{{ skill.summary_markdown }}
+
+{% endfor %}
+{% if contents.orchestration_skills %}
+## Orchestration Skill{% if contents.orchestration_skills | length > 1 %}s{% endif %}
+
+{% for skill in contents.orchestration_skills %}
+### {{ skill.name }} - {{ skill.description }}
+
+{{ skill.summary_markdown }}
+
+{% endfor %}
+{% endif %}
+{% if contents.skills_decision_guide %}
+## Skills Decision Guide
+
+| User request | Skill to use | Reason |
+|--------------|--------------|--------|
+{% for d in contents.skills_decision_guide %}| {{ d.user_request }} | {{ d.skill_to_use }} | {{ d.reason }} |
+{% endfor %}
+{% endif %}
+{% if documentation_section %}
+## Documentation
+
+{{ documentation_section }}
+{% endif %}
+{% if mcp_section %}
+## MCP Server Integrations
+
+{{ mcp_section }}
+{% endif %}
+## Sample Workflows
+
+{% for wf in sample_workflows %}
+### {{ wf.name }}
+
+{{ wf.workflow }}
+
+{% endfor %}
+{% if security_model %}
+## Security Model
+
+{{ security_model }}
+{% endif %}
+## License
+
+{% if legal_resources and legal_resources.license_agreement_url %}
+[{{ license or "Apache 2.0" }}]({{ legal_resources.license_agreement_url }})
+{% else %}
+[Apache 2.0](LICENSE)
+{% endif %}
+
+## References
+
+{% for r in resources %}
+- [{{ r.title }}]({{ r.url }}){% if r.description %} - {{ r.description }}{% endif %}
+
+{% endfor %}

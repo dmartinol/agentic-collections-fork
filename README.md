@@ -44,8 +44,11 @@ Generate and view documentation locally:
 # Install dependencies (first time only)
 make install
 
-# Validate pack structure (plugin.json, .mcp.json, frontmatter)
+# Validate pack structure (plugin.json, .mcp.json, frontmatter, collection.yaml)
 make validate
+
+# Generate catalog from collection.yaml (marketplace, plugins, README)
+make generate-catalog
 
 # Validate skills against Design Principles (SKILL_DESIGN_PRINCIPLES.md)
 # Validate only changed skills (staged + unstaged) - recommended for local dev:
@@ -54,7 +57,7 @@ make validate-skill-design-changed
 make validate-skill-design
 make validate-skill-design PACK=rh-sre
 
-# Generate docs/data.json
+# Generate catalog (marketplace, plugins, README) + docs/data.json
 make generate
 
 # Start local server at http://localhost:8000

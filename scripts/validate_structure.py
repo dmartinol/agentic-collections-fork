@@ -1,17 +1,152 @@
 #!/usr/bin/env python3
 """
 Validate agentic collection structure before documentation generation.
+
+Validates:
+- plugin.json, .mcp.json (optional)
+- collection.yaml against catalog/schema.yaml
+- SKILL.md and agent frontmatter
 """
 
 import json
 import sys
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Set, Tuple
 import yaml
 import re
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
 # List of agentic collections to validate
-PACK_DIRS = ['rh-sre', 'rh-developer', 'ocp-admin', 'rh-support-engineer', 'rh-virt', 'rh-ai-engineer', 'rh-automation']
+PACK_DIRS = ['ocp-admin', 'rh-ai-engineer', 'rh-automation', 'rh-developer', 'rh-sre', 'rh-support-engineer', 'rh-virt']
+
+# Required collection.yaml fields (per catalog/schema.yaml)
+REQUIRED_COLLECTION_TOP = ['id', 'name', 'provider', 'version', 'categories', 'personas', 'marketplaces',
+                           'description', 'summary', 'contents', 'deploy_and_use', 'sample_workflows', 'resources']
+REQUIRED_CONTENTS = ['description', 'skills']
+REQUIRED_SKILL_ENTRY = ['name', 'description', 'summary_markdown']
+REQUIRED_DECISION_ENTRY = ['user_request', 'skill_to_use', 'reason']
+REQUIRED_WORKFLOW_ENTRY = ['name', 'workflow']
+REQUIRED_RESOURCE_ENTRY = ['title', 'url']
+
+
+def validate_collection_yaml(pack_dir: str) -> List[str]:
+    """
+    Validate collection.yaml against catalog/schema.yaml.
+
+    Args:
+        pack_dir: Collection directory name (relative to REPO_ROOT)
+
+    Returns:
+        List of error messages (empty if valid)
+    """
+    errors: List[str] = []
+    coll_path = REPO_ROOT / pack_dir / 'collection.yaml'
+
+    if not coll_path.exists():
+        errors.append(f"{pack_dir}: collection.yaml not found")
+        return errors
+
+    try:
+        with open(coll_path, 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+    except yaml.YAMLError as e:
+        errors.append(f"{pack_dir}: Invalid YAML in collection.yaml: {e}")
+        return errors
+
+    if not isinstance(data, dict):
+        errors.append(f"{pack_dir}: collection.yaml must be a YAML mapping")
+        return errors
+
+    # Required top-level fields
+    for field in REQUIRED_COLLECTION_TOP:
+        if field not in data:
+            errors.append(f"{pack_dir}: collection.yaml missing required field '{field}'")
+        elif data[field] is None:
+            errors.append(f"{pack_dir}: collection.yaml field '{field}' must not be empty")
+
+    # contents
+    contents = data.get('contents')
+    if contents is not None:
+        if not isinstance(contents, dict):
+            errors.append(f"{pack_dir}: contents must be a mapping")
+        else:
+            for field in REQUIRED_CONTENTS:
+                if field not in contents:
+                    errors.append(f"{pack_dir}: contents missing required field '{field}'")
+
+            # skills
+            skills = contents.get('skills')
+            if skills is not None:
+                if not isinstance(skills, list):
+                    errors.append(f"{pack_dir}: contents.skills must be a list")
+                else:
+                    for i, entry in enumerate(skills):
+                        if not isinstance(entry, dict):
+                            errors.append(f"{pack_dir}: contents.skills[{i}] must be a mapping")
+                        else:
+                            for req in REQUIRED_SKILL_ENTRY:
+                                if req not in entry:
+                                    errors.append(f"{pack_dir}: contents.skills[{i}] missing '{req}'")
+
+            # orchestration_skills
+            orch = contents.get('orchestration_skills')
+            if orch is not None and isinstance(orch, list):
+                for i, entry in enumerate(orch):
+                    if isinstance(entry, dict):
+                        for req in REQUIRED_SKILL_ENTRY:
+                            if req not in entry:
+                                errors.append(f"{pack_dir}: contents.orchestration_skills[{i}] missing '{req}'")
+
+            # skills_decision_guide
+            guide = contents.get('skills_decision_guide')
+            if guide is not None:
+                if not isinstance(guide, list):
+                    errors.append(f"{pack_dir}: contents.skills_decision_guide must be a list")
+                else:
+                    known_skills: Set[str] = set()
+                    for s in (contents.get('skills') or []):
+                        if isinstance(s, dict) and 'name' in s:
+                            known_skills.add(str(s['name']))
+                    for o in (contents.get('orchestration_skills') or []):
+                        if isinstance(o, dict) and 'name' in o:
+                            known_skills.add(str(o['name']))
+
+                    for i, entry in enumerate(guide):
+                        if not isinstance(entry, dict):
+                            errors.append(f"{pack_dir}: contents.skills_decision_guide[{i}] must be a mapping")
+                        else:
+                            for req in REQUIRED_DECISION_ENTRY:
+                                if req not in entry:
+                                    errors.append(f"{pack_dir}: contents.skills_decision_guide[{i}] missing '{req}'")
+                            # skill_to_use should reference a known skill
+                            if isinstance(entry, dict) and 'skill_to_use' in entry and known_skills:
+                                skill_ref = entry.get('skill_to_use')
+                                if skill_ref and skill_ref not in known_skills:
+                                    errors.append(
+                                        f"{pack_dir}: contents.skills_decision_guide[{i}] "
+                                        f"skill_to_use '{skill_ref}' not in contents.skills or orchestration_skills"
+                                    )
+
+    # sample_workflows
+    workflows = data.get('sample_workflows')
+    if workflows is not None and isinstance(workflows, list):
+        for i, entry in enumerate(workflows):
+            if isinstance(entry, dict):
+                for req in REQUIRED_WORKFLOW_ENTRY:
+                    if req not in entry:
+                        errors.append(f"{pack_dir}: sample_workflows[{i}] missing '{req}'")
+
+    # resources
+    resources = data.get('resources')
+    if resources is not None and isinstance(resources, list):
+        for i, entry in enumerate(resources):
+            if isinstance(entry, dict):
+                for req in REQUIRED_RESOURCE_ENTRY:
+                    if req not in entry:
+                        errors.append(f"{pack_dir}: resources[{i}] missing '{req}'")
+
+    return errors
 
 
 def validate_plugin_json(pack_dir: str) -> List[str]:
@@ -25,7 +160,7 @@ def validate_plugin_json(pack_dir: str) -> List[str]:
         List of error messages (empty if valid)
     """
     errors = []
-    plugin_path = Path(pack_dir) / '.claude-plugin' / 'plugin.json'
+    plugin_path = REPO_ROOT / pack_dir / '.claude-plugin' / 'plugin.json'
 
     if not plugin_path.exists():
         # plugin.json is optional
@@ -62,7 +197,7 @@ def validate_mcp_json(pack_dir: str) -> List[str]:
         List of error messages (empty if valid)
     """
     errors = []
-    mcp_path = Path(pack_dir) / '.mcp.json'
+    mcp_path = REPO_ROOT / pack_dir / '.mcp.json'
 
     if not mcp_path.exists():
         # .mcp.json is optional
@@ -136,7 +271,7 @@ def validate_skills(pack_dir: str) -> List[str]:
         List of error messages (empty if valid)
     """
     errors = []
-    skills_dir = Path(pack_dir) / 'skills'
+    skills_dir = REPO_ROOT / pack_dir / 'skills'
 
     if not skills_dir.exists():
         # Skills directory is optional
@@ -162,7 +297,7 @@ def validate_agents(pack_dir: str) -> List[str]:
         List of error messages (empty if valid)
     """
     errors = []
-    agents_dir = Path(pack_dir) / 'agents'
+    agents_dir = REPO_ROOT / pack_dir / 'agents'
 
     if not agents_dir.exists():
         # Agents directory is optional
@@ -190,9 +325,12 @@ def validate_pack(pack_dir: str) -> List[str]:
     errors = []
 
     # Check if pack directory exists
-    if not Path(pack_dir).exists():
+    if not (REPO_ROOT / pack_dir).exists():
         errors.append(f"{pack_dir}: Pack directory does not exist")
         return errors
+
+    # Validate collection.yaml (required)
+    errors.extend(validate_collection_yaml(pack_dir))
 
     # Validate plugin.json
     errors.extend(validate_plugin_json(pack_dir))

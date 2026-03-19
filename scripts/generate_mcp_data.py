@@ -181,6 +181,7 @@ def generate_mcp_data() -> List[Dict[str, Any]]:
                 server['title'] = custom_data[server_name].get('title', server_name)
                 server['tier'] = custom_data[server_name].get('tier', 'Official')
                 server['owner'] = custom_data[server_name].get('owner', 'Red Hat')
+                server['icon'] = custom_data[server_name].get('icon', '')
             else:
                 # No custom data available - use defaults
                 server['repository'] = ''
@@ -188,6 +189,7 @@ def generate_mcp_data() -> List[Dict[str, Any]]:
                 server['title'] = server_name
                 server['tier'] = 'Official'
                 server['owner'] = 'Red Hat'
+                server['icon'] = ''
 
         mcp_servers.extend(servers)
 

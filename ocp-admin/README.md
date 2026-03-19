@@ -1,65 +1,137 @@
-# OpenShift Administration Agentic Pack
+# Red Hat OpenShift Administration Agentic Collection
 
-Administration and management tools for OpenShift Container Platform. This pack provides automation capabilities for cluster management, workload orchestration, security policies, and operational tasks.
+Automation capabilities for OpenShift Container Platform cluster management, workload orchestration, security policies, and operational tasks.
 
-**Persona**: OpenShift Administrator
+**Persona**: OpenShift Engineer
 **Marketplaces**: Claude Code, Cursor
+
+## Overview
+
+The ocp-admin collection provides skills for openshift tasks.
+
+## Quick Start
+
+### Prerequisites
+
+- Claude Code CLI or IDE extension
+- OpenShift cluster with cluster-admin or appropriate RBAC
+- `oc` CLI and `KUBECONFIG` configured for cluster access
+
+### Environment Setup
+
+Configure OpenShift cluster access:
+
+```bash
+export KUBECONFIG="/path/to/your/kubeconfig"
+```
+
+Verify access:
+
+```bash
+oc get nodes
+```
+
+### Installation (Claude Code)
+
+Install the collection as a Claude Code plugin:
+
+```bash
+claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+claude plugin install ocp-admin
+```
+
+Or for local development:
+
+```bash
+claude plugin marketplace add /path/to/agentic-collections
+claude plugin install ocp-admin
+```
+
+### Installation (Cursor)
+
+Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/ocp-admin ~/.cursor/plugins/ocp-admin
+```
+
+Or download and extract:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/ocp-admin ~/.cursor/plugins/ocp-admin
+```
+
+### Installation (Open Code)
+
+Open Code does not support direct marketplace install via CLI. Clone or download the repository:
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/ocp-admin ~/.opencode/plugins/ocp-admin
+```
+
+Or with wget:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
+```
+
 
 ## Skills
 
-| Command | Description |
-| ------- | ----------- |
-| `/cluster-report` | Generate a consolidated health report across multiple OpenShift clusters (nodes, CPU, memory, GPUs, namespaces, pods) |
+The pack provides 1 skill for OpenShift cluster management.
 
-## Prerequisites
 
-- OpenShift cluster access via `KUBECONFIG`
-- For multi-cluster reports, a kubeconfig with multiple contexts
+### cluster-report - Multi-Cluster Health Report
 
-## Multi-Cluster Authentication
+Generate a consolidated health report across multiple OpenShift clusters.
 
-For running `cluster-report` across many clusters (10–100+), use service account tokens instead of interactive `oc login`. This avoids repeated browser-based OAuth sessions and produces non-expiring tokens.
+**Use when:**
+- "Show me a report across all clusters"
+- "Compare cluster health"
+- "Multi-cluster status overview"
+- "How are my clusters doing?"
 
-| Script / Manifest | Purpose |
-|-------------------|---------|
-| [`build-kubeconfig.py`](scripts/cluster-report/build-kubeconfig.py) | Builds a merged kubeconfig from SA tokens (`setup` + `build` subcommands) |
-| [`cluster-reporter-rbac.yaml`](scripts/cluster-report/cluster-reporter-rbac.yaml) | Read-only RBAC resources applied once per cluster |
+**What it does:**
+- Verifies each kubeconfig context is a genuine OpenShift cluster
+- Collects node resources (CPU, memory, GPUs)
+- Reports namespace counts and pod status
+- Provides single comparison view across clusters
 
-> **Required permissions**: The RBAC setup creates cluster-scoped resources (ClusterRole, ClusterRoleBinding), so the user running `setup` needs `cluster-admin` privileges. This is a one-time step per cluster. If RBAC has already been applied, use `--skip-rbac` to skip the apply step and only extract existing SA tokens.
 
-**Quick start:**
 
-```bash
-# 1. One-time (requires cluster-admin): apply RBAC and extract tokens for all clusters you're logged into
-python3 ocp-admin/scripts/cluster-report/build-kubeconfig.py setup --all-contexts
 
-# If RBAC is already configured, skip the apply step and only extract tokens
-python3 ocp-admin/scripts/cluster-report/build-kubeconfig.py setup --all-contexts --skip-rbac
 
-# 2. Build merged kubeconfig from saved tokens
-python3 ocp-admin/scripts/cluster-report/build-kubeconfig.py \
-  build --clusters ~/.ocp-clusters/clusters.json --verify
+## Skills Decision Guide
 
-# 3. Export and run
-export KUBECONFIG=/tmp/cluster-report-kubeconfig
-# In Claude Code: /cluster-report
-```
+| User request | Skill to use | Reason |
+|--------------|--------------|--------|
+| "Show me a report across all clusters" or "Compare cluster health" | cluster-report | Generates consolidated health report across multiple OpenShift clusters. |
+| "Multi-cluster status overview" or "How are my clusters doing?" | cluster-report | Single skill for cluster health; verifies kubeconfig contexts and reports node resources, pods, namespaces. |
 
-See [docs/multi-cluster-auth.md](docs/multi-cluster-auth.md) for the full setup guide, token rotation, and troubleshooting.
 
-## Helper Scripts
 
-The `cluster-report` skill uses two Python scripts (stdlib only, no dependencies) in `scripts/cluster-report/`:
 
-| Script | Purpose |
-|--------|---------|
-| `assemble.py` | Resolves `$file` references in the manifest JSON, loading persisted MCP output from disk into a complete data structure. With `--aggregate`, pipes into `aggregate.py` automatically. |
-| `aggregate.py` | Computes per-cluster and fleet-wide metrics (CPU/memory usage, pod status counts, GPU totals, top namespaces) and flags attention items (>85% utilization, failed pods, missing metrics). |
+## Sample Workflows
 
-Both scripts read from stdin and write to stdout. They are invoked as a pipeline by the skill and should be treated as black boxes.
 
-## MCP Servers
+### See collection.yaml
 
-- **openshift** - OpenShift cluster management with multi-cluster support
+Add workflows in collection.yaml.
 
-> **Container UID mapping**: On Linux, the MCP server automatically adds `--userns=keep-id:uid=65532,gid=65532` to map the host user to the container's non-root UID (65532), allowing the container to read `chmod 600` files like `KUBECONFIG` without weakening file permissions. On macOS the flag is omitted automatically since Podman runs inside a VM where `--userns` can cause startup failures.
+
+
+## License
+
+
+[Apache-2.0](https://www.redhat.com/en/about/agreements)
+
+
+## References
+
+
+- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections) - agentic-collections
+

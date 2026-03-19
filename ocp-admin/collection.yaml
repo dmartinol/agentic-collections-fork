@@ -1,0 +1,131 @@
+id: ocp-admin
+name: Red Hat OpenShift Administration Agentic Collection
+provider: Red Hat
+version: 1.0.0
+categories:
+- OpenShift
+- Administration
+personas:
+- OpenShift Engineer
+marketplaces:
+- Claude Code
+- Cursor
+support_level: Unknown
+description: Automation capabilities for OpenShift Container Platform cluster management,
+  workload orchestration, security policies, and operational tasks.
+summary: The ocp-admin collection provides skills for openshift tasks.
+contents:
+  description: The pack provides 1 skill for OpenShift cluster management.
+  skills_decision_guide:
+  - user_request: '"Show me a report across all clusters" or "Compare cluster health"'
+    skill_to_use: cluster-report
+    reason: Generates consolidated health report across multiple OpenShift clusters.
+  - user_request: '"Multi-cluster status overview" or "How are my clusters doing?"'
+    skill_to_use: cluster-report
+    reason: Single skill for cluster health; verifies kubeconfig contexts and reports node resources, pods, namespaces.
+  skills:
+  - name: cluster-report
+    description: Multi-Cluster Health Report
+    summary_markdown: |
+      Generate a consolidated health report across multiple OpenShift clusters.
+
+      **Use when:**
+      - "Show me a report across all clusters"
+      - "Compare cluster health"
+      - "Multi-cluster status overview"
+      - "How are my clusters doing?"
+
+      **What it does:**
+      - Verifies each kubeconfig context is a genuine OpenShift cluster
+      - Collects node resources (CPU, memory, GPUs)
+      - Reports namespace counts and pod status
+      - Provides single comparison view across clusters
+deploy_and_use: |
+  ### Prerequisites
+
+  - Claude Code CLI or IDE extension
+  - OpenShift cluster with cluster-admin or appropriate RBAC
+  - `oc` CLI and `KUBECONFIG` configured for cluster access
+
+  ### Environment Setup
+
+  Configure OpenShift cluster access:
+
+  ```bash
+  export KUBECONFIG="/path/to/your/kubeconfig"
+  ```
+
+  Verify access:
+
+  ```bash
+  oc get nodes
+  ```
+
+  ### Installation (Claude Code)
+
+  Install the collection as a Claude Code plugin:
+
+  ```bash
+  claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+  claude plugin install ocp-admin
+  ```
+
+  Or for local development:
+
+  ```bash
+  claude plugin marketplace add /path/to/agentic-collections
+  claude plugin install ocp-admin
+  ```
+
+  ### Installation (Cursor)
+
+  Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
+
+  ```bash
+  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+  cp -r agentic-collections/ocp-admin ~/.cursor/plugins/ocp-admin
+  ```
+
+  Or download and extract:
+
+  ```bash
+  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+  cp -r agentic-collections-main/ocp-admin ~/.cursor/plugins/ocp-admin
+  ```
+
+  ### Installation (Open Code)
+
+  Open Code does not support direct marketplace install via CLI. Clone or download the repository:
+
+  ```bash
+  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+  cp -r agentic-collections/ocp-admin ~/.opencode/plugins/ocp-admin
+  ```
+
+  Or with wget:
+
+  ```bash
+  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+  cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
+  ```
+sample_workflows:
+- name: 'TODO: Add workflow'
+  workflow: Extract from README Sample Workflows section.
+resources:
+- title: Main Repository
+  description: agentic-collections
+  url: https://github.com/RHEcosystemAppEng/agentic-collections
+legal_resources:
+  license_agreement_url: https://www.redhat.com/en/about/agreements
+  privacy_policy_url: https://www.redhat.com/en/about/privacy-policy
+author:
+  name: Red Hat Ecosystem Engineering
+  email: eco-engineering@redhat.com
+homepage: https://github.com/RHEcosystemAppEng/agentic-collections
+repository: https://github.com/RHEcosystemAppEng/agentic-collections
+license: Apache-2.0
+keywords:
+- red-hat
+- openshift
+- administration
+- management

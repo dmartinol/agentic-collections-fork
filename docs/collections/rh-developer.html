@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Hat Developer Agentic Collection - Red Hat Agentic Catalog</title>
+    <link rel="stylesheet" href="../styles.css?v=21">
+    <style>
+        .collection-back { margin-bottom: 1.5rem; }
+        .collection-content { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; }
+        .collection-content h1 { margin-top: 0; }
+        .collection-content h2 { margin-top: 2rem; border-bottom: 1px solid var(--border, #e5e5e5); padding-bottom: 0.5rem; }
+        .collection-content h3 { margin-top: 1.5rem; }
+        .collection-content pre { background: var(--bg-code, #f5f5f5); padding: 1rem; border-radius: var(--radius, 8px); overflow-x: auto; }
+        .collection-content code { background: var(--bg-code, #f5f5f5); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+        .collection-content pre code { padding: 0; background: none; }
+        .collection-content ul, .collection-content ol { margin: 0.5rem 0 1rem 1.5rem; }
+        .collection-content a { color: var(--primary, #ee0000); }
+        .collection-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border, #e5e5e5); margin: 1.5rem 0 0; }
+        .collection-tab { padding: 0.75rem 1.5rem; font-weight: 600; font-size: 0.95rem; color: var(--text-secondary); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s ease; }
+        .collection-tab:hover { color: var(--primary); }
+        .collection-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .collection-tab-panel { display: none; padding: 1.5rem 0; }
+        .collection-tab-panel.active { display: block; }
+        .install-accordion { margin-top: 1rem; }
+        .install-accordion-item { border: 1px solid var(--border, #e5e5e5); border-radius: var(--radius, 8px); margin-bottom: 0.5rem; overflow: hidden; }
+        .install-accordion-item:last-child { margin-bottom: 0; }
+        .install-accordion-header { padding: 0.75rem 1rem; font-weight: 600; font-size: 1rem; cursor: pointer; list-style: none; background: var(--bg-section, #f8f9fa); transition: background 0.2s ease; }
+        .install-accordion-header::-webkit-details-marker { display: none; }
+        .install-accordion-header::before { content: '▶'; display: inline-block; margin-right: 0.5rem; font-size: 0.7em; transition: transform 0.2s ease; }
+        .install-accordion-item[open] .install-accordion-header::before { transform: rotate(90deg); }
+        .install-accordion-header:hover { background: var(--bg-hover, #fafafa); }
+        .install-accordion-body { padding: 1rem 1rem 1rem 2rem; border-top: 1px solid var(--border, #e5e5e5); }
+        .skill-list { margin: 1rem 0 1rem 1.5rem; padding-left: 1.5rem; }
+        .skill-list li { margin-bottom: 1.5rem; }
+        .skill-list li:last-child { margin-bottom: 0; }
+        .skill-summary { margin-top: 0.5rem; margin-left: 0; font-weight: 400; }
+        .collection-mcp-grid { margin-top: 1rem; }
+        .collection-mcp-card { text-decoration: none; color: inherit; display: block; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <a href="../index.html" class="collection-back">← Back to Catalog</a>
+                <h1>Red Hat Developer Agentic Collection</h1>
+                <p class="subtitle">Plugins for building and deploying applications on Red Hat platforms.</p>
+            </div>
+            <div class="toolbar-right">
+                <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" class="toolbar-button">GitHub</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="collection-content">
+            <nav class="collection-tabs" role="tablist">
+                <button class="collection-tab active" role="tab" aria-selected="true" data-tab="overview">Overview</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="skills">Skills</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="resources">Resources</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="agents">Agents</button>
+            </nav>
+
+            <div id="tab-overview" class="collection-tab-panel active" role="tabpanel">
+                <h2>Overview</h2>
+<p>The rh-developer collection provides skills for development tasks.</p>
+<h2>Quick Start</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Claude Code CLI or IDE extension</li>
+<li>OpenShift cluster with build and deployment capabilities</li>
+<li><code>oc</code> CLI and <code>KUBECONFIG</code> configured for cluster access</li>
+</ul>
+<h3>Environment Setup</h3>
+<p>Configure OpenShift cluster access:</p>
+<pre><code class="language-bash">export KUBECONFIG=&quot;/path/to/your/kubeconfig&quot;
+</code></pre>
+<p>Verify access:</p>
+<pre><code class="language-bash">oc get projects
+</code></pre>
+<div class="install-accordion">
+<details class="install-accordion-item" open>
+<summary class="install-accordion-header">Installation (Claude Code)</summary>
+<div class="install-accordion-body"><p>Install the collection as a Claude Code plugin:</p>
+<pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+claude plugin install rh-developer
+</code></pre>
+<p>Or for local development:</p>
+<pre><code class="language-bash">claude plugin marketplace add /path/to/agentic-collections
+claude plugin install rh-developer
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Cursor)</summary>
+<div class="install-accordion-body"><p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-developer ~/.cursor/plugins/rh-developer
+</code></pre>
+<p>Or download and extract:</p>
+<pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-developer ~/.cursor/plugins/rh-developer
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Open Code)</summary>
+<div class="install-accordion-body"><p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-developer ~/.opencode/plugins/rh-developer
+</code></pre>
+<p>Or with wget:</p>
+<pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
+</code></pre></div>
+</details>
+</div>
+<h2>License</h2>
+<p><a href="https://www.redhat.com/en/about/agreements">Apache-2.0</a></p>
+            </div>
+            <div id="tab-skills" class="collection-tab-panel" role="tabpanel">
+                <h2>Skills</h2>
+<p>The pack provides 14 skills for building and deploying applications on Red Hat platforms, including one orchestration skill for end-to-end containerization.</p>
+<ol class="skill-list">
+<li><strong>/detect-project</strong> - Project Analysis
+<div class="skill-summary"><p>Analyze a project folder or GitHub repository to detect programming language, framework, and version requirements.</p>
+<p><strong>Use when:</strong><br />
+- What language is this project?<br />
+- Detect the framework for this app<br />
+- Analyze project for containerization</p>
+<p><strong>What it does:</strong><br />
+- Detects language and framework<br />
+- Identifies build requirements<br />
+- Recommends S2I builder images</p></div>
+</li>
+<li><strong>/recommend-image</strong> - Builder Image Recommendation
+<div class="skill-summary"><p>Recommend the optimal S2I builder image or container base image for a project.</p>
+<p><strong>Use when:</strong><br />
+- What S2I image should I use?<br />
+- Recommend a builder for this Node.js app<br />
+- Best base image for Python project</p>
+<p><strong>What it does:</strong><br />
+- Analyzes project requirements<br />
+- Recommends images based on language, security, target<br />
+- Supports OpenShift and standalone deployments</p></div>
+</li>
+<li><strong>/s2i-build</strong> - Source-to-Image Build
+<div class="skill-summary"><p>Create BuildConfig and ImageStream resources and trigger S2I builds on OpenShift.</p>
+<p><strong>Use when:</strong><br />
+- Build this app with S2I<br />
+- Create a container image from source<br />
+- Build the project on the cluster</p>
+<p><strong>What it does:</strong><br />
+- Creates BuildConfig and ImageStream<br />
+- Triggers S2I build<br />
+- Handles build logs and status</p></div>
+</li>
+<li><strong>/deploy</strong> - OpenShift Deployment
+<div class="skill-summary"><p>Create Kubernetes Deployment, Service, and Route resources to deploy and expose an application.</p>
+<p><strong>Use when:</strong><br />
+- Deploy this image to OpenShift<br />
+- Expose the app with a route<br />
+- Create deployment for the built image</p>
+<p><strong>What it does:</strong><br />
+- Creates Deployment, Service, Route<br />
+- Handles port detection<br />
+- Exposes application externally</p></div>
+</li>
+<li><strong>/helm-deploy</strong> - Helm Chart Deployment
+<div class="skill-summary"><p>Deploy applications to OpenShift using Helm charts.</p>
+<p><strong>Use when:</strong><br />
+- Deploy with Helm<br />
+- Install this Helm chart<br />
+- Deploy using the chart in the project</p>
+<p><strong>What it does:</strong><br />
+- Installs Helm charts<br />
+- Supports custom values<br />
+- Manages chart upgrades</p></div>
+</li>
+<li><strong>/rhel-deploy</strong> - RHEL Standalone Deployment
+<div class="skill-summary"><p>Deploy applications to standalone RHEL/Fedora/CentOS systems using Podman or native packages.</p>
+<p><strong>Use when:</strong><br />
+- Deploy to RHEL server<br />
+- Run this on a bare metal system<br />
+- Install on Fedora</p>
+<p><strong>What it does:</strong><br />
+- Uses Podman with systemd or native packages<br />
+- Configures for standalone systems<br />
+- Handles non-OpenShift targets</p></div>
+</li>
+<li><strong>/validate-environment</strong> - Environment Validation
+<div class="skill-summary"><p>Check and report the status of required tools and environment for rh-developer skills.</p>
+<p><strong>Use when:</strong><br />
+- Validate my environment<br />
+- Check if oc and helm are installed<br />
+- Verify cluster connectivity</p>
+<p><strong>What it does:</strong><br />
+- Validates tool installation (oc, helm, podman, git, skopeo)<br />
+- Checks cluster connectivity<br />
+- Reports permissions and configuration</p></div>
+</li>
+<li><strong>/debug-pod</strong> - Pod Failure Diagnosis
+<div class="skill-summary"><p>Diagnose pod failures on OpenShift including CrashLoopBackOff, ImagePullBackOff, OOMKilled, and pending pods.</p>
+<p><strong>Use when:</strong><br />
+- Why is this pod failing?<br />
+- Debug CrashLoopBackOff<br />
+- Pod won't start</p>
+<p><strong>What it does:</strong><br />
+- Analyzes pod status and events<br />
+- Retrieves current and previous logs<br />
+- Checks resource limits and image pull</p></div>
+</li>
+<li><strong>/debug-build</strong> - Build Failure Diagnosis
+<div class="skill-summary"><p>Diagnose OpenShift build failures including S2I builds, Docker/Podman builds, and BuildConfig issues.</p>
+<p><strong>Use when:</strong><br />
+- Why did the build fail?<br />
+- Debug S2I build<br />
+- BuildConfig not working</p>
+<p><strong>What it does:</strong><br />
+- Validates BuildConfig<br />
+- Analyzes build pod logs<br />
+- Checks registry authentication</p></div>
+</li>
+<li><strong>/debug-container</strong> - Container Diagnosis
+<div class="skill-summary"><p>Diagnose local container issues with Podman/Docker including image pull errors, container startup failures, and OOM kills.</p>
+<p><strong>Use when:</strong><br />
+- Container won't start<br />
+- Image pull failed<br />
+- Debug Podman container</p>
+<p><strong>What it does:</strong><br />
+- Inspects container configuration<br />
+- Analyzes logs and events<br />
+- Identifies startup and resource issues</p></div>
+</li>
+<li><strong>/debug-network</strong> - Network Connectivity Diagnosis
+<div class="skill-summary"><p>Diagnose OpenShift service connectivity issues including DNS, service endpoints, routes, and network policies.</p>
+<p><strong>Use when:</strong><br />
+- Service not reachable<br />
+- DNS resolution failing<br />
+- Debug connectivity between pods</p>
+<p><strong>What it does:</strong><br />
+- Verifies service endpoints<br />
+- Checks route and ingress<br />
+- Analyzes network policies</p></div>
+</li>
+<li><strong>/debug-pipeline</strong> - Pipeline Failure Diagnosis
+<div class="skill-summary"><p>Diagnose OpenShift Pipelines (Tekton) CI/CD failures including PipelineRun and TaskRun errors.</p>
+<p><strong>Use when:</strong><br />
+- Pipeline failed<br />
+- Debug Tekton PipelineRun<br />
+- TaskRun step error</p>
+<p><strong>What it does:</strong><br />
+- Analyzes PipelineRun and TaskRun<br />
+- Checks workspace and PVC binding<br />
+- Identifies authentication issues</p></div>
+</li>
+<li><strong>/debug-rhel</strong> - RHEL System Diagnosis
+<div class="skill-summary"><p>Diagnose RHEL system issues including systemd failures, SELinux denials, firewall blocking, and resource problems.</p>
+<p><strong>Use when:</strong><br />
+- Service won't start on RHEL<br />
+- SELinux blocking<br />
+- Debug systemd unit</p>
+<p><strong>What it does:</strong><br />
+- Analyzes journalctl logs<br />
+- Checks SELinux denials<br />
+- Verifies firewall and resources</p></div>
+</li>
+</ol>
+<h2>Orchestration Skill</h2>
+<ol class="skill-list">
+<li><strong>/containerize-deploy</strong> - End-to-End Containerization and Deployment
+<div class="skill-summary"><p>Complete workflow for containerizing and deploying applications to OpenShift or standalone RHEL systems.</p>
+<p><strong>Use when:</strong><br />
+- Containerize and deploy this app<br />
+- Build and deploy to OpenShift<br />
+- Full deployment from source</p>
+<p><strong>Workflow:</strong><br />
+1. Detect project (detect-project skill)<br />
+2. Build image (s2i-build skill)<br />
+3. Deploy (deploy, helm-deploy, or rhel-deploy skill based on target)</p>
+<p><strong>Capabilities:</strong><br />
+- Automatic project detection<br />
+- S2I or custom build<br />
+- OpenShift or RHEL deployment targets</p></div>
+</li>
+</ol>
+<h2>Skills Decision Guide</h2>
+<table><thead><tr><th>User request</th><th>Skill to use</th><th>Reason</th></tr></thead><tbody><tr><td>"Containerize and deploy this app" or "Build and deploy to OpenShift"</td><td><code>/containerize-deploy</code></td><td>End-to-end workflow from source to running app; orchestrates detect-project, s2i-build, deploy.</td></tr><tr><td>"What language is this project?" or "Detect framework for this app"</td><td><code>/detect-project</code></td><td>Analyzes project to detect language, framework, and version requirements.</td></tr><tr><td>"Why is this pod failing?" or "Debug CrashLoopBackOff"</td><td><code>/debug-pod</code></td><td>Diagnoses pod failures on OpenShift (CrashLoopBackOff, ImagePullBackOff, OOMKilled).</td></tr><tr><td>"Why did the build fail?" or "Debug S2I build"</td><td><code>/debug-build</code></td><td>Diagnoses OpenShift build failures including S2I builds and BuildConfig issues.</td></tr><tr><td>"What S2I image should I use?" or "Recommend builder for Node.js"</td><td><code>/recommend-image</code></td><td>Recommends optimal S2I builder or base image based on project requirements.</td></tr></tbody></table>
+            </div>
+            <div id="tab-resources" class="collection-tab-panel" role="tabpanel">
+                <h2>Documentation</h2>
+<ul>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/dynamic-validation.md" target="_blank" rel="noopener">Dynamic Image Validation Reference</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/image-selection-criteria.md" target="_blank" rel="noopener">Image Selection Criteria Reference</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/python-s2i-entrypoints.md" target="_blank" rel="noopener">Python S2I Entry Point Requirements</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/builder-images.md" target="_blank" rel="noopener">S2I Builder Image Reference</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/rhel-deployment.md" target="_blank" rel="noopener">RHEL Deployment Reference</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/human-in-the-loop.md" target="_blank" rel="noopener">Human In The Loop</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/debugging-patterns.md" target="_blank" rel="noopener">Debugging Patterns</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/selinux-troubleshooting.md" target="_blank" rel="noopener">SELinux Troubleshooting</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/prerequisites.md" target="_blank" rel="noopener">Prerequisites</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener">Main Repository</a> - agentic-collections</li>
+</ul>
+            </div>
+            <div id="tab-agents" class="collection-tab-panel" role="tabpanel">
+                <h2>MCP Server Integrations</h2>
+<div class="grid collection-mcp-grid">
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-developer" data-mcp-name="openshift" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">☸️</span><span>OpenShift MCP Server</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Official</p>
+<p class="container">Type: Container</p>
+<div class="env-vars">1 env var</div>
+<div class="env-vars">39 tools</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-developer" data-mcp-name="podman" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">🐳</span><span>Podman MCP Server</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Marc Nuri (Red Hat)</p>
+<p class="container">Type: Container</p>
+<div class="env-vars">No env vars</div>
+<div class="env-vars">13 tools</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-developer" data-mcp-name="github" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">🐙</span><span>GitHub MCP Server</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By GitHub</p>
+<p class="container">Type: Container</p>
+<div class="env-vars">1 env var</div>
+<div class="env-vars">40 tools</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-developer" data-mcp-name="lightspeed-mcp" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">💡</span><span>Red Hat Lightspeed MCP</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: Container</p>
+<div class="env-vars">2 env vars</div>
+<div class="env-vars">39 tools</div>
+</div>
+</div>
+<h2>Sample Workflows</h2>
+<h3>See collection.yaml</h3>
+<p>Add workflows in collection.yaml.</p>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>Generated from <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank">agentic-collections</a> repository</p>
+    </footer>
+
+    <!-- Modal for MCP Server Details (same as catalog) -->
+    <div id="mcp-modal" class="modal">
+        <div class="modal-content" id="mcp-details"></div>
+    </div>
+
+    <script src="../app.js?v=22"></script>
+    <script>
+        // Tab switching
+        document.querySelectorAll('.collection-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = 'tab-' + tab.dataset.tab;
+                document.querySelectorAll('.collection-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+                document.querySelectorAll('.collection-tab-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+collections:
+  ocp-admin:
+    icon: "☸️"
+  rh-ai-engineer:
+    icon: "🤖"
+  rh-automation:
+    icon: "⚙️"
+  rh-developer:
+    icon: "💻"
+  rh-sre:
+    icon: "🔧"
+  rh-support-engineer:
+    icon: "🎯"
+  rh-virt:
+    icon: "🖥️"
