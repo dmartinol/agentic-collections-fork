@@ -119,6 +119,7 @@ cp -r agentic-collections-main/rh-virt ~/.opencode/plugins/openshift-virtualizat
 The pack provides 10 skills for virtual machine management on OpenShift Virtualization.
 
 
+
 ### vm-clone - VM Cloning
 
 Clone existing virtual machines for testing, scaling, or creating templates.
@@ -276,7 +277,6 @@ Restore virtual machines from existing snapshots.
 - Restores VM from snapshot
 - Handles disk and configuration
 - Preserves or creates new VM
-
 
 
 

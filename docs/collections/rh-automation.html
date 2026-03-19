@@ -113,6 +113,40 @@ cp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation
             <div id="tab-skills" class="collection-tab-panel" role="tabpanel">
                 <h2>Skills</h2>
 <p>The pack provides 11 skills for AAP governance, execution safety, and forensic troubleshooting, including 3 orchestration skills.</p>
+<h2>Orchestration Skills</h2>
+<ol class="skill-list">
+<li><strong>/governance-assessor</strong> - Orchestrates Platform Governance Audit
+<div class="skill-summary"><p>Orchestrates AAP governance readiness assessments across 7 domains.</p>
+<p><strong>Use when:</strong><br />
+- "Assess my AAP platform's governance readiness"<br />
+- "Audit my platform governance"<br />
+- "What should I fix before executing jobs?"</p>
+<p><strong>Workflow:</strong><br />
+- Validates MCP connectivity (aap-mcp-validator)<br />
+- Runs governance-readiness-assessor (full or scoped)<br />
+- Produces execution-summary</p></div>
+</li>
+<li><strong>/governance-executor</strong> - Orchestrates Governed Execution
+<div class="skill-summary"><p>Orchestrates governed job execution with risk analysis and approval.</p>
+<p><strong>Use when:</strong><br />
+- "Execute the security patch on production urgently"<br />
+- Run jobs with check mode and approval</p>
+<p><strong>Workflow:</strong><br />
+- execution-risk-analyzer (inventory risk, secret scanning)<br />
+- governed-job-launcher (check mode, approval, phased rollout)</p></div>
+</li>
+<li><strong>/forensic-troubleshooter</strong> - Orchestrates Failure Root Cause Analysis
+<div class="skill-summary"><p>Orchestrates forensic failure analysis with error classification.</p>
+<p><strong>Use when:</strong><br />
+- "Job #4451 failed. What happened?"<br />
+- Troubleshoot job failures</p>
+<p><strong>Workflow:</strong><br />
+- job-failure-analyzer (event extraction, error classification)<br />
+- host-fact-inspector (host correlation)<br />
+- resolution-advisor (Red Hat doc-backed recommendations)</p></div>
+</li>
+</ol>
+<h2>Skills</h2>
 <ol class="skill-list">
 <li><strong>/aap-mcp-validator</strong> - Validate AAP MCP Server Connectivity
 <div class="skill-summary"><p>Validate that required AAP MCP servers are accessible before executing automation skills.</p>
@@ -200,39 +234,6 @@ cp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation
 - Analyzes conversation history<br />
 - Extracts agents, skills, tools, and docs used<br />
 - Provides audit trail for workflows</p></div>
-</li>
-</ol>
-<h2>Orchestration Skills</h2>
-<ol class="skill-list">
-<li><strong>/governance-assessor</strong> - Orchestrates Platform Governance Audit
-<div class="skill-summary"><p>Orchestrates AAP governance readiness assessments across 7 domains.</p>
-<p><strong>Use when:</strong><br />
-- "Assess my AAP platform's governance readiness"<br />
-- "Audit my platform governance"<br />
-- "What should I fix before executing jobs?"</p>
-<p><strong>Workflow:</strong><br />
-- Validates MCP connectivity (aap-mcp-validator)<br />
-- Runs governance-readiness-assessor (full or scoped)<br />
-- Produces execution-summary</p></div>
-</li>
-<li><strong>/governance-executor</strong> - Orchestrates Governed Execution
-<div class="skill-summary"><p>Orchestrates governed job execution with risk analysis and approval.</p>
-<p><strong>Use when:</strong><br />
-- "Execute the security patch on production urgently"<br />
-- Run jobs with check mode and approval</p>
-<p><strong>Workflow:</strong><br />
-- execution-risk-analyzer (inventory risk, secret scanning)<br />
-- governed-job-launcher (check mode, approval, phased rollout)</p></div>
-</li>
-<li><strong>/forensic-troubleshooter</strong> - Orchestrates Failure Root Cause Analysis
-<div class="skill-summary"><p>Orchestrates forensic failure analysis with error classification.</p>
-<p><strong>Use when:</strong><br />
-- "Job #4451 failed. What happened?"<br />
-- Troubleshoot job failures</p>
-<p><strong>Workflow:</strong><br />
-- job-failure-analyzer (event extraction, error classification)<br />
-- host-fact-inspector (host correlation)<br />
-- resolution-advisor (Red Hat doc-backed recommendations)</p></div>
 </li>
 </ol>
 <h2>Skills Decision Guide</h2>

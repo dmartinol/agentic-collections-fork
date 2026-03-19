@@ -85,6 +85,32 @@ cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
 The pack provides 14 skills for building and deploying applications on Red Hat platforms, including one orchestration skill for end-to-end containerization.
 
 
+## Orchestration Skill
+
+
+### containerize-deploy - End-to-End Containerization and Deployment
+
+Complete workflow for containerizing and deploying applications to OpenShift or standalone RHEL systems.
+
+**Use when:**
+- Containerize and deploy this app
+- Build and deploy to OpenShift
+- Full deployment from source
+
+**Workflow:**
+1. Detect project (detect-project skill)
+2. Build image (s2i-build skill)
+3. Deploy (deploy, helm-deploy, or rhel-deploy skill based on target)
+
+**Capabilities:**
+- Automatic project detection
+- S2I or custom build
+- OpenShift or RHEL deployment targets
+
+
+
+
+
 ### detect-project - Project Analysis
 
 Analyze a project folder or GitHub repository to detect programming language, framework, and version requirements.
@@ -290,32 +316,6 @@ Diagnose RHEL system issues including systemd failures, SELinux denials, firewal
 - Analyzes journalctl logs
 - Checks SELinux denials
 - Verifies firewall and resources
-
-
-
-
-## Orchestration Skill
-
-
-### containerize-deploy - End-to-End Containerization and Deployment
-
-Complete workflow for containerizing and deploying applications to OpenShift or standalone RHEL systems.
-
-**Use when:**
-- Containerize and deploy this app
-- Build and deploy to OpenShift
-- Full deployment from source
-
-**Workflow:**
-1. Detect project (detect-project skill)
-2. Build image (s2i-build skill)
-3. Deploy (deploy, helm-deploy, or rhel-deploy skill based on target)
-
-**Capabilities:**
-- Automatic project detection
-- S2I or custom build
-- OpenShift or RHEL deployment targets
-
 
 
 

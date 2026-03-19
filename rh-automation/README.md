@@ -73,6 +73,56 @@ cp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation
 The pack provides 11 skills for AAP governance, execution safety, and forensic troubleshooting, including 3 orchestration skills.
 
 
+## Orchestration Skills
+
+
+### governance-assessor - Orchestrates Platform Governance Audit
+
+Orchestrates AAP governance readiness assessments across 7 domains.
+
+**Use when:**
+- "Assess my AAP platform's governance readiness"
+- "Audit my platform governance"
+- "What should I fix before executing jobs?"
+
+**Workflow:**
+- Validates MCP connectivity (aap-mcp-validator)
+- Runs governance-readiness-assessor (full or scoped)
+- Produces execution-summary
+
+
+
+### governance-executor - Orchestrates Governed Execution
+
+Orchestrates governed job execution with risk analysis and approval.
+
+**Use when:**
+- "Execute the security patch on production urgently"
+- Run jobs with check mode and approval
+
+**Workflow:**
+- execution-risk-analyzer (inventory risk, secret scanning)
+- governed-job-launcher (check mode, approval, phased rollout)
+
+
+
+### forensic-troubleshooter - Orchestrates Failure Root Cause Analysis
+
+Orchestrates forensic failure analysis with error classification.
+
+**Use when:**
+- "Job #4451 failed. What happened?"
+- Troubleshoot job failures
+
+**Workflow:**
+- job-failure-analyzer (event extraction, error classification)
+- host-fact-inspector (host correlation)
+- resolution-advisor (Red Hat doc-backed recommendations)
+
+
+
+
+
 ### aap-mcp-validator - Validate AAP MCP Server Connectivity
 
 Validate that required AAP MCP servers are accessible before executing automation skills.
@@ -197,56 +247,6 @@ Generate execution reports for audit and learning purposes.
 - Analyzes conversation history
 - Extracts agents, skills, tools, and docs used
 - Provides audit trail for workflows
-
-
-
-
-## Orchestration Skills
-
-
-### governance-assessor - Orchestrates Platform Governance Audit
-
-Orchestrates AAP governance readiness assessments across 7 domains.
-
-**Use when:**
-- "Assess my AAP platform's governance readiness"
-- "Audit my platform governance"
-- "What should I fix before executing jobs?"
-
-**Workflow:**
-- Validates MCP connectivity (aap-mcp-validator)
-- Runs governance-readiness-assessor (full or scoped)
-- Produces execution-summary
-
-
-
-### governance-executor - Orchestrates Governed Execution
-
-Orchestrates governed job execution with risk analysis and approval.
-
-**Use when:**
-- "Execute the security patch on production urgently"
-- Run jobs with check mode and approval
-
-**Workflow:**
-- execution-risk-analyzer (inventory risk, secret scanning)
-- governed-job-launcher (check mode, approval, phased rollout)
-
-
-
-### forensic-troubleshooter - Orchestrates Failure Root Cause Analysis
-
-Orchestrates forensic failure analysis with error classification.
-
-**Use when:**
-- "Job #4451 failed. What happened?"
-- Troubleshoot job failures
-
-**Workflow:**
-- job-failure-analyzer (event extraction, error classification)
-- host-fact-inspector (host correlation)
-- resolution-advisor (Red Hat doc-backed recommendations)
-
 
 
 

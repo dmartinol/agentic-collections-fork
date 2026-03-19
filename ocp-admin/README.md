@@ -85,6 +85,7 @@ cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
 The pack provides 1 skill for OpenShift cluster management.
 
 
+
 ### cluster-report - Multi-Cluster Health Report
 
 Generate a consolidated health report across multiple OpenShift clusters.
@@ -100,7 +101,6 @@ Generate a consolidated health report across multiple OpenShift clusters.
 - Collects node resources (CPU, memory, GPUs)
 - Reports namespace counts and pod status
 - Provides single comparison view across clusters
-
 
 
 

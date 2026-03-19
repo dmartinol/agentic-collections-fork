@@ -87,6 +87,7 @@ cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
 The pack provides 11 skills for deploying and managing AI/ML models on Red Hat OpenShift AI.
 
 
+
 ### ds-project-setup - Data Science Project Setup
 
 Set up data science projects on OpenShift AI with namespace setup, S3 data connections, pipeline server, and model serving enablement.
@@ -267,7 +268,6 @@ Deploy TrustyAI Guardrails Orchestrator with input/output content safety detecto
 - Deploys GuardrailsOrchestrator CR
 - Configures detectors (content safety, PII, prompt injection, toxicity)
 - Manages orchestration policies and guarded endpoint validation
-
 
 
 
