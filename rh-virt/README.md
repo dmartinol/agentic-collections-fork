@@ -297,9 +297,33 @@ Restore virtual machines from existing snapshots.
 ## Sample Workflows
 
 
-### See collection.yaml
+### VM Lifecycle Management
 
-Add workflows in collection.yaml.
+User: "Start VM web-server in namespace vms"
+- vm-lifecycle-manager skill:
+  1. Gathers VM name, namespace, and action
+  2. Confirms before executing
+  3. Executes start/stop/restart via MCP
+
+
+
+### VM Snapshot Before Upgrade
+
+User: "Create a snapshot of database-vm before I upgrade"
+- vm-snapshot-create skill creates snapshot
+- vm-snapshot-list to view existing snapshots
+- vm-snapshot-restore to roll back if needed
+
+
+
+### Live Migration (VM Rebalance)
+
+User: "Rebalance VMs across nodes to balance workload"
+- vm-rebalance skill:
+  1. Analyzes node utilization
+  2. Proposes live migration plan
+  3. Executes migrations with user approval
+
 
 
 

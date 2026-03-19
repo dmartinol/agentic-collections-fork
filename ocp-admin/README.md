@@ -174,6 +174,17 @@ uses **openshift-administration** MCP (see `.mcp.json`).
 
 
 
+### Multi-Cluster Health Report
+
+User: "Show me a report across all clusters"
+- cluster-report skill:
+  1. Verifies each kubeconfig context is OpenShift
+  2. Collects node resources (CPU, memory, GPUs)
+  3. Aggregates namespace counts and pod status
+  4. Produces comparison view
+
+
+
 
 ## License
 

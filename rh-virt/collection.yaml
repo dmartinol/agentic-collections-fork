@@ -276,8 +276,26 @@ deploy_and_use: |
   cp -r agentic-collections-main/rh-virt ~/.opencode/plugins/openshift-virtualization
   ```
 sample_workflows:
-- name: 'TODO: Add workflow'
-  workflow: Extract from README Sample Workflows section.
+- name: VM Lifecycle Management
+  workflow: |
+    User: "Start VM web-server in namespace vms"
+    - vm-lifecycle-manager skill:
+      1. Gathers VM name, namespace, and action
+      2. Confirms before executing
+      3. Executes start/stop/restart via MCP
+- name: VM Snapshot Before Upgrade
+  workflow: |
+    User: "Create a snapshot of database-vm before I upgrade"
+    - vm-snapshot-create skill creates snapshot
+    - vm-snapshot-list to view existing snapshots
+    - vm-snapshot-restore to roll back if needed
+- name: Live Migration (VM Rebalance)
+  workflow: |
+    User: "Rebalance VMs across nodes to balance workload"
+    - vm-rebalance skill:
+      1. Analyzes node utilization
+      2. Proposes live migration plan
+      3. Executes migrations with user approval
 resources:
   - title: OpenShift Virtualization Documentation
     url: https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html

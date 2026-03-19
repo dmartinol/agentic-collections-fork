@@ -333,9 +333,62 @@ Verify an AAP job template meets requirements for executing CVE remediation play
 ## Sample Workflows
 
 
-### See collection.yaml
+### Fleet Discovery → CVE Analysis → Remediation
 
-Add workflows in collection.yaml.
+User: "Show the managed fleet"
+- fleet-inventory skill lists all systems
+
+User: "What are the critical CVEs affecting these systems?"
+- cve-impact skill analyzes vulnerabilities
+
+User: "Remediate CVE-2024-1234 on all RHEL 8 production systems"
+- remediation skill orchestrates end-to-end remediation
+
+
+
+### Emergency CVE Patching
+
+User: "URGENT: CVE-2024-CRITICAL has CVSS 9.8 - create emergency remediation playbooks for all production systems"
+- remediation skill:
+  1. Validates CVE (cve-validation skill)
+  2. Lists production systems (system-context skill)
+  3. Generates playbook (playbook-generator skill)
+  4. Provides execution instructions
+  5. Offers automated execution option
+
+
+
+### Batch Remediation with Verification
+
+User: "Create and execute remediation playbooks for CVE-X, CVE-Y, CVE-Z on systems server-01, server-02, server-03"
+- remediation skill:
+  1. Validates all CVEs
+  2. Gathers system context
+  3. Generates consolidated playbook
+  4. Asks for execution approval
+  5. Executes and monitors job status
+  6. Verifies remediation success (remediation-verifier skill)
+
+
+
+### Account-Level CVE Discovery
+
+User: "What are the critical vulnerabilities on my account?"
+- cve-impact skill with account-level parameters
+- Lists critical CVEs across the fleet, filters by severity and remediation availability
+
+
+
+### Playbook Execution with Dry-Run
+
+User: "Execute the CVE remediation playbook"
+- playbook-executor skill:
+  1. Validates AAP prerequisites
+  2. Lists and selects job template
+  3. Offers dry-run first (check mode)
+  4. Proceeds to actual execution after approval
+  5. Monitors job status and reports results
+
 
 
 

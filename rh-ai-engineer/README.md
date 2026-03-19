@@ -249,6 +249,8 @@ Deploy guardrails orchestrators with PII, toxicity, and prompt-injection detecto
 
 ### Deploy a model from registry
 
+User: "Deploy model v1.2 from the registry to production"
+
 1. Use **model-registry** to list and select a model version.
 2. Use **model-deploy** to deploy the selected model to a serving runtime.
 3. Use **ai-observability** to monitor inference performance.
@@ -256,6 +258,8 @@ Deploy guardrails orchestrators with PII, toxicity, and prompt-injection detecto
 
 
 ### Set up a new data science project
+
+User: "Create a new data science project with a Jupyter workbench"
 
 1. Use **ds-project-setup** to create the project with data connections and pipeline server.
 2. Use **workbench-manage** to create a Jupyter workbench for development.

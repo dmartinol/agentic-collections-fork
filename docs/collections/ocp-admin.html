@@ -207,6 +207,13 @@ uses <strong>openshift-administration</strong> MCP (see <code>.mcp.json</code>).
 <li>Run <strong>cluster-inventory</strong> to list managed and self-managed clusters.</li>
 <li>Align kubeconfig contexts, then run <strong>cluster-report</strong> for resource and pod health across the fleet.</li>
 </ol>
+<h3>Multi-Cluster Health Report</h3>
+<p>User: "Show me a report across all clusters"<br />
+- cluster-report skill:<br />
+  1. Verifies each kubeconfig context is OpenShift<br />
+  2. Collects node resources (CPU, memory, GPUs)<br />
+  3. Aggregates namespace counts and pod status<br />
+  4. Produces comparison view</p>
             </div>
         </div>
     </main>

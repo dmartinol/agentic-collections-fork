@@ -73,9 +73,7 @@ deploy_and_use: |
   wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
   cp -r agentic-collections-main/rh-support-engineer ~/.opencode/plugins/rh-support-engineer
   ```
-sample_workflows:
-- name: 'TODO: Add workflow'
-  workflow: Extract from README Sample Workflows section.
+sample_workflows: []
 resources:
   - title: Red Hat Customer Portal
     url: https://access.redhat.com/

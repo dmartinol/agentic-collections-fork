@@ -304,8 +304,26 @@ deploy_and_use: |
   cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
   ```
 sample_workflows:
-- name: 'TODO: Add workflow'
-  workflow: Extract from README Sample Workflows section.
+- name: Source-to-Image Build and Deploy
+  workflow: |
+    User: "Containerize this app and deploy it to OpenShift"
+    - containerize-deploy skill:
+      1. Detects project (detect-project)
+      2. Selects deployment target (OpenShift or RHEL)
+      3. Builds image (s2i-build or Podman)
+      4. Deploys to cluster (deploy)
+      5. User confirmation at each phase
+- name: Source-to-Image Build
+  workflow: |
+    User: "Build a container from this source code"
+    - detect-project skill identifies language and framework
+    - s2i-build skill builds container image
+    - deploy skill deploys to OpenShift
+- name: Helm Chart Deployment
+  workflow: |
+    User: "Deploy this Helm chart to OpenShift"
+    - detect-project skill (if Helm chart detected) or provide chart path
+    - helm-deploy skill deploys with release name and namespace
 resources:
   - title: OpenShift Source-to-Image (S2I)
     url: https://docs.openshift.com/container-platform/latest/openshift_images/using_images/using-s21-images.html

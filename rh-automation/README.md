@@ -268,17 +268,33 @@ Generate execution reports for audit and learning purposes.
 
 ### Governance Assessment
 
-Use governance-assessor to audit AAP platform across 7 governance domains. Produces PASS/GAP/WARN report with Red Hat citations.
+User: "Assess my AAP governance - is it ready for production?"
+- governance-assessor skill:
+  1. Audits AAP platform across 7 governance domains
+  2. Produces PASS/GAP/WARN report with Red Hat citations
+
 
 
 ### Governed Execution
 
-Use governance-executor to run jobs with risk analysis, check mode, and approval. Catches failures in dry run before production.
+User: "Run this job template with full governance check"
+- governance-executor skill:
+  1. Performs risk analysis
+  2. Runs check mode (dry run) first
+  3. Requires approval before production execution
+  4. Catches failures in dry run before production
+
 
 
 ### Forensic Troubleshooting
 
-Use forensic-troubleshooter when a job fails. Extracts events, classifies errors, correlates host facts, and provides resolution recommendations.
+User: "Job 12345 failed - help me troubleshoot"
+- forensic-troubleshooter skill:
+  1. Extracts job events and host facts
+  2. Classifies errors per taxonomy
+  3. Correlates host facts and failures
+  4. Provides resolution recommendations
+
 
 
 

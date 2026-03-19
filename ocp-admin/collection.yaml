@@ -159,6 +159,14 @@ sample_workflows:
   workflow: |
     1. Run **cluster-inventory** to list managed and self-managed clusters.
     2. Align kubeconfig contexts, then run **cluster-report** for resource and pod health across the fleet.
+- name: Multi-Cluster Health Report
+  workflow: |
+    User: "Show me a report across all clusters"
+    - cluster-report skill:
+      1. Verifies each kubeconfig context is OpenShift
+      2. Collects node resources (CPU, memory, GPUs)
+      3. Aggregates namespace counts and pod status
+      4. Produces comparison view
 resources:
   - title: OpenShift Container Platform Documentation
     url: https://docs.openshift.com/container-platform/latest/welcome/index.html

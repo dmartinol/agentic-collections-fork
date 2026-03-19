@@ -331,8 +331,42 @@ cp -r agentic-collections-main/rh-sre ~/.opencode/plugins/rh-sre
 </div>
 </div>
 <h2>Sample Workflows</h2>
-<h3>See collection.yaml</h3>
-<p>Add workflows in collection.yaml.</p>
+<h3>Fleet Discovery → CVE Analysis → Remediation</h3>
+<p>User: "Show the managed fleet"<br />
+- fleet-inventory skill lists all systems</p>
+<p>User: "What are the critical CVEs affecting these systems?"<br />
+- cve-impact skill analyzes vulnerabilities</p>
+<p>User: "Remediate CVE-2024-1234 on all RHEL 8 production systems"<br />
+- remediation skill orchestrates end-to-end remediation</p>
+<h3>Emergency CVE Patching</h3>
+<p>User: "URGENT: CVE-2024-CRITICAL has CVSS 9.8 - create emergency remediation playbooks for all production systems"<br />
+- remediation skill:<br />
+  1. Validates CVE (cve-validation skill)<br />
+  2. Lists production systems (system-context skill)<br />
+  3. Generates playbook (playbook-generator skill)<br />
+  4. Provides execution instructions<br />
+  5. Offers automated execution option</p>
+<h3>Batch Remediation with Verification</h3>
+<p>User: "Create and execute remediation playbooks for CVE-X, CVE-Y, CVE-Z on systems server-01, server-02, server-03"<br />
+- remediation skill:<br />
+  1. Validates all CVEs<br />
+  2. Gathers system context<br />
+  3. Generates consolidated playbook<br />
+  4. Asks for execution approval<br />
+  5. Executes and monitors job status<br />
+  6. Verifies remediation success (remediation-verifier skill)</p>
+<h3>Account-Level CVE Discovery</h3>
+<p>User: "What are the critical vulnerabilities on my account?"<br />
+- cve-impact skill with account-level parameters<br />
+- Lists critical CVEs across the fleet, filters by severity and remediation availability</p>
+<h3>Playbook Execution with Dry-Run</h3>
+<p>User: "Execute the CVE remediation playbook"<br />
+- playbook-executor skill:<br />
+  1. Validates AAP prerequisites<br />
+  2. Lists and selects job template<br />
+  3. Offers dry-run first (check mode)<br />
+  4. Proceeds to actual execution after approval<br />
+  5. Monitors job status and reports results</p>
             </div>
         </div>
     </main>

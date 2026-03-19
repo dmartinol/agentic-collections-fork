@@ -196,6 +196,37 @@ def validate_collection_yaml(pack_dir: str) -> List[str]:
                 for req in REQUIRED_WORKFLOW_ENTRY:
                     if req not in entry:
                         errors.append(f"{pack_dir}: sample_workflows[{i}] missing '{req}'")
+                # Basic content checks for workflow field
+                workflow_text = entry.get('workflow')
+                if workflow_text is not None and isinstance(workflow_text, str):
+                    wf = workflow_text.strip()
+                    if not wf:
+                        errors.append(f"{pack_dir}: sample_workflows[{i}] workflow is empty")
+                    else:
+                        # Placeholder check
+                        placeholders = [
+                            'TODO:', 'todo:', 'Extract from README',
+                            'Extract from README Sample Workflows',
+                            'placeholder', 'TBD', 'to be added'
+                        ]
+                        wf_lower = wf.lower()
+                        for ph in placeholders:
+                            if ph.lower() in wf_lower:
+                                errors.append(
+                                    f"{pack_dir}: sample_workflows[{i}] contains placeholder '{ph}'"
+                                )
+                                break
+                        # Format: must contain User request (User: or User: ")
+                        if 'User:' not in workflow_text and 'user:' not in wf_lower:
+                            errors.append(
+                                f"{pack_dir}: sample_workflows[{i}] workflow must start with "
+                                "User request (e.g. User: \"...\")"
+                            )
+                        # Format: must contain bullet points (- )
+                        if '- ' not in workflow_text:
+                            errors.append(
+                                f"{pack_dir}: sample_workflows[{i}] workflow must use bullet points (-)"
+                            )
 
     resources = data.get("resources")
     if resources is not None and isinstance(resources, list):

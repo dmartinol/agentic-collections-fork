@@ -101,6 +101,40 @@ External references and optional embedded documentation. Each entry has:
 
 The Resources tab on collection pages shows only References (from `collection.yaml`); no separate Documentation section.
 
+**Regenerating resources from docs:** Use the generate-collection skill. It iterates over `docs/**/*.md` (excluding INDEX.md, README.md, SOURCES.md), reads each doc's `sources` frontmatter, and uses the first source for `title` and `url`. Set `embedded_doc` to the doc path relative to pack root. Deduplicate by URL; when multiple docs cite the same URL, prefer the doc most central to the pack's skills.
+
+**Validation:** When `embedded_doc` is present, the path must exist under the pack root (enforced by `make validate`).
+
+### sample_workflows
+
+Sample workflows illustrate how users interact with the collection. Each entry has:
+
+- `name` (required): Short title (e.g. "Fleet Discovery → CVE Analysis → Remediation")
+- `workflow` (required): Multiline markdown describing the workflow
+
+**Format requirements** (enforced by `make validate`):
+
+- Each workflow must contain a **user request** (`User: "..."` or `User:` followed by a quoted request).
+- Steps must use **bullet points** (`-`).
+- No placeholder text (e.g. `TODO:`, `Extract from README`, `TBD`).
+
+**Example format:**
+
+```yaml
+sample_workflows:
+  - name: Fleet Discovery → Remediation
+    workflow: |
+      User: "Show the managed fleet"
+      - fleet-inventory skill lists all systems
+
+      User: "Remediate CVE-2024-1234 on production systems"
+      - remediation skill orchestrates end-to-end remediation
+```
+
+For multi-turn workflows, repeat `User: "..."` followed by bullets for each turn. Use numbered sub-bullets when a skill has internal steps (e.g. `- remediation skill: 1. Validates 2. Gathers context`).
+
+**Regenerating from skills:** Use the generate-collection skill. It extracts from orchestration skills' `## Workflow` sections, `references/flows/*.md`, and `references/*workflow*.md` / `references/*examples*.md`. Skills referenced in workflows must exist in `contents.skills` or `contents.orchestration_skills`.
+
 ## Generation Pipeline
 
 ```bash
@@ -129,8 +163,8 @@ Validates `collection.yaml` structure per pack:
 | **contents.skills** | Each entry has `name`, `description`, `summary_markdown` |
 | **contents.orchestration_skills** | Each entry has `name`, `description`, `summary_markdown` |
 | **contents.skills_decision_guide** | Each entry has `user_request`, `skill_to_use`, `reason`; `skill_to_use` must reference a skill in `skills` or `orchestration_skills` |
-| **sample_workflows** | Each entry has `name`, `workflow` |
-| **resources** | Each entry has `title`, `url` |
+| **sample_workflows** | Each entry has `name`, `workflow`; workflow non-empty, no placeholders, must contain `User:` and bullet points (`-`) |
+| **resources** | Each entry has `title`, `url`; `embedded_doc` path must exist when present |
 
 **Not validated:** Cross-check that all `skills/*/SKILL.md` are listed in `collection.yaml`, or that orchestration skills are not duplicated in `skills`.
 

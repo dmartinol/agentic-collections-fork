@@ -294,11 +294,24 @@ cp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation
 </div>
 <h2>Sample Workflows</h2>
 <h3>Governance Assessment</h3>
-<p>Use governance-assessor to audit AAP platform across 7 governance domains. Produces PASS/GAP/WARN report with Red Hat citations.</p>
+<p>User: "Assess my AAP governance - is it ready for production?"<br />
+- governance-assessor skill:<br />
+  1. Audits AAP platform across 7 governance domains<br />
+  2. Produces PASS/GAP/WARN report with Red Hat citations</p>
 <h3>Governed Execution</h3>
-<p>Use governance-executor to run jobs with risk analysis, check mode, and approval. Catches failures in dry run before production.</p>
+<p>User: "Run this job template with full governance check"<br />
+- governance-executor skill:<br />
+  1. Performs risk analysis<br />
+  2. Runs check mode (dry run) first<br />
+  3. Requires approval before production execution<br />
+  4. Catches failures in dry run before production</p>
 <h3>Forensic Troubleshooting</h3>
-<p>Use forensic-troubleshooter when a job fails. Extracts events, classifies errors, correlates host facts, and provides resolution recommendations.</p>
+<p>User: "Job 12345 failed - help me troubleshoot"<br />
+- forensic-troubleshooter skill:<br />
+  1. Extracts job events and host facts<br />
+  2. Classifies errors per taxonomy<br />
+  3. Correlates host facts and failures<br />
+  4. Provides resolution recommendations</p>
             </div>
         </div>
     </main>

@@ -284,8 +284,23 @@ cp -r agentic-collections-main/rh-virt ~/.opencode/plugins/openshift-virtualizat
 </div>
 </div>
 <h2>Sample Workflows</h2>
-<h3>See collection.yaml</h3>
-<p>Add workflows in collection.yaml.</p>
+<h3>VM Lifecycle Management</h3>
+<p>User: "Start VM web-server in namespace vms"<br />
+- vm-lifecycle-manager skill:<br />
+  1. Gathers VM name, namespace, and action<br />
+  2. Confirms before executing<br />
+  3. Executes start/stop/restart via MCP</p>
+<h3>VM Snapshot Before Upgrade</h3>
+<p>User: "Create a snapshot of database-vm before I upgrade"<br />
+- vm-snapshot-create skill creates snapshot<br />
+- vm-snapshot-list to view existing snapshots<br />
+- vm-snapshot-restore to roll back if needed</p>
+<h3>Live Migration (VM Rebalance)</h3>
+<p>User: "Rebalance VMs across nodes to balance workload"<br />
+- vm-rebalance skill:<br />
+  1. Analyzes node utilization<br />
+  2. Proposes live migration plan<br />
+  3. Executes migrations with user approval</p>
             </div>
         </div>
     </main>

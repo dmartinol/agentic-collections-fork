@@ -249,11 +249,27 @@ deploy_and_use: |
   ```
 sample_workflows:
 - name: Governance Assessment
-  workflow: Use governance-assessor to audit AAP platform across 7 governance domains. Produces PASS/GAP/WARN report with Red Hat citations.
+  workflow: |
+    User: "Assess my AAP governance - is it ready for production?"
+    - governance-assessor skill:
+      1. Audits AAP platform across 7 governance domains
+      2. Produces PASS/GAP/WARN report with Red Hat citations
 - name: Governed Execution
-  workflow: Use governance-executor to run jobs with risk analysis, check mode, and approval. Catches failures in dry run before production.
+  workflow: |
+    User: "Run this job template with full governance check"
+    - governance-executor skill:
+      1. Performs risk analysis
+      2. Runs check mode (dry run) first
+      3. Requires approval before production execution
+      4. Catches failures in dry run before production
 - name: Forensic Troubleshooting
-  workflow: Use forensic-troubleshooter when a job fails. Extracts events, classifies errors, correlates host facts, and provides resolution recommendations.
+  workflow: |
+    User: "Job 12345 failed - help me troubleshoot"
+    - forensic-troubleshooter skill:
+      1. Extracts job events and host facts
+      2. Classifies errors per taxonomy
+      3. Correlates host facts and failures
+      4. Provides resolution recommendations
 resources:
   - title: Red Hat Ansible Automation Platform
     url: https://www.redhat.com/en/technologies/management/ansible

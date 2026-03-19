@@ -336,9 +336,33 @@ Diagnose RHEL system issues including systemd failures, SELinux denials, firewal
 ## Sample Workflows
 
 
-### See collection.yaml
+### Source-to-Image Build and Deploy
 
-Add workflows in collection.yaml.
+User: "Containerize this app and deploy it to OpenShift"
+- containerize-deploy skill:
+  1. Detects project (detect-project)
+  2. Selects deployment target (OpenShift or RHEL)
+  3. Builds image (s2i-build or Podman)
+  4. Deploys to cluster (deploy)
+  5. User confirmation at each phase
+
+
+
+### Source-to-Image Build
+
+User: "Build a container from this source code"
+- detect-project skill identifies language and framework
+- s2i-build skill builds container image
+- deploy skill deploys to OpenShift
+
+
+
+### Helm Chart Deployment
+
+User: "Deploy this Helm chart to OpenShift"
+- detect-project skill (if Helm chart detected) or provide chart path
+- helm-deploy skill deploys with release name and namespace
+
 
 
 

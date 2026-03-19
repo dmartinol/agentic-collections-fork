@@ -328,8 +328,23 @@ cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
 </div>
 </div>
 <h2>Sample Workflows</h2>
-<h3>See collection.yaml</h3>
-<p>Add workflows in collection.yaml.</p>
+<h3>Source-to-Image Build and Deploy</h3>
+<p>User: "Containerize this app and deploy it to OpenShift"<br />
+- containerize-deploy skill:<br />
+  1. Detects project (detect-project)<br />
+  2. Selects deployment target (OpenShift or RHEL)<br />
+  3. Builds image (s2i-build or Podman)<br />
+  4. Deploys to cluster (deploy)<br />
+  5. User confirmation at each phase</p>
+<h3>Source-to-Image Build</h3>
+<p>User: "Build a container from this source code"<br />
+- detect-project skill identifies language and framework<br />
+- s2i-build skill builds container image<br />
+- deploy skill deploys to OpenShift</p>
+<h3>Helm Chart Deployment</h3>
+<p>User: "Deploy this Helm chart to OpenShift"<br />
+- detect-project skill (if Helm chart detected) or provide chart path<br />
+- helm-deploy skill deploys with release name and namespace</p>
             </div>
         </div>
     </main>

@@ -7,8 +7,9 @@ description: |
   - "Generate collection catalog from SKILL.md files"
   - "Add new skill to collection.yaml"
   - "Regenerate resources" / "Update resources from docs" / "Extract resources from docs"
+  - "Regenerate sample_workflows" / "Update sample_workflows" / "Extract workflows from skills"
 
-  Reads skills/<name>/SKILL.md, extracts frontmatter, and produces contents.skills / contents.orchestration_skills entries per COLLECTION_SPEC.md. When regenerating resources, iterates over docs/**/*.md and extracts from frontmatter `sources`.
+  Reads skills/<name>/SKILL.md, extracts frontmatter, and produces contents.skills / contents.orchestration_skills entries per COLLECTION_SPEC.md. When regenerating resources, iterates over docs/**/*.md and extracts from frontmatter `sources`. When regenerating sample_workflows, extracts from SKILL.md Workflow sections and references/ (including references/flows/) markdown files.
 allowed-tools: Read Glob Grep
 ---
 
@@ -110,10 +111,52 @@ When creating or updating `resources`, each entry has:
 
 **When only adding a skill** (user did not ask to regenerate resources): Preserve existing `resources`; do not replace them.
 
+### Step 5b: Sample Workflows
+
+When regenerating sample_workflows (user asks to "regenerate sample_workflows", "update sample_workflows", "extract workflows from skills", or when doing a full collection scaffold/regenerate):
+
+**Sources to extract from** (in order of priority):
+
+1. **Orchestration skills** (`contents.orchestration_skills`): Each orchestration skill typically represents an end-to-end workflow. Read the skill's SKILL.md `## Workflow` section. Produce one `sample_workflows` entry per orchestration skill:
+   - `name`: Skill display name or a short user-facing title (e.g. "End-to-End CVE Remediation", "Governance Assessment")
+   - `workflow`: 1–3 sentence summary of the workflow, or a short step list (e.g. "1. Use `/cve-impact` for analysis. 2. Use `/cve-validation` to check remediability. 3. Use `/playbook-generator` to create playbook. 4. Use `/playbook-executor` to run.")
+
+2. **references/flows/*.md**: Files under `{pack_dir}/skills/<skill>/references/flows/`. Each file with `# Flow: <Title>` is a workflow pattern:
+   - `name`: Extract from heading (e.g. "Account-Level CVEs", "System-Level CVEs (Remediatable)")
+   - `workflow`: Use "When to Use" bullets or first 2–3 steps as the workflow description. Include which skill invokes it (e.g. "Use `/cve-impact` skill with account-level parameters").
+
+3. **references/*.md** with workflow/examples content: Files like `03-workflow-examples.md`, `04-examples.md`, `sample-*.md`. Look for `## Example 1:`, `## Example 2:` or similar:
+   - `name`: From the example heading (e.g. "Full Workflow with Dry-Run", "Handle Execution Failure")
+   - `workflow`: First 2–4 lines summarizing the example, or "Use `<skill-name>` for this pattern."
+
+4. **Regular skills with notable workflows**: If a regular skill has a `## Workflow` section that describes a multi-step user journey (not just internal steps), consider one entry:
+   - `name`: Skill name or derived title
+   - `workflow`: One-sentence summary (e.g. "Use `/fleet-inventory` to list systems, filter by environment, then transition to `/remediation` for patching.")
+
+**Deduplication**: If multiple sources yield the same workflow (e.g. orchestration skill + flow doc), keep one. Prefer the orchestration-skill-derived entry. Limit to 5–10 workflows per pack; prioritize orchestration skills and flows.
+
+**Output format** (per [catalog/schema.yaml](../../../catalog/schema.yaml)):
+
+Each workflow must **start with a user request** and use **bullet points** for steps:
+
+```yaml
+sample_workflows:
+  - name: string  # Short title, e.g. "Fleet Discovery → CVE Analysis → Remediation"
+    workflow: |
+      User: "Exact user request in quotes"
+      - skill-name or step 1
+      - step 2
+      - step 3 (or nested: skill-name: 1. step 2. step)
+```
+
+For multi-turn workflows, repeat `User: "..."` followed by bullets for each turn. Use numbered sub-bullets when a skill has internal steps (e.g. `- remediation skill: 1. Validates 2. Gathers context`).
+
+**When only adding a skill** (user did not ask to regenerate sample_workflows): Preserve existing `sample_workflows`; do not replace them.
+
 ### Step 6: Merge or Create collection.yaml
 
-- **If collection.yaml exists:** Preserve top-level metadata (`id`, `name`, `provider`, `version`, `categories`, `personas`, `marketplaces`, `description`, `summary`, `deploy_and_use`, `sample_workflows`, `resources`). Replace only `contents.skills` and `contents.orchestration_skills` with generated entries. Preserve `contents.description`, `contents.skills_decision_guide`, and `resources` unless user asks to regenerate.
-- **If collection.yaml does not exist:** Use [catalog/schema.yaml](../../../catalog/schema.yaml) and an existing pack (e.g. `rh-sre`) as template. Generate full structure with placeholder values for metadata; user must fill in `description`, `summary`, `deploy_and_use`, `sample_workflows`, `resources`.
+- **If collection.yaml exists:** Preserve top-level metadata (`id`, `name`, `provider`, `version`, `categories`, `personas`, `marketplaces`, `description`, `summary`, `deploy_and_use`, `resources`). Replace `contents.skills` and `contents.orchestration_skills` with generated entries. Replace `sample_workflows` only when user asked to regenerate them (Step 5b). Preserve `contents.description`, `contents.skills_decision_guide`, and `resources` unless user asks to regenerate.
+- **If collection.yaml does not exist:** Use [catalog/schema.yaml](../../../catalog/schema.yaml) and an existing pack (e.g. `rh-sre`) as template. Generate full structure with placeholder values for metadata; include generated `sample_workflows` from Step 5b; user must fill in `description`, `summary`, `deploy_and_use`, `resources` as needed.
 
 ### Step 7: Validate
 
@@ -151,3 +194,14 @@ Run `make validate` to confirm structure. Report any errors and suggest fixes.
 3. Deduplicate by URL; add pack-level refs (Lightspeed, lightspeed-mcp)
 4. Replace `resources` in `rh-sre/collection.yaml`
 5. Run `make validate`
+
+**User:** "Regenerate sample_workflows for all collections" or "Enrich collection specifications with workflows"
+
+**Workflow:**
+1. For each pack in PACK_DIRS (see `scripts/validate_structure.py`): ocp-admin, rh-ai-engineer, rh-automation, rh-developer, rh-sre, rh-virt (exclude rh-support-engineer if WIP)
+2. List orchestration skills from `{pack}/collection.yaml` or discover from `{pack}/skills/*/SKILL.md`
+3. For each orchestration skill: read SKILL.md `## Workflow`, produce sample_workflows entry
+4. List `{pack}/skills/*/references/flows/*.md` and `references/*workflow*.md`, `references/*examples*.md`
+5. Extract workflows from flow docs and example docs; deduplicate
+6. Replace `sample_workflows` in `{pack}/collection.yaml`
+7. Run `make validate`

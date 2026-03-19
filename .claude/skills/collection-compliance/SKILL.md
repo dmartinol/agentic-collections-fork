@@ -7,7 +7,7 @@ description: |
   - "Verify collection.yaml against spec"
   - Before committing collection changes
 
-  Runs structural validation (make validate) and cross-checks: skills on disk vs collection.yaml, orchestration placement, summary_markdown alignment.
+  Runs structural validation (make validate) and cross-checks: skills on disk vs collection.yaml, orchestration placement, summary_markdown alignment, sample_workflows format (User request + bullets) and consistency with SKILL.md.
 allowed-tools: Read Glob Grep
 ---
 
@@ -64,6 +64,21 @@ For each pack, validate `resources`:
 2. **embedded_doc:** When a resource has `embedded_doc`, verify `{pack_dir}/{embedded_doc}` exists on disk. Path is relative to pack root (e.g. `docs/rhel/package-management.md`).
 3. **Report:** PASS if all `embedded_doc` paths exist or none present; WARN if any `embedded_doc` points to a missing file.
 
+### Step 4b: Sample Workflows Cross-Check
+
+For each pack, validate `sample_workflows`:
+
+1. **Structure:** Each entry has `name` and `workflow` (enforced by `make validate`).
+2. **Placeholder check:** WARN if any entry has placeholder text (e.g. "TODO: Add workflow", "Extract from README Sample Workflows section").
+3. **Format check:** Each workflow must start with a user request and use bullet points:
+   - **User request:** Workflow text should contain `User: "` or `User:` followed by a quoted request. WARN if missing (e.g. workflow starts with "Use /skill" or numbered steps instead).
+   - **Bullet points:** Steps should use `-` bullets. WARN if workflow uses only numbered paragraphs (e.g. "1. Step 2. Step") without bullets, or prose-only format.
+   - **Reference:** Per generate-collection skill Step 5b: `User: "..."` first, then `- step` bullets.
+4. **Consistency with SKILL.md:**
+   - **Skills referenced:** Extract skill names from workflow text (e.g. "remediation skill", "fleet-inventory", "cve-impact"). Each must exist in `contents.skills` or `contents.orchestration_skills`. WARN if workflow references a skill not in the collection.
+   - **Orchestration alignment:** For workflows that mention an orchestration skill, read that skill's SKILL.md `## Workflow` section. Verify the workflow steps in the sample_workflow reflect the orchestration steps (e.g. validate → impact → context → playbook → execute). WARN if major steps are missing or order differs significantly.
+5. **Content check:** Each orchestration skill should ideally have a corresponding sample_workflow. If pack has orchestration skills but sample_workflows are placeholders or missing orchestration coverage, report WARN: "Consider regenerating sample_workflows from skills (generate-collection skill)."
+
 ### Step 5: Report Results
 
 **Output format:**
@@ -78,6 +93,9 @@ For each pack, validate `resources`:
 - [PASS|FAIL] No orchestration skills duplicated in skills
 - [PASS|WARN] summary_markdown alignment with SKILL.md
 - [PASS|WARN] resources.embedded_doc paths exist
+- [PASS|WARN] sample_workflows populated (no placeholders; orchestration skills covered)
+- [PASS|WARN] sample_workflows format (User request + bullet points)
+- [PASS|WARN] sample_workflows consistency with SKILL.md (skills exist; orchestration steps align)
 
 ### Recommendations
 - <actionable items>
@@ -89,6 +107,7 @@ For each pack, validate `resources`:
 - [COLLECTION_SPEC.md](../../../COLLECTION_SPEC.md) — schema, validation scope, what is not validated
 - [scripts/validate_structure.py](../../../scripts/validate_structure.py) — structural validation logic
 - [catalog/schema.yaml](../../../catalog/schema.yaml) — schema reference
+- [generate-collection SKILL.md](../generate-collection/SKILL.md) — sample_workflows format (Step 5b)
 
 ## What Is Checked vs Not Checked
 
@@ -102,6 +121,9 @@ For each pack, validate `resources`:
 | Orchestration not in skills | This skill | Cross-check |
 | summary_markdown aligns with SKILL.md | This skill | Required cross-check |
 | resources.embedded_doc paths exist | This skill | Cross-check |
+| sample_workflows populated (no placeholders) | This skill | Cross-check |
+| sample_workflows format (User + bullets) | This skill | Cross-check |
+| sample_workflows consistency with SKILL.md | This skill | Cross-check |
 
 ## Example Usage
 
@@ -113,4 +135,5 @@ For each pack, validate `resources`:
 3. Compare: any missing? duplicates?
 4. Check summary_markdown alignment for all skills
 5. Verify resources.embedded_doc paths exist (if any)
-6. Output compliance report with recommendations
+6. Check sample_workflows format (User request + bullets) and consistency with SKILL.md
+7. Output compliance report with recommendations
