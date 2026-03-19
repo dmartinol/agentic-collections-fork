@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Hat AI Engineer Agentic Collection - Red Hat Agentic Catalog</title>
+    <link rel="stylesheet" href="../styles.css?v=21">
+    <style>
+        .collection-back { margin-bottom: 1.5rem; }
+        .collection-content { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; }
+        .collection-content h1 { margin-top: 0; }
+        .collection-content h2 { margin-top: 2rem; border-bottom: 1px solid var(--border, #e5e5e5); padding-bottom: 0.5rem; }
+        .collection-content h3 { margin-top: 1.5rem; }
+        .collection-content pre { background: var(--bg-code, #f5f5f5); padding: 1rem; border-radius: var(--radius, 8px); overflow-x: auto; }
+        .collection-content code { background: var(--bg-code, #f5f5f5); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+        .collection-content pre code { padding: 0; background: none; }
+        .collection-content ul, .collection-content ol { margin: 0.5rem 0 1rem 1.5rem; }
+        .collection-content a { color: var(--primary, #ee0000); }
+        .collection-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border, #e5e5e5); margin: 1.5rem 0 0; }
+        .collection-tab { padding: 0.75rem 1.5rem; font-weight: 600; font-size: 0.95rem; color: var(--text-secondary); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s ease; }
+        .collection-tab:hover { color: var(--primary); }
+        .collection-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .collection-tab-panel { display: none; padding: 1.5rem 0; }
+        .collection-tab-panel.active { display: block; }
+        .install-accordion { margin-top: 1rem; }
+        .install-accordion-item { border: 1px solid var(--border, #e5e5e5); border-radius: var(--radius, 8px); margin-bottom: 0.5rem; overflow: hidden; }
+        .install-accordion-item:last-child { margin-bottom: 0; }
+        .install-accordion-header { padding: 0.75rem 1rem; font-weight: 600; font-size: 1rem; cursor: pointer; list-style: none; background: var(--bg-section, #f8f9fa); transition: background 0.2s ease; }
+        .install-accordion-header::-webkit-details-marker { display: none; }
+        .install-accordion-header::before { content: '▶'; display: inline-block; margin-right: 0.5rem; font-size: 0.7em; transition: transform 0.2s ease; }
+        .install-accordion-item[open] .install-accordion-header::before { transform: rotate(90deg); }
+        .install-accordion-header:hover { background: var(--bg-hover, #fafafa); }
+        .install-accordion-body { padding: 1rem 1rem 1rem 2rem; border-top: 1px solid var(--border, #e5e5e5); }
+        .skill-list { margin: 1rem 0 1rem 1.5rem; padding-left: 1.5rem; }
+        .skill-list li { margin-bottom: 1.5rem; }
+        .skill-list li:last-child { margin-bottom: 0; }
+        .skill-summary { margin-top: 0.5rem; margin-left: 0; font-weight: 400; }
+        .collection-mcp-grid { margin-top: 1rem; }
+        .collection-mcp-card { text-decoration: none; color: inherit; display: block; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <a href="../index.html" class="collection-back">← Back to Catalog</a>
+                <h1>Red Hat AI Engineer Agentic Collection</h1>
+                <p class="subtitle">Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, reg</p>
+            </div>
+            <div class="toolbar-right">
+                <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" class="toolbar-button">GitHub</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="collection-content">
+            <nav class="collection-tabs" role="tablist">
+                <button class="collection-tab active" role="tab" aria-selected="true" data-tab="overview">Overview</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="skills">Skills</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="resources">Resources</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="agents">Agents</button>
+            </nav>
+
+            <div id="tab-overview" class="collection-tab-panel active" role="tabpanel">
+                <h2>Overview</h2>
+<p>The rh-ai-engineer collection provides skills for deploying and managing AI/ML models,<br />
+pipelines, workbenches, and serving runtimes on Red Hat OpenShift AI.</p>
+<h2>Quick Start</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Claude Code CLI or IDE extension</li>
+<li>Red Hat OpenShift AI (RHOAI) cluster with model serving capabilities</li>
+<li><code>oc</code> CLI and <code>KUBECONFIG</code> configured for cluster access</li>
+</ul>
+<h3>Environment Setup</h3>
+<p>Configure OpenShift AI cluster access:</p>
+<pre><code class="language-bash">export KUBECONFIG=&quot;/path/to/your/kubeconfig&quot;
+</code></pre>
+<p>Verify access to OpenShift AI:</p>
+<pre><code class="language-bash">oc get datascienceprojects -A
+</code></pre>
+<div class="install-accordion">
+<details class="install-accordion-item" open>
+<summary class="install-accordion-header">Installation (Claude Code)</summary>
+<div class="install-accordion-body"><p>Install the collection as a Claude Code plugin:</p>
+<pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+claude plugin install rh-ai-engineer
+</code></pre>
+<p>Or for local development:</p>
+<pre><code class="language-bash">claude plugin marketplace add /path/to/agentic-collections
+claude plugin install rh-ai-engineer
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Cursor)</summary>
+<div class="install-accordion-body"><p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+</code></pre>
+<p>Or download and extract:</p>
+<pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Open Code)</summary>
+<div class="install-accordion-body"><p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+</code></pre>
+<p>Or with wget:</p>
+<pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+</code></pre></div>
+</details>
+</div>
+<h2>License</h2>
+<p><a href="https://www.redhat.com/en/about/agreements">Apache-2.0</a></p>
+            </div>
+            <div id="tab-skills" class="collection-tab-panel" role="tabpanel">
+                <h2>Skills</h2>
+<p>The pack provides 11 skills for deploying and managing AI/ML models on Red Hat OpenShift AI.</p>
+<ol class="skill-list">
+<li><strong>/ds-project-setup</strong> - Data Science Project Setup
+<div class="skill-summary"><p>Set up data science projects on OpenShift AI with appropriate configurations and resources.</p>
+<p><strong>Use when:</strong><br />
+- "Create a new data science project"<br />
+- "Set up project for model development"<br />
+- "Configure OpenShift AI project"</p>
+<p><strong>What it does:</strong><br />
+- Creates and configures DS projects<br />
+- Sets up resource quotas<br />
+- Configures access and permissions</p></div>
+</li>
+<li><strong>/workbench-manage</strong> - Workbench Management
+<div class="skill-summary"><p>Manage OpenShift AI workbenches for interactive development and experimentation.</p>
+<p><strong>Use when:</strong><br />
+- "Create a workbench"<br />
+- "Manage my Jupyter workbench"<br />
+- "Configure development environment"</p>
+<p><strong>What it does:</strong><br />
+- Creates and manages workbenches<br />
+- Configures notebook environments<br />
+- Handles resource allocation</p></div>
+</li>
+<li><strong>/model-deploy</strong> - Model Deployment
+<div class="skill-summary"><p>Deploy AI/ML models to OpenShift AI serving runtimes.</p>
+<p><strong>Use when:</strong><br />
+- "Deploy this model"<br />
+- "Serve the trained model"<br />
+- "Create inference endpoint"</p>
+<p><strong>What it does:</strong><br />
+- Deploys models to serving runtimes<br />
+- Configures inference endpoints<br />
+- Manages model versions</p></div>
+</li>
+<li><strong>/model-registry</strong> - Model Registry
+<div class="skill-summary"><p>Register, version, and promote ML models in the Model Registry across environments.</p>
+<p><strong>Use when:</strong><br />
+- "Register a new model in the registry"<br />
+- "List registered models"<br />
+- "What versions exist for my model?"<br />
+- "Promote a model from dev to production"</p>
+<p><strong>What it does:</strong><br />
+- Handles model registration and versioning<br />
+- Manages metadata and artifact tracking<br />
+- Supports cross-environment promotion</p></div>
+</li>
+<li><strong>/pipeline-manage</strong> - Pipeline Management
+<div class="skill-summary"><p>Create, run, schedule, and monitor Data Science Pipelines (Kubeflow Pipelines 2.0).</p>
+<p><strong>Use when:</strong><br />
+- "Run a pipeline in my project"<br />
+- "Schedule a recurring pipeline"<br />
+- "Check my pipeline run status"<br />
+- "List pipeline runs and their logs"</p>
+<p><strong>What it does:</strong><br />
+- Submits pipeline runs from YAML<br />
+- Schedules recurring runs with cron<br />
+- Monitors execution and step logs</p></div>
+</li>
+<li><strong>/nim-setup</strong> - NIM (NVIDIA Inference Microservices) Setup
+<div class="skill-summary"><p>Set up NVIDIA Inference Microservices for GPU-accelerated model serving.</p>
+<p><strong>Use when:</strong><br />
+- "Configure NIM for model serving"<br />
+- "Set up GPU inference"<br />
+- "Deploy with NVIDIA NIM"</p>
+<p><strong>What it does:</strong><br />
+- Configures NIM integration<br />
+- Sets up GPU resources<br />
+- Manages inference microservices</p></div>
+</li>
+<li><strong>/serving-runtime-config</strong> - Serving Runtime Configuration
+<div class="skill-summary"><p>Configure serving runtimes for model inference on OpenShift AI.</p>
+<p><strong>Use when:</strong><br />
+- "Configure serving runtime"<br />
+- "Set up inference configuration"<br />
+- "Adjust model serving parameters"</p>
+<p><strong>What it does:</strong><br />
+- Configures runtime parameters<br />
+- Manages resource allocation<br />
+- Sets up scaling and replicas</p></div>
+</li>
+<li><strong>/debug-inference</strong> - Inference Debugging
+<div class="skill-summary"><p>Diagnose and troubleshoot model inference issues on OpenShift AI.</p>
+<p><strong>Use when:</strong><br />
+- "Why is inference failing?"<br />
+- "Debug model serving"<br />
+- "Inference errors"</p>
+<p><strong>What it does:</strong><br />
+- Analyzes inference logs<br />
+- Checks endpoint health<br />
+- Identifies configuration issues</p></div>
+</li>
+<li><strong>/ai-observability</strong> - AI Observability
+<div class="skill-summary"><p>Monitor and observe AI/ML workloads, model performance, and inference metrics.</p>
+<p><strong>Use when:</strong><br />
+- "Show model performance metrics"<br />
+- "Monitor inference latency"<br />
+- "AI workload observability"</p>
+<p><strong>What it does:</strong><br />
+- Collects and displays metrics<br />
+- Monitors inference performance<br />
+- Tracks model usage and latency</p></div>
+</li>
+<li><strong>/model-monitor</strong> - TrustyAI Model Monitoring
+<div class="skill-summary"><p>Configure TrustyAI bias detection (SPD, DIR) and data drift monitoring on deployed InferenceServices.</p>
+<p><strong>Use when:</strong><br />
+- "Monitor my model for bias"<br />
+- "Set up drift detection on my inference endpoint"<br />
+- "Configure TrustyAI for my deployed model"<br />
+- "Check if my model has fairness issues"</p>
+<p><strong>What it does:</strong><br />
+- Deploys TrustyAIService CR<br />
+- Configures bias metrics (SPD, DIR) and drift metrics<br />
+- Validates monitoring and threshold tuning</p></div>
+</li>
+<li><strong>/guardrails-config</strong> - TrustyAI Guardrails Orchestrator
+<div class="skill-summary"><p>Deploy TrustyAI Guardrails Orchestrator with input/output content safety detectors for LLM endpoints.</p>
+<p><strong>Use when:</strong><br />
+- "Add guardrails to my LLM endpoint"<br />
+- "Set up content safety for my model"<br />
+- "Configure PII detection on my inference endpoint"<br />
+- "Block prompt injection attacks"</p>
+<p><strong>What it does:</strong><br />
+- Deploys GuardrailsOrchestrator CR<br />
+- Configures detectors (content safety, PII, prompt injection, toxicity)<br />
+- Manages orchestration policies and guarded endpoint validation</p></div>
+</li>
+</ol>
+<h2>Skills Decision Guide</h2>
+<table><thead><tr><th>User request</th><th>Skill to use</th><th>Reason</th></tr></thead><tbody><tr><td>"Deploy Llama 3 on my cluster" or "Create inference endpoint"</td><td><code>/model-deploy</code></td><td>Deploys AI/ML models to OpenShift AI serving runtimes (vLLM, NIM, Caikit+TGIS).</td></tr><tr><td>"Set up NIM on my cluster" or "Configure NGC credentials for NIM"</td><td><code>/nim-setup</code></td><td>Configures NVIDIA NIM platform on OpenShift AI for GPU-accelerated inference.</td></tr><tr><td>"Why is inference failing?" or "Debug model serving"</td><td><code>/debug-inference</code></td><td>Troubleshoots failed or slow InferenceService deployments.</td></tr><tr><td>"Show model performance metrics" or "Monitor inference latency"</td><td><code>/ai-observability</code></td><td>Analyzes model performance, GPU utilization, and cluster health.</td></tr><tr><td>"Create a new data science project" or "Set up project for model development"</td><td><code>/ds-project-setup</code></td><td>Creates and configures Data Science Projects on OpenShift AI.</td></tr><tr><td>"Monitor my model for bias" or "Set up drift detection"</td><td><code>/model-monitor</code></td><td>Configures TrustyAI bias (SPD, DIR) and drift monitoring on deployed InferenceServices.</td></tr><tr><td>"Add guardrails to my LLM" or "Set up content safety"</td><td><code>/guardrails-config</code></td><td>Deploys TrustyAI Guardrails Orchestrator with input/output content safety detectors.</td></tr></tbody></table>
+            </div>
+            <div id="tab-resources" class="collection-tab-panel" role="tabpanel">
+                <h2>Documentation</h2>
+<ul>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/examples/model-deploy.md" target="_blank" rel="noopener">Model Deploy</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/examples/nim-setup.md" target="_blank" rel="noopener">Nim Setup</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/references/known-model-profiles.md" target="_blank" rel="noopener">Known Model Hardware Profiles</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/references/supported-runtimes.md" target="_blank" rel="noopener">Supported Serving Runtimes</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener">Main Repository</a> - agentic-collections</li>
+</ul>
+            </div>
+            <div id="tab-agents" class="collection-tab-panel" role="tabpanel">
+                <h2>MCP Server Integrations</h2>
+<div class="grid collection-mcp-grid">
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-ai-engineer" data-mcp-name="openshift" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">☸️</span><span>OpenShift MCP Server</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Official</p>
+<p class="container">Type: Container</p>
+<div class="env-vars">1 env var</div>
+<div class="env-vars">39 tools</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-ai-engineer" data-mcp-name="ai-observability" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">🔬</span><span>AI Observability MCP Server</span><span title="HTTP Remote Server" style="font-size:1rem">🌐</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: HTTP Remote</p>
+<div class="env-vars">1 env var</div>
+<div class="env-vars">14 tools</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-ai-engineer" data-mcp-name="rhoai" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">🤖</span><span>Red Hat OpenShift AI MCP Server</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: Container</p>
+<div class="env-vars">2 env vars</div>
+<div class="env-vars">8 tools</div>
+</div>
+</div>
+<h2>Sample Workflows</h2>
+<h3>Deploy a model from registry</h3>
+<ol>
+<li>Use <code>/model-registry</code> to list and select a model version</li>
+<li>Use <code>/model-deploy</code> to deploy the selected model to a serving runtime</li>
+<li>Use <code>/ai-observability</code> to monitor inference performance</li>
+</ol>
+<h3>Set up new data science project</h3>
+<ol>
+<li>Use <code>/ds-project-setup</code> to create project with data connections and pipeline server</li>
+<li>Use <code>/workbench-manage</code> to create a Jupyter workbench for development</li>
+<li>Use <code>/pipeline-manage</code> to run and monitor pipelines</li>
+</ol>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>Generated from <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank">agentic-collections</a> repository</p>
+    </footer>
+
+    <!-- Modal for MCP Server Details (same as catalog) -->
+    <div id="mcp-modal" class="modal">
+        <div class="modal-content" id="mcp-details"></div>
+    </div>
+
+    <script src="../app.js?v=22"></script>
+    <script>
+        // Tab switching
+        document.querySelectorAll('.collection-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = 'tab-' + tab.dataset.tab;
+                document.querySelectorAll('.collection-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+                document.querySelectorAll('.collection-tab-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
