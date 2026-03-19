@@ -33,6 +33,6 @@ This directory contains Red Hat Lightspeed-specific guidance for CVE vulnerabili
 
 ## Quick Links
 
-- Red Hat Lightspeed: https://docs.redhat.com/en/documentation/red_hat_insights/1-latest
-- CVE Assessment Guide: https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview
+- Red Hat Lightspeed: https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest
+- CVE Assessment Guide: https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview
 - Source attribution: [../SOURCES.md](../SOURCES.md)

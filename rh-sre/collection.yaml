@@ -315,11 +315,11 @@ resources:
     description: Creating remediation plans, playbook generation.
     embedded_doc: docs/ansible/cve-remediation-templates.md
   - title: Red Hat Lightspeed MCP
-    url: https://github.com/redhat/lightspeed-mcp
+    url: https://github.com/RedHatInsights/insights-mcp
     description: MCP server used by this collection; parameter reference.
     embedded_doc: docs/references/lightspeed-mcp-parameters.md
   - title: Assessing and Monitoring Security Vulnerabilities on RHEL Systems
-    url: https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview
+    url: https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview
     description: CVE identification, classification, threat intelligence.
     embedded_doc: docs/insights/vulnerability-logic.md
   - title: Managing Software with the DNF Tool (RHEL 9)
