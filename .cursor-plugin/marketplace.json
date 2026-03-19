@@ -1,0 +1,97 @@
+{
+  "name": "redhat-agentic-collections",
+  "owner": {
+    "name": "Red Hat Ecosystem Engineering",
+    "email": "eco-engineering@redhat.com"
+  },
+  "metadata": {
+    "description": "Validated Agentic Collections from Red Hat Ecosystem Engineering",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "ocp-admin",
+      "source": "ocp-admin",
+      "description": "Automation capabilities for OpenShift Container Platform cluster management, workload orchestration, security policies, and operational tasks.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "category": "openshift",
+      "skills": "./skills"
+    },
+    {
+      "name": "rh-ai-engineer",
+      "source": "rh-ai-engineer",
+      "description": "Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, registries, workbenches, and serving runtimes on OpenShift AI.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "category": "ai-ml",
+      "skills": "./skills"
+    },
+    {
+      "name": "rh-automation",
+      "source": "rh-automation",
+      "description": "Ansible Automation Platform governance, execution safety, and forensic troubleshooting tools for Red Hat automation engineers.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "category": "automation",
+      "skills": "./skills"
+    },
+    {
+      "name": "rh-developer",
+      "source": "rh-developer",
+      "description": "Plugins for building and deploying applications on Red Hat platforms.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "category": "development",
+      "skills": "./skills"
+    },
+    {
+      "name": "rh-sre",
+      "source": "rh-sre",
+      "description": "Site reliability engineering tools and automation for managing Red Hat platforms and infrastructure.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "category": "site-reliability",
+      "skills": "./skills"
+    },
+    {
+      "name": "rh-support-engineer",
+      "source": "rh-support-engineer",
+      "description": "Technical support and troubleshooting tools for Red Hat products and platforms.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "category": "development",
+      "skills": "./skills"
+    },
+    {
+      "name": "openshift-virtualization",
+      "source": "rh-virt",
+      "description": "Virtual machine management and automation for OpenShift Virtualization and KubeVirt workloads.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "category": "virtualization",
+      "skills": "./skills"
+    }
+  ]
+}
