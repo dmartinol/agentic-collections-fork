@@ -48,6 +48,7 @@ make install
 make validate
 
 # Generate catalog from collection.yaml (marketplace, plugins, README)
+# See COLLECTION_SPEC.md for collection structure and generation pipeline
 make generate-catalog
 
 # Validate skills against Design Principles (SKILL_DESIGN_PRINCIPLES.md)

@@ -64,7 +64,7 @@ Each skill in `contents.skills` has `name`, `description`, and `summary_markdown
 
 **Skills Decision Guide** (`contents.skills_decision_guide`): Optional array of `{ user_request, skill_to_use, reason }` entries that help users choose the right skill. Rendered as a table in the generated README. Add relevant decision mappings (e.g., "Show the managed fleet" → fleet-inventory).
 
-When adding a skill, update both `skills/<name>/SKILL.md` and `collection.yaml` (`contents.skills` or `contents.orchestration_skills`). Consider adding a `skills_decision_guide` entry for common user intents.
+When adding a skill, update both `skills/<name>/SKILL.md` and `collection.yaml` (`contents.skills` or `contents.orchestration_skills`). Consider adding a `skills_decision_guide` entry for common user intents. See [COLLECTION_SPEC.md](COLLECTION_SPEC.md) for full collection structure and generation.
 
 ## Skill and Agent Requirements
 

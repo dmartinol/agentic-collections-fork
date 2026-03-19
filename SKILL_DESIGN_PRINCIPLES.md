@@ -519,9 +519,15 @@ Ask: "Proceed?" Wait for confirmation.
 
 ## Collection Catalog
 
-When adding a skill, also update `collection.yaml` (see [CLAUDE.md](CLAUDE.md)):
+When adding a skill, also update `collection.yaml`. See [COLLECTION_SPEC.md](COLLECTION_SPEC.md) for full structure and generation pipeline.
+
+**Required:**
 - Add the skill to `contents.skills` or `contents.orchestration_skills` with `name`, `description`, `summary_markdown`
-- Consider adding a `skills_decision_guide` entry for common user intents that map to this skill (e.g., "Show the managed fleet" → fleet-inventory)
+- Use `orchestration_skills` only for skills that invoke other skills (e.g. `/remediation`); do not duplicate in `skills`
+
+**Recommended:**
+- Add a `skills_decision_guide` entry for common user intents (e.g., "Show the managed fleet" → fleet-inventory)
+- Align `summary_markdown` with the skill's SKILL.md description (Use when, What it does)
 
 The `validate_structure` script validates `collection.yaml` against the catalog schema.
 
