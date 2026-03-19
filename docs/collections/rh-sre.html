@@ -117,6 +117,31 @@ cp -r agentic-collections-main/rh-sre ~/.opencode/plugins/rh-sre
             <div id="tab-skills" class="collection-tab-panel" role="tabpanel">
                 <h2>Skills</h2>
 <p>The pack provides 13 skills for common SRE operations, including one orchestration skill for end-to-end remediation.</p>
+<h2>Orchestration Skill</h2>
+<ol class="skill-list">
+<li><strong>/remediation</strong> - End-to-End CVE Remediation
+<div class="skill-summary"><p>The remediation skill orchestrates 6 specialized skills to provide complete CVE remediation workflows.</p>
+<p><strong>Use when:</strong><br />
+- Remediate CVE-2024-1234 on system abc-123<br />
+- Create and execute a remediation playbook for CVE-X<br />
+- Patch these 5 CVEs on all production servers</p>
+<p><strong>Workflow:</strong><br />
+0. Validate MCP (mcp-lightspeed-validator, mcp-aap-validator)<br />
+1. Impact (cve-impact skill, if needed)<br />
+2. Validate CVE (cve-validation skill)<br />
+3. Gather Context (system-context skill)<br />
+4. Generate Playbook (playbook-generator skill)<br />
+5. Execute (playbook-executor skill, with user confirmation)<br />
+6. Verify (remediation-verifier skill)</p>
+<p><strong>Capabilities:</strong><br />
+- Single CVE on single system<br />
+- Batch remediation (multiple CVEs, multiple systems)<br />
+- Cross-environment patching (dev → staging → prod)<br />
+- Automated job tracking and reporting<br />
+- Partial failure handling</p></div>
+</li>
+</ol>
+<h2>Skills</h2>
 <ol class="skill-list">
 <li><strong>/fleet-inventory</strong> - System Discovery and Fleet Management
 <div class="skill-summary"><p>Query and display Red Hat Lightspeed managed system inventory.</p>
@@ -260,30 +285,6 @@ cp -r agentic-collections-main/rh-sre ~/.opencode/plugins/rh-sre
 - Checks recommended options (ask variables/limit on launch)<br />
 - Verifies project and inventory exist<br />
 - Reports PASSED / PASSED WITH WARNINGS / FAILED</p></div>
-</li>
-</ol>
-<h2>Orchestration Skill</h2>
-<ol class="skill-list">
-<li><strong>/remediation</strong> - End-to-End CVE Remediation
-<div class="skill-summary"><p>The remediation skill orchestrates 6 specialized skills to provide complete CVE remediation workflows.</p>
-<p><strong>Use when:</strong><br />
-- Remediate CVE-2024-1234 on system abc-123<br />
-- Create and execute a remediation playbook for CVE-X<br />
-- Patch these 5 CVEs on all production servers</p>
-<p><strong>Workflow:</strong><br />
-0. Validate MCP (mcp-lightspeed-validator, mcp-aap-validator)<br />
-1. Impact (cve-impact skill, if needed)<br />
-2. Validate CVE (cve-validation skill)<br />
-3. Gather Context (system-context skill)<br />
-4. Generate Playbook (playbook-generator skill)<br />
-5. Execute (playbook-executor skill, with user confirmation)<br />
-6. Verify (remediation-verifier skill)</p>
-<p><strong>Capabilities:</strong><br />
-- Single CVE on single system<br />
-- Batch remediation (multiple CVEs, multiple systems)<br />
-- Cross-environment patching (dev → staging → prod)<br />
-- Automated job tracking and reporting<br />
-- Partial failure handling</p></div>
 </li>
 </ol>
 <h2>Skills Decision Guide</h2>

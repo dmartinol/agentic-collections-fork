@@ -119,6 +119,25 @@ cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
             <div id="tab-skills" class="collection-tab-panel" role="tabpanel">
                 <h2>Skills</h2>
 <p>The pack provides 14 skills for building and deploying applications on Red Hat platforms, including one orchestration skill for end-to-end containerization.</p>
+<h2>Orchestration Skill</h2>
+<ol class="skill-list">
+<li><strong>/containerize-deploy</strong> - End-to-End Containerization and Deployment
+<div class="skill-summary"><p>Complete workflow for containerizing and deploying applications to OpenShift or standalone RHEL systems.</p>
+<p><strong>Use when:</strong><br />
+- Containerize and deploy this app<br />
+- Build and deploy to OpenShift<br />
+- Full deployment from source</p>
+<p><strong>Workflow:</strong><br />
+1. Detect project (detect-project skill)<br />
+2. Build image (s2i-build skill)<br />
+3. Deploy (deploy, helm-deploy, or rhel-deploy skill based on target)</p>
+<p><strong>Capabilities:</strong><br />
+- Automatic project detection<br />
+- S2I or custom build<br />
+- OpenShift or RHEL deployment targets</p></div>
+</li>
+</ol>
+<h2>Skills</h2>
 <ol class="skill-list">
 <li><strong>/detect-project</strong> - Project Analysis
 <div class="skill-summary"><p>Analyze a project folder or GitHub repository to detect programming language, framework, and version requirements.</p>
@@ -262,24 +281,6 @@ cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
 - Analyzes journalctl logs<br />
 - Checks SELinux denials<br />
 - Verifies firewall and resources</p></div>
-</li>
-</ol>
-<h2>Orchestration Skill</h2>
-<ol class="skill-list">
-<li><strong>/containerize-deploy</strong> - End-to-End Containerization and Deployment
-<div class="skill-summary"><p>Complete workflow for containerizing and deploying applications to OpenShift or standalone RHEL systems.</p>
-<p><strong>Use when:</strong><br />
-- Containerize and deploy this app<br />
-- Build and deploy to OpenShift<br />
-- Full deployment from source</p>
-<p><strong>Workflow:</strong><br />
-1. Detect project (detect-project skill)<br />
-2. Build image (s2i-build skill)<br />
-3. Deploy (deploy, helm-deploy, or rhel-deploy skill based on target)</p>
-<p><strong>Capabilities:</strong><br />
-- Automatic project detection<br />
-- S2I or custom build<br />
-- OpenShift or RHEL deployment targets</p></div>
 </li>
 </ol>
 <h2>Skills Decision Guide</h2>

@@ -151,18 +151,21 @@ def build_overview_html(data: Dict[str, Any]) -> str:
 
 
 def build_skills_html(data: Dict[str, Any]) -> str:
-    """Build Skills tab: Skills, Orchestration Skill, Skills Decision Guide."""
+    """Build Skills tab: Orchestration Skills (first), Skills, Skills Decision Guide."""
     parts = []
     contents = data.get("contents", {})
-    # Skills
     desc = contents.get("description", "")
+    orch = contents.get("orchestration_skills", [])
     skills = contents.get("skills", [])
     if desc:
         parts.append("<h2>Skills</h2>")
         parts.append(md_to_html(desc))
-    if skills:
+    # Orchestration Skills (first)
+    if orch:
+        label = "Orchestration Skill" if len(orch) == 1 else "Orchestration Skills"
+        parts.append(f"<h2>{label}</h2>")
         parts.append("<ol class=\"skill-list\">")
-        for s in skills:
+        for s in orch:
             name = s.get("name", "")
             desc_s = s.get("description", "")
             summary = md_to_html(s.get("summary_markdown", ""))
@@ -171,13 +174,12 @@ def build_skills_html(data: Dict[str, Any]) -> str:
                 parts.append(f"<div class=\"skill-summary\">{summary}</div>")
             parts.append("</li>")
         parts.append("</ol>")
-    # Orchestration Skills
-    orch = contents.get("orchestration_skills", [])
-    if orch:
-        label = "Orchestration Skill" if len(orch) == 1 else "Orchestration Skills"
-        parts.append(f"<h2>{label}</h2>")
+    # Skills (regular)
+    if skills:
+        if orch:
+            parts.append("<h2>Skills</h2>")
         parts.append("<ol class=\"skill-list\">")
-        for s in orch:
+        for s in skills:
             name = s.get("name", "")
             desc_s = s.get("description", "")
             summary = md_to_html(s.get("summary_markdown", ""))

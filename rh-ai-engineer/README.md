@@ -90,6 +90,7 @@ cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
 The pack provides 11 skills for OpenShift AI workflows from project bootstrap through guarded inference.
 
 
+
 ### ds-project-setup - Data Science Project Setup
 
 Create and configure Data Science Projects with namespaces, S3 data connections, pipeline server prep, and model serving enablement.
@@ -197,7 +198,6 @@ Deploy guardrails orchestrators with PII, toxicity, and prompt-injection detecto
 **Use when:** "Add guardrails to my LLM", "Need a secured inference route".
 
 **What it does:** Creates GuardrailsOrchestrator policies atop existing InferenceServices.
-
 
 
 

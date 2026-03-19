@@ -17,12 +17,6 @@
 
 {{ contents.description }}
 
-{% for skill in contents.skills %}
-### {{ skill.name }} - {{ skill.description }}
-
-{{ skill.summary_markdown }}
-
-{% endfor %}
 {% if contents.orchestration_skills %}
 ## Orchestration Skill{% if contents.orchestration_skills | length > 1 %}s{% endif %}
 
@@ -33,6 +27,12 @@
 
 {% endfor %}
 {% endif %}
+{% for skill in contents.skills %}
+### {{ skill.name }} - {{ skill.description }}
+
+{{ skill.summary_markdown }}
+
+{% endfor %}
 {% if contents.skills_decision_guide %}
 ## Skills Decision Guide
 

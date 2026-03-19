@@ -125,6 +125,7 @@ List and inspect clusters across self-managed (OCP, SNO) and managed (ROSA, ARO,
 
 
 
+
 ### cluster-report - Multi-Cluster Health Report
 
 Generate a consolidated health and resource report across kubeconfig contexts.
@@ -140,7 +141,6 @@ Generate a consolidated health and resource report across kubeconfig contexts.
 
 **Requires:** `KUBECONFIG` with appropriate cluster access;
 uses **openshift-administration** MCP (see `.mcp.json`).
-
 
 
 

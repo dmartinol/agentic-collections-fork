@@ -80,6 +80,38 @@ cp -r agentic-collections-main/rh-sre ~/.opencode/plugins/rh-sre
 The pack provides 13 skills for common SRE operations, including one orchestration skill for end-to-end remediation.
 
 
+## Orchestration Skill
+
+
+### remediation - End-to-End CVE Remediation
+
+The remediation skill orchestrates 6 specialized skills to provide complete CVE remediation workflows.
+
+**Use when:**
+- Remediate CVE-2024-1234 on system abc-123
+- Create and execute a remediation playbook for CVE-X
+- Patch these 5 CVEs on all production servers
+
+**Workflow:**
+0. Validate MCP (mcp-lightspeed-validator, mcp-aap-validator)
+1. Impact (cve-impact skill, if needed)
+2. Validate CVE (cve-validation skill)
+3. Gather Context (system-context skill)
+4. Generate Playbook (playbook-generator skill)
+5. Execute (playbook-executor skill, with user confirmation)
+6. Verify (remediation-verifier skill)
+
+**Capabilities:**
+- Single CVE on single system
+- Batch remediation (multiple CVEs, multiple systems)
+- Cross-environment patching (dev → staging → prod)
+- Automated job tracking and reporting
+- Partial failure handling
+
+
+
+
+
 ### fleet-inventory - System Discovery and Fleet Management
 
 Query and display Red Hat Lightspeed managed system inventory.
@@ -281,38 +313,6 @@ Verify an AAP job template meets requirements for executing CVE remediation play
 - Checks recommended options (ask variables/limit on launch)
 - Verifies project and inventory exist
 - Reports PASSED / PASSED WITH WARNINGS / FAILED
-
-
-
-
-## Orchestration Skill
-
-
-### remediation - End-to-End CVE Remediation
-
-The remediation skill orchestrates 6 specialized skills to provide complete CVE remediation workflows.
-
-**Use when:**
-- Remediate CVE-2024-1234 on system abc-123
-- Create and execute a remediation playbook for CVE-X
-- Patch these 5 CVEs on all production servers
-
-**Workflow:**
-0. Validate MCP (mcp-lightspeed-validator, mcp-aap-validator)
-1. Impact (cve-impact skill, if needed)
-2. Validate CVE (cve-validation skill)
-3. Gather Context (system-context skill)
-4. Generate Playbook (playbook-generator skill)
-5. Execute (playbook-executor skill, with user confirmation)
-6. Verify (remediation-verifier skill)
-
-**Capabilities:**
-- Single CVE on single system
-- Batch remediation (multiple CVEs, multiple systems)
-- Cross-environment patching (dev → staging → prod)
-- Automated job tracking and reporting
-- Partial failure handling
-
 
 
 
