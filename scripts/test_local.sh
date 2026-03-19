@@ -131,9 +131,12 @@ import sys
 with open('docs/data.json') as f:
     data = json.load(f)
 
-# Check for non-variable env values (should all be uppercase with underscores)
+# Check for non-variable env values (uppercase with underscore, or known vars like KUBECONFIG)
+KNOWN_VARS = {'KUBECONFIG', 'PATH', 'HOME'}
 for server in data['mcp_servers']:
     for env_var in server.get('env', []):
+        if env_var in KNOWN_VARS:
+            continue
         if not env_var.isupper() or '_' not in env_var:
             print(f"Suspicious env var: {env_var} in {server['name']}")
             sys.exit(1)

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Hat Automation Agentic Collection - Red Hat Agentic Catalog</title>
+    <link rel="stylesheet" href="../styles.css?v=21">
+    <style>
+        .collection-back { margin-bottom: 1.5rem; }
+        .collection-content { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; }
+        .collection-content h1 { margin-top: 0; }
+        .collection-content h2 { margin-top: 2rem; border-bottom: 1px solid var(--border, #e5e5e5); padding-bottom: 0.5rem; }
+        .collection-content h3 { margin-top: 1.5rem; }
+        .collection-content pre { background: var(--bg-code, #f5f5f5); padding: 1rem; border-radius: var(--radius, 8px); overflow-x: auto; }
+        .collection-content code { background: var(--bg-code, #f5f5f5); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+        .collection-content pre code { padding: 0; background: none; }
+        .collection-content ul, .collection-content ol { margin: 0.5rem 0 1rem 1.5rem; }
+        .collection-content a { color: var(--primary, #ee0000); }
+        .collection-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border, #e5e5e5); margin: 1.5rem 0 0; }
+        .collection-tab { padding: 0.75rem 1.5rem; font-weight: 600; font-size: 0.95rem; color: var(--text-secondary); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s ease; }
+        .collection-tab:hover { color: var(--primary); }
+        .collection-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .collection-tab-panel { display: none; padding: 1.5rem 0; }
+        .collection-tab-panel.active { display: block; }
+        .install-accordion { margin-top: 1rem; }
+        .install-accordion-item { border: 1px solid var(--border, #e5e5e5); border-radius: var(--radius, 8px); margin-bottom: 0.5rem; overflow: hidden; }
+        .install-accordion-item:last-child { margin-bottom: 0; }
+        .install-accordion-header { padding: 0.75rem 1rem; font-weight: 600; font-size: 1rem; cursor: pointer; list-style: none; background: var(--bg-section, #f8f9fa); transition: background 0.2s ease; }
+        .install-accordion-header::-webkit-details-marker { display: none; }
+        .install-accordion-header::before { content: '▶'; display: inline-block; margin-right: 0.5rem; font-size: 0.7em; transition: transform 0.2s ease; }
+        .install-accordion-item[open] .install-accordion-header::before { transform: rotate(90deg); }
+        .install-accordion-header:hover { background: var(--bg-hover, #fafafa); }
+        .install-accordion-body { padding: 1rem 1rem 1rem 2rem; border-top: 1px solid var(--border, #e5e5e5); }
+        .skill-list { margin: 1rem 0 1rem 1.5rem; padding-left: 1.5rem; }
+        .skill-list li { margin-bottom: 1.5rem; }
+        .skill-list li:last-child { margin-bottom: 0; }
+        .skill-summary { margin-top: 0.5rem; margin-left: 0; font-weight: 400; }
+        .collection-mcp-grid { margin-top: 1rem; }
+        .collection-mcp-card { text-decoration: none; color: inherit; display: block; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <a href="../index.html" class="collection-back">← Back to Catalog</a>
+                <h1>Red Hat Automation Agentic Collection</h1>
+                <p class="subtitle">Ansible Automation Platform governance, execution safety, and forensic troubleshooting tools for Red Hat automation engi</p>
+            </div>
+            <div class="toolbar-right">
+                <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" class="toolbar-button">GitHub</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="collection-content">
+            <nav class="collection-tabs" role="tablist">
+                <button class="collection-tab active" role="tab" aria-selected="true" data-tab="overview">Overview</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="skills">Skills</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="resources">Resources</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="agents">Agents</button>
+            </nav>
+
+            <div id="tab-overview" class="collection-tab-panel active" role="tabpanel">
+                <h2>Overview</h2>
+<p>The rh-automation collection provides 11 skills for AAP governance assessment, governed execution, and forensic troubleshooting.</p>
+<h2>Quick Start</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Claude Code CLI or IDE extension (or Cursor)</li>
+<li>Red Hat Ansible Automation Platform 2.5+</li>
+<li>AAP API token (Personal Access Token)</li>
+</ul>
+<h3>Environment Setup</h3>
+<p>Configure AAP MCP server and API token:</p>
+<pre><code class="language-bash">export AAP_MCP_SERVER=&quot;your-aap-mcp-server.example.com&quot;
+export AAP_API_TOKEN=&quot;your-personal-access-token&quot;
+</code></pre>
+<div class="install-accordion">
+<details class="install-accordion-item" open>
+<summary class="install-accordion-header">Installation (Claude Code)</summary>
+<div class="install-accordion-body"><p>Install the collection as a Claude Code plugin:</p>
+<pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+claude plugin install rh-automation
+</code></pre>
+<p>Or for local development:</p>
+<pre><code class="language-bash">claude plugin marketplace add /path/to/agentic-collections
+claude plugin install rh-automation
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Cursor)</summary>
+<div class="install-accordion-body"><p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-automation ~/.cursor/plugins/rh-automation
+</code></pre>
+<p>Or download and extract:</p>
+<pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-automation ~/.cursor/plugins/rh-automation
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Open Code)</summary>
+<div class="install-accordion-body"><p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation
+</code></pre></div>
+</details>
+</div>
+<h2>License</h2>
+<p>Apache 2.0</p>
+            </div>
+            <div id="tab-skills" class="collection-tab-panel" role="tabpanel">
+                <h2>Skills</h2>
+<p>The pack provides 11 skills for AAP governance, execution safety, and forensic troubleshooting, including 3 orchestration skills.</p>
+<ol class="skill-list">
+<li><strong>/aap-mcp-validator</strong> - Validate AAP MCP Server Connectivity
+<div class="skill-summary"><p>Validate that required AAP MCP servers are accessible before executing automation skills.</p>
+<p><strong>Use when:</strong><br />
+- Before any skill that requires AAP MCP access<br />
+- "Validate AAP MCP", "Check if AAP is configured"<br />
+- "Verify AAP connection", "Test AAP MCP servers"</p>
+<p><strong>What it does:</strong><br />
+- Validates one or more of the 6 AAP MCP servers<br />
+- Verifies environment variables (AAP_MCP_SERVER, AAP_API_TOKEN)<br />
+- Reports connectivity status (PASSED/PARTIAL/FAILED)</p></div>
+</li>
+<li><strong>/governance-readiness-assessor</strong> - 7-Domain Platform Governance Audit
+<div class="skill-summary"><p>Audit AAP platform across 7 governance domains with Red Hat citations.</p>
+<p><strong>Use when:</strong><br />
+- "Assess my AAP governance", "Is my AAP ready for production?"<br />
+- "Check credentials setup", "Audit RBAC", "How are my notifications?"</p>
+<p><strong>What it does:</strong><br />
+- Assesses Workflow Governance, Notification Coverage, RBAC, Credential Security,<br />
+  Execution Environments, Workload Isolation, Audit Trail<br />
+- Produces PASS/GAP/WARN report with Red Hat documentation citations</p></div>
+</li>
+<li><strong>/execution-risk-analyzer</strong> - Inventory Risk Classification and Secret Scanning
+<div class="skill-summary"><p>Classify inventory risk and scan extra_vars for secrets before execution.</p>
+<p><strong>Use when:</strong><br />
+- Before executing jobs on production<br />
+- "What's the risk of running this on prod?"<br />
+- Validate extra_vars for sensitive data</p>
+<p><strong>What it does:</strong><br />
+- Classifies inventory risk (dev/staging/prod)<br />
+- Scans extra_vars for potential secrets<br />
+- Supports governed execution flow</p></div>
+</li>
+<li><strong>/governed-job-launcher</strong> - Check Mode, Approval, and Phased Rollout
+<div class="skill-summary"><p>Launch jobs with check mode, approval gates, phased rollout, and rollback.</p>
+<p><strong>Use when:</strong><br />
+- "Execute the security patch on production urgently"<br />
+- Run jobs with dry-run before real execution<br />
+- Phased rollout across environments</p>
+<p><strong>What it does:</strong><br />
+- Runs check mode before execution<br />
+- Requires approval for production targets<br />
+- Supports phased rollout and rollback</p></div>
+</li>
+<li><strong>/job-failure-analyzer</strong> - Event Extraction and Error Classification
+<div class="skill-summary"><p>Extract failure events and classify errors (Platform/Code/Configuration).</p>
+<p><strong>Use when:</strong><br />
+- "Job #4451 failed. What happened?"<br />
+- Analyze job failure events<br />
+- Classify error type for resolution</p>
+<p><strong>What it does:</strong><br />
+- Extracts failure events from job execution<br />
+- Classifies errors using Red Hat taxonomy<br />
+- Correlates with host facts for root cause</p></div>
+</li>
+<li><strong>/host-fact-inspector</strong> - Host Fact Correlation with Failures
+<div class="skill-summary"><p>Correlate host ansible_facts with job failures for root cause analysis.</p>
+<p><strong>Use when:</strong><br />
+- Job failed on specific hosts<br />
+- Need host configuration context for failure<br />
+- Correlate failures with host facts</p>
+<p><strong>What it does:</strong><br />
+- Retrieves host facts from inventory<br />
+- Correlates with failure events<br />
+- Supports forensic troubleshooting</p></div>
+</li>
+<li><strong>/resolution-advisor</strong> - Red Hat Doc-Backed Resolution Recommendations
+<div class="skill-summary"><p>Provide resolution recommendations backed by Red Hat documentation.</p>
+<p><strong>Use when:</strong><br />
+- After error classification in troubleshooting<br />
+- Need resolution steps for identified error type<br />
+- Advisory guidance (no MCP tools)</p>
+<p><strong>What it does:</strong><br />
+- Maps error types to resolution paths<br />
+- Cites Red Hat documentation<br />
+- Provides actionable recommendations</p></div>
+</li>
+<li><strong>/execution-summary</strong> - Audit Trail with Doc Consultation Tracking
+<div class="skill-summary"><p>Generate execution reports for audit and learning purposes.</p>
+<p><strong>Use when:</strong><br />
+- Generate execution summary<br />
+- Create audit trail for workflow<br />
+- Summarize skills and docs used</p>
+<p><strong>What it does:</strong><br />
+- Analyzes conversation history<br />
+- Extracts agents, skills, tools, and docs used<br />
+- Provides audit trail for workflows</p></div>
+</li>
+</ol>
+<h2>Orchestration Skills</h2>
+<ol class="skill-list">
+<li><strong>/governance-assessor</strong> - Orchestrates Platform Governance Audit
+<div class="skill-summary"><p>Orchestrates AAP governance readiness assessments across 7 domains.</p>
+<p><strong>Use when:</strong><br />
+- "Assess my AAP platform's governance readiness"<br />
+- "Audit my platform governance"<br />
+- "What should I fix before executing jobs?"</p>
+<p><strong>Workflow:</strong><br />
+- Validates MCP connectivity (aap-mcp-validator)<br />
+- Runs governance-readiness-assessor (full or scoped)<br />
+- Produces execution-summary</p></div>
+</li>
+<li><strong>/governance-executor</strong> - Orchestrates Governed Execution
+<div class="skill-summary"><p>Orchestrates governed job execution with risk analysis and approval.</p>
+<p><strong>Use when:</strong><br />
+- "Execute the security patch on production urgently"<br />
+- Run jobs with check mode and approval</p>
+<p><strong>Workflow:</strong><br />
+- execution-risk-analyzer (inventory risk, secret scanning)<br />
+- governed-job-launcher (check mode, approval, phased rollout)</p></div>
+</li>
+<li><strong>/forensic-troubleshooter</strong> - Orchestrates Failure Root Cause Analysis
+<div class="skill-summary"><p>Orchestrates forensic failure analysis with error classification.</p>
+<p><strong>Use when:</strong><br />
+- "Job #4451 failed. What happened?"<br />
+- Troubleshoot job failures</p>
+<p><strong>Workflow:</strong><br />
+- job-failure-analyzer (event extraction, error classification)<br />
+- host-fact-inspector (host correlation)<br />
+- resolution-advisor (Red Hat doc-backed recommendations)</p></div>
+</li>
+</ol>
+<h2>Skills Decision Guide</h2>
+<table><thead><tr><th>User request</th><th>Skill to use</th><th>Reason</th></tr></thead><tbody><tr><td>"Assess my AAP governance" or "Is my AAP ready for production?"</td><td><code>/governance-assessor</code></td><td>Orchestrates full platform governance audit across 7 domains.</td></tr><tr><td>"Execute the security patch on production" or "Run this job with check mode"</td><td><code>/governance-executor</code></td><td>Orchestrates governed execution with risk analysis and approval.</td></tr><tr><td>"Job #4451 failed. What happened?" or "Troubleshoot this job failure"</td><td><code>/forensic-troubleshooter</code></td><td>Orchestrates failure root cause analysis with error classification.</td></tr><tr><td>"Validate AAP MCP" or "Check AAP connectivity"</td><td><code>/aap-mcp-validator</code></td><td>Direct MCP connectivity validation without full assessment.</td></tr></tbody></table>
+            </div>
+            <div id="tab-resources" class="collection-tab-panel" role="tabpanel">
+                <h2>Documentation</h2>
+<ul>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/aap/governance-readiness.md" target="_blank" rel="noopener">AAP Governance Readiness Assessment</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/aap/execution-governance.md" target="_blank" rel="noopener">Execution Governance</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/aap/job-troubleshooting.md" target="_blank" rel="noopener">Job Troubleshooting</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-automation/docs/references/error-classification.md" target="_blank" rel="noopener">Error Classification Taxonomy</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.redhat.com/en/technologies/management/ansible" target="_blank" rel="noopener">Red Hat Ansible Automation Platform</a></li>
+<li><a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices" target="_blank" rel="noopener">AAP 2.5 Security Best Practices</a></li>
+<li><a href="https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs" target="_blank" rel="noopener">AAP 2.6 Troubleshooting Guide</a></li>
+<li><a href="https://github.com/ansible/aap-mcp-server" target="_blank" rel="noopener">AAP MCP Server</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener">Main Repository</a></li>
+</ul>
+            </div>
+            <div id="tab-agents" class="collection-tab-panel" role="tabpanel">
+                <h2>MCP Server Integrations</h2>
+<div class="grid collection-mcp-grid">
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-automation" data-mcp-name="aap-mcp-job-management" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">⚙️</span><span>AAP MCP Service-Job Management</span><span title="HTTP Remote Server" style="font-size:1rem">🌐</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: HTTP Remote</p>
+<div class="env-vars">2 env vars</div>
+<div class="env-vars">19 tools</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-automation" data-mcp-name="aap-mcp-inventory-management" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">📋</span><span>AAP MCP Service-Inventory Management</span><span title="HTTP Remote Server" style="font-size:1rem">🌐</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: HTTP Remote</p>
+<div class="env-vars">2 env vars</div>
+<div class="env-vars">5 tools</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-automation" data-mcp-name="aap-mcp-configuration" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">⚙️</span><span>AAP MCP Service-Configuration</span><span title="HTTP Remote Server" style="font-size:1rem">🌐</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: HTTP Remote</p>
+<div class="env-vars">2 env vars</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-automation" data-mcp-name="aap-mcp-security-compliance" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">🔒</span><span>AAP MCP Service-Security &amp; Compliance</span><span title="HTTP Remote Server" style="font-size:1rem">🌐</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: HTTP Remote</p>
+<div class="env-vars">2 env vars</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-automation" data-mcp-name="aap-mcp-system-monitoring" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">📊</span><span>AAP MCP Service-System Monitoring</span><span title="HTTP Remote Server" style="font-size:1rem">🌐</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: HTTP Remote</p>
+<div class="env-vars">2 env vars</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="rh-automation" data-mcp-name="aap-mcp-user-management" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span class="card-icon">👥</span><span>AAP MCP Service-User Management</span><span title="HTTP Remote Server" style="font-size:1rem">🌐</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: HTTP Remote</p>
+<div class="env-vars">2 env vars</div>
+</div>
+</div>
+<h2>Sample Workflows</h2>
+<h3>Governance Assessment</h3>
+<p>Use governance-assessor to audit AAP platform across 7 governance domains. Produces PASS/GAP/WARN report with Red Hat citations.</p>
+<h3>Governed Execution</h3>
+<p>Use governance-executor to run jobs with risk analysis, check mode, and approval. Catches failures in dry run before production.</p>
+<h3>Forensic Troubleshooting</h3>
+<p>Use forensic-troubleshooter when a job fails. Extracts events, classifies errors, correlates host facts, and provides resolution recommendations.</p>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>Generated from <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank">agentic-collections</a> repository</p>
+    </footer>
+
+    <!-- Modal for MCP Server Details (same as catalog) -->
+    <div id="mcp-modal" class="modal">
+        <div class="modal-content" id="mcp-details"></div>
+    </div>
+
+    <script src="../app.js?v=22"></script>
+    <script>
+        // Tab switching
+        document.querySelectorAll('.collection-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = 'tab-' + tab.dataset.tab;
+                document.querySelectorAll('.collection-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+                document.querySelectorAll('.collection-tab-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

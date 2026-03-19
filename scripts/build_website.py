@@ -7,32 +7,34 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
+import yaml
 
 # Import our data generators
 from generate_pack_data import generate_pack_data
 from generate_mcp_data import generate_mcp_data
+from generate_collection_pages import main as generate_collection_pages
 
 
-def load_icons() -> Dict[str, Dict[str, str]]:
+def load_marketplace_icons() -> Dict[str, str]:
     """
-    Load icon mappings from docs/icons.json.
-    
+    Load collection icon mappings from catalog/marketplace.yaml.
+
     Returns:
-        Dictionary with 'packs' and 'mcp_servers' icon mappings
+        Dictionary mapping collection id to icon
     """
-    icons_file = Path('docs/icons.json')
-    
-    if not icons_file.exists():
-        print("⚠️  Warning: docs/icons.json not found, icons will not be loaded")
-        return {'packs': {}, 'mcp_servers': {}}
-    
+    marketplace_file = Path('catalog/marketplace.yaml')
+    if not marketplace_file.exists():
+        print("⚠️  Warning: catalog/marketplace.yaml not found, icons will not be loaded")
+        return {}
     try:
-        with open(icons_file, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        with open(marketplace_file, 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+        return {k: v.get('icon', '') for k, v in (data.get('collections') or {}).items()}
     except Exception as e:
-        print(f"⚠️  Warning: Failed to load docs/icons.json: {e}")
-        return {'packs': {}, 'mcp_servers': {}}
+        print(f"⚠️  Warning: Failed to load catalog/marketplace.yaml: {e}")
+        return {}
 
 
 def build_website():
@@ -42,30 +44,31 @@ def build_website():
     print("🔨 Building documentation website...")
     print()
 
-    # Load icons
-    print("🎨 Loading icons...")
-    icons = load_icons()
+    # Load collection icons from marketplace
+    print("🎨 Loading collection icons...")
+    collection_icons = load_marketplace_icons()
     print()
 
     # Generate pack data
     print("📦 Parsing agentic collections...")
     pack_data = generate_pack_data()
     
-    # Merge pack icons
+    # Merge collection icons and sort alphabetically by collection name
     for pack in pack_data:
-        pack_name = pack['name']
-        pack['icon'] = icons['packs'].get(pack_name, '')
+        pack['icon'] = collection_icons.get(pack['name'], '')
+    pack_data = sorted(pack_data, key=lambda p: p['name'])
     
     print()
 
-    # Generate MCP server data
+    # Generate MCP server data (needed for collection pages)
     print("🔌 Parsing MCP servers...")
     mcp_data = generate_mcp_data()
     
-    # Merge MCP server icons
-    for server in mcp_data:
-        server_name = server['name']
-        server['icon'] = icons['mcp_servers'].get(server_name, '')
+    print()
+
+    # Generate collection pages (with tabbed view)
+    print("📄 Generating collection pages...")
+    generate_collection_pages(pack_data=pack_data, mcp_data=mcp_data)
     
     print()
 

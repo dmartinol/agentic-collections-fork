@@ -31,9 +31,9 @@ This script parses all agentic collections and MCP configurations.
 ## Manual Updates
 
 To manually update the site:
-1. Modify pack configurations (plugin.json, .mcp.json, skills, agents)
-2. Run `make generate` from the root directory
-3. Commit the updated `docs/data.json`
+1. Modify pack configurations (collection.yaml, .mcp.json, skills, agents)
+2. Run `make generate` from the root directory (generates catalog + docs)
+3. Commit the updated generated files (marketplace, plugin.json, README, docs/data.json, docs/collections/)
 4. Push to trigger GitHub Pages deployment
 
 ## Security

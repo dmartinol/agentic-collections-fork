@@ -11,7 +11,7 @@ from typing import Dict, List, Any
 import yaml
 
 # List of agentic packs to parse
-PACK_DIRS = ['rh-sre', 'rh-developer', 'ocp-admin', 'rh-support-engineer', 'rh-virt', 'rh-ai-engineer', 'rh-automation']
+PACK_DIRS = ['ocp-admin', 'rh-ai-engineer', 'rh-automation', 'rh-developer', 'rh-sre', 'rh-support-engineer', 'rh-virt']
 
 
 def parse_yaml_frontmatter(file_path: Path) -> Dict[str, Any]:
@@ -41,38 +41,26 @@ def parse_yaml_frontmatter(file_path: Path) -> Dict[str, Any]:
         return {}
 
 
-def load_plugin_titles() -> Dict[str, str]:
-    """
-    Load plugin title mappings from docs/plugins.json.
-
-    Returns:
-        Dictionary mapping plugin names to display titles
-    """
-    plugins_file = Path('docs/plugins.json')
-
-    if not plugins_file.exists():
-        print("Warning: docs/plugins.json not found, using default titles")
-        return {}
-
+def load_collection(pack_dir: str) -> Dict[str, Any] | None:
+    """Load collection.yaml for a pack. Returns None if not found."""
+    coll_path = Path(pack_dir) / 'collection.yaml'
+    if not coll_path.exists():
+        return None
     try:
-        with open(plugins_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        # Extract just the titles into a simple mapping
-        return {name: info['title'] for name, info in data.items()}
-
+        with open(coll_path, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
     except Exception as e:
-        print(f"Warning: Failed to load docs/plugins.json: {e}")
-        return {}
+        print(f"Warning: Failed to load {coll_path}: {e}")
+        return None
 
 
-def parse_plugin_json(pack_dir: str, plugin_titles: Dict[str, str]) -> Dict[str, Any]:
+def parse_plugin_json(pack_dir: str, collection_data: Dict[str, Any] | None) -> Dict[str, Any]:
     """
-    Parse plugin.json from a pack directory and merge with title from docs/plugins.json.
+    Parse plugin.json from a pack directory and merge with name from collection.yaml.
 
     Args:
         pack_dir: Name of the pack directory
-        plugin_titles: Dictionary mapping plugin names to display titles
+        collection_data: Loaded collection.yaml data, or None
 
     Returns:
         Dictionary with plugin metadata, or defaults if file doesn't exist
@@ -90,9 +78,7 @@ def parse_plugin_json(pack_dir: str, plugin_titles: Dict[str, str]) -> Dict[str,
     }
 
     if not plugin_path.exists():
-        # Use title from plugins.json if available
-        if pack_dir in plugin_titles:
-            defaults['title'] = plugin_titles[pack_dir]
+        defaults['title'] = collection_data.get('name', pack_dir) if collection_data else pack_dir
         return defaults
 
     try:
@@ -101,21 +87,14 @@ def parse_plugin_json(pack_dir: str, plugin_titles: Dict[str, str]) -> Dict[str,
 
         # Merge with defaults (in case some fields are missing)
         result = {**defaults, **data}
-        
-        # Override with title from docs/plugins.json if available
-        if pack_dir in plugin_titles:
-            result['title'] = plugin_titles[pack_dir]
-        elif 'title' not in result:
-            # Fallback: use name as title if not set
-            result['title'] = result['name']
+        # Use collection name for title (single source of truth)
+        result['title'] = collection_data.get('name', result.get('name', pack_dir)) if collection_data else result.get('title', result.get('name', pack_dir))
 
         return result
 
     except Exception as e:
         print(f"Warning: Failed to parse {plugin_path}: {e}")
-        # Use title from plugins.json if available even on error
-        if pack_dir in plugin_titles:
-            defaults['title'] = plugin_titles[pack_dir]
+        defaults['title'] = collection_data.get('name', pack_dir) if collection_data else pack_dir
         return defaults
 
 
@@ -276,11 +255,8 @@ def generate_pack_data() -> List[Dict[str, Any]]:
         List of pack dictionaries
     """
     packs = []
-    
-    # Load plugin title mappings from docs/plugins.json
-    plugin_titles = load_plugin_titles()
 
-    for pack_dir in PACK_DIRS:
+    for pack_dir in sorted(PACK_DIRS):
         pack_path = Path(pack_dir)
 
         if not pack_path.exists():
@@ -288,11 +264,12 @@ def generate_pack_data() -> List[Dict[str, Any]]:
             continue
 
         docs = parse_docs(pack_dir)
+        collection_data = load_collection(pack_dir)
 
         pack = {
             'name': pack_dir,
             'path': f'./{pack_dir}',
-            'plugin': parse_plugin_json(pack_dir, plugin_titles),
+            'plugin': parse_plugin_json(pack_dir, collection_data),
             'skills': parse_skills(pack_dir),
             'agents': parse_agents(pack_dir),
             'docs': docs,

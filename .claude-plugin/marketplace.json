@@ -1,108 +1,37 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "redhat-agentic-collections",
+  "version": "1.0.0",
+  "description": "Validated Agentic Collections from Red Hat Ecosystem Engineering",
   "owner": {
     "name": "Red Hat Ecosystem Engineering",
     "email": "eco-engineering@redhat.com"
   },
-  "metadata": {
-    "version": "1.0.0",
-    "description": "Validated Agentic Collections from Red Hat Ecosystem Engineering"
-  },
   "plugins": [
     {
-      "name": "rh-sre",
-      "description": "Site Reliability Engineering Agentic Collection",
-      "version": "1.0.0",
-      "author": {
-        "name": "Red Hat Ecosystem Engineering",
-        "email": "eco-engineering@redhat.com"
-      },
-      "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "license": "Apache-2.0",
-      "keywords": ["sre", "red-hat", "platforms", "products", "automation"],
-      "source": "./rh-sre",
-      "category": "sre",
-      "skills": "./skills"
-    },
-    {
-      "name": "rh-developer",
-      "description": "Developer Agentic Collection",
-      "version": "1.0.0",
-      "author": {
-        "name": "Red Hat Ecosystem Engineering",
-        "email": "eco-engineering@redhat.com"
-      },
-      "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "license": "Apache-2.0",
-      "keywords": ["developer", "openshift", "rhel", "s2i", "containerization", "deployment", "helm", "podman"],
-      "source": "./rh-developer",
-      "category": "developer",
-      "skills": "./skills"
-    },
-    {
-      "name": "openshift-virtualization",
-      "description": "OpenShift Virtualization Agentic Collection",
-      "version": "1.0.0",
-      "author": {
-        "name": "Red Hat Ecosystem Engineering",
-        "email": "eco-engineering@redhat.com"
-      },
-      "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "license": "Apache-2.0",
-      "keywords": ["red-hat", "kubevirt", "openshift", "virtualization"],
-      "source": "./rh-virt",
-      "category": "virtualization",
-      "skills": "./skills"
-    },
-    {
       "name": "ocp-admin",
-      "description": "Red Hat OpenShift Administration Agentic Skills Collection",
+      "description": "Automation capabilities for OpenShift Container Platform cluster management, workload orchestration, security policies, and operational tasks.",
       "version": "1.0.0",
       "author": {
         "name": "Red Hat Ecosystem Engineering",
         "email": "eco-engineering@redhat.com"
       },
-      "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "license": "Apache-2.0",
-      "keywords": ["red-hat", "openshift", "administration", "management"],
       "source": "./ocp-admin",
       "category": "openshift",
+      "agents": [],
       "skills": "./skills"
     },
     {
       "name": "rh-ai-engineer",
-      "description": "Red Hat OpenShift AI Engineering Agentic Collection",
+      "description": "Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI)\u2014projects, workbenches, model deployment, pipelines, NIM, runtimes, observability, monitoring, and guardrails.",
       "version": "1.0.0",
       "author": {
         "name": "Red Hat Ecosystem Engineering",
         "email": "eco-engineering@redhat.com"
       },
-      "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "license": "Apache-2.0",
-      "keywords": ["ai-engineer", "openshift-ai", "rhoai", "kserve", "vllm", "nvidia-nim", "model-serving", "inference", "gpu"],
       "source": "./rh-ai-engineer",
-      "category": "ai-engineering",
-      "skills": "./skills"
-    },
-    {
-      "name": "rh-support-engineer",
-      "description": "Technical support and troubleshooting tools for Red Hat products and platforms.",
-      "version": "1.0.0",
-      "author": {
-        "name": "Red Hat Ecosystem Engineering",
-        "email": "eco-engineering@redhat.com"
-      },
-      "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "license": "Apache-2.0",
-      "keywords": ["red-hat", "support", "troubleshooting", "engineering"],
-      "source": "./rh-support-engineer",
-      "category": "support",
+      "category": "artificial-intelligence",
+      "agents": [],
       "skills": "./skills"
     },
     {
@@ -113,12 +42,61 @@
         "name": "Red Hat Ecosystem Engineering",
         "email": "eco-engineering@redhat.com"
       },
-      "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "license": "Apache-2.0",
-      "keywords": ["ansible", "aap", "automation", "red-hat", "governance", "troubleshooting", "execution"],
       "source": "./rh-automation",
       "category": "automation",
+      "agents": [],
+      "skills": "./skills"
+    },
+    {
+      "name": "rh-developer",
+      "description": "Plugins for building and deploying applications on Red Hat platforms.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "source": "./rh-developer",
+      "category": "development",
+      "agents": [],
+      "skills": "./skills"
+    },
+    {
+      "name": "rh-sre",
+      "description": "Site reliability engineering tools and automation for managing Red Hat platforms and infrastructure.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "source": "./rh-sre",
+      "category": "site-reliability",
+      "agents": [],
+      "skills": "./skills"
+    },
+    {
+      "name": "rh-support-engineer",
+      "description": "Technical support and troubleshooting tools for Red Hat products and platforms.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "source": "./rh-support-engineer",
+      "category": "development",
+      "agents": [],
+      "skills": "./skills"
+    },
+    {
+      "name": "openshift-virtualization",
+      "description": "Virtual machine management and automation for OpenShift Virtualization and KubeVirt workloads.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Red Hat Ecosystem Engineering",
+        "email": "eco-engineering@redhat.com"
+      },
+      "source": "./rh-virt",
+      "category": "virtualization",
+      "agents": [],
       "skills": "./skills"
     }
   ]

@@ -1,6 +1,7 @@
 {
   "openshift": {
     "title": "OpenShift MCP Server",
+    "icon": "☸️",
     "owner": "Official",
     "repository": "https://github.com/openshift/openshift-mcp-server",
     "tools": [
@@ -164,6 +165,7 @@
   },
   "podman": {
     "title": "Podman MCP Server",
+    "icon": "🐳",
     "tier": "Community",
     "owner": "Marc Nuri (Red Hat)",
     "repository": "https://github.com/manusa/podman-mcp-server",
@@ -224,6 +226,7 @@
   },
   "github": {
     "title": "GitHub MCP Server",
+    "icon": "🐙",
     "tier": "Community",
     "owner": "GitHub",
     "repository": "https://github.com/github/github-mcp-server",
@@ -392,6 +395,7 @@
   },
   "lightspeed-mcp": {
     "title": "Red Hat Lightspeed MCP",
+    "icon": "💡",
     "tier": "Official",
     "owner": "Red Hat",
     "repository": "https://github.com/RedHatInsights/insights-mcp",
@@ -556,6 +560,7 @@
   },
   "aap-mcp-job-management": {
     "title": "AAP MCP Service-Job Management",
+    "icon": "⚙️",
     "tier": "Official",
     "owner": "Red Hat",
     "type": "http",
@@ -640,8 +645,19 @@
       }
     ]
   },
+  "aap-mcp-configuration": {
+    "title": "AAP MCP Service-Configuration",
+    "icon": "⚙️",
+    "tier": "Official",
+    "owner": "Red Hat",
+    "type": "http",
+    "repository": "https://github.com/ansible/aap-mcp-server",
+    "description": "AAP configuration: notification templates, execution environments, and platform settings",
+    "tools": []
+  },
   "aap-mcp-inventory-management": {
     "title": "AAP MCP Service-Inventory Management",
+    "icon": "📋",
     "tier": "Official",
     "owner": "Red Hat",
     "type": "http",
@@ -670,8 +686,39 @@
       }
     ]
   },
+  "aap-mcp-security-compliance": {
+    "title": "AAP MCP Service-Security & Compliance",
+    "icon": "🔒",
+    "tier": "Official",
+    "owner": "Red Hat",
+    "type": "http",
+    "repository": "https://github.com/ansible/aap-mcp-server",
+    "description": "AAP security and compliance: credentials, credential types, and credential testing",
+    "tools": []
+  },
+  "aap-mcp-system-monitoring": {
+    "title": "AAP MCP Service-System Monitoring",
+    "icon": "📊",
+    "tier": "Official",
+    "owner": "Red Hat",
+    "type": "http",
+    "repository": "https://github.com/ansible/aap-mcp-server",
+    "description": "AAP system monitoring: instance groups, instances, activity stream, platform status, and mesh topology",
+    "tools": []
+  },
+  "aap-mcp-user-management": {
+    "title": "AAP MCP Service-User Management",
+    "icon": "👥",
+    "tier": "Official",
+    "owner": "Red Hat",
+    "type": "http",
+    "repository": "https://github.com/ansible/aap-mcp-server",
+    "description": "AAP user management: users, teams, organizations, role assignments, role definitions, and authenticators",
+    "tools": []
+  },
   "ai-observability": {
     "title": "AI Observability MCP Server",
+    "icon": "🔬",
     "tier": "Official",
     "owner": "Red Hat",
     "type": "http",
@@ -738,6 +785,7 @@
   },
   "rhoai": {
     "title": "Red Hat OpenShift AI MCP Server",
+    "icon": "🤖",
     "tier": "Official",
     "owner": "Red Hat",
     "repository": "https://github.com/opendatahub-io/rhoai-mcp",
@@ -779,6 +827,7 @@
   },
   "openshift-virtualization": {
     "title": "OpenShift MCP Server - Virtualization",
+    "icon": "🖥️",
     "tier": "Official",
     "owner": "Red Hat",
     "repository": "https://github.com/openshift/openshift-mcp-server",

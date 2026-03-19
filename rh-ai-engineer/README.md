@@ -1,77 +1,234 @@
-# Red Hat AI Engineer Agentic Pack
+# Red Hat AI Engineer Agentic Collection
 
-Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, registries, workbenches, and serving runtimes on OpenShift AI.
+Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI)—projects, workbenches, model deployment, pipelines, NIM, runtimes, observability, monitoring, and guardrails.
+
+**Persona**: AI/ML Engineer
+**Marketplaces**: Claude Code, Cursor
+
+## Overview
+
+Deploy and operate models on OpenShift AI with skills for **data science projects**, **workbenches**,
+**model serving** (KServe / vLLM / NIM), **registries**, **pipelines**, **custom runtimes**,
+**debugging**, **observability**, **TrustyAI monitoring**, and **guardrails**.
+
+
+## Quick Start
+
+### Prerequisites
+
+- Claude Code CLI or IDE extension
+- Red Hat OpenShift AI cluster with model serving components available
+- `oc` CLI and `KUBECONFIG` configured for the cluster
+
+### Environment Setup
+
+```bash
+export KUBECONFIG="/path/to/your/kubeconfig"
+oc get datascienceprojects -A
+```
+
+Skills rely on **`openshift`** (required), **`rhoai`** (preferred), and optional **`ai-observability`** MCP servers defined in `rh-ai-engineer/.mcp.json`. Copy entries into your Claude Code MCP settings; use `${...}` env placeholders only.
+
+### Installation (Claude Code)
+
+```bash
+claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+claude plugin install rh-ai-engineer
+```
+
+Local development:
+
+```bash
+claude plugin marketplace add /path/to/agentic-collections
+claude plugin install rh-ai-engineer
+```
+
+### Installation (Cursor)
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+```
+
+### Installation (Open Code)
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+```
+
 
 ## Skills
 
-| Command | Description |
-|---------|-------------|
-| `/ds-project-setup` | Create and configure Data Science Projects with namespace, data connections, pipeline server, and model serving |
-| `/workbench-manage` | Create and manage Jupyter notebook workbenches with image selection, resources, and lifecycle |
-| `/model-deploy` | Deploy AI/ML models with vLLM, NIM, or Caikit+TGIS runtimes |
-| `/model-registry` | Register, version, and promote ML models in the Model Registry across environments |
-| `/pipeline-manage` | Create, run, schedule, and monitor Data Science Pipelines (Kubeflow Pipelines 2.0) |
-| `/nim-setup` | Configure NVIDIA NIM platform on OpenShift AI (NGC credentials, Account CR) |
-| `/serving-runtime-config` | Configure custom ServingRuntime CRs for model serving frameworks |
-| `/debug-inference` | Troubleshoot failed or slow InferenceService deployments |
-| `/ai-observability` | Analyze model performance, GPU utilization, cluster health, and distributed traces |
-| `/model-monitor` | Configure TrustyAI bias detection (SPD, DIR) and data drift monitoring |
-| `/guardrails-config` | Deploy TrustyAI Guardrails Orchestrator with input/output content safety detectors |
+The pack provides 11 skills for OpenShift AI workflows from project bootstrap through guarded inference.
 
-## Prerequisites
 
-### Tools
-- `podman` for running containerized MCP servers
-- `oc` CLI (OpenShift client) for cluster access
+### ds-project-setup - Data Science Project Setup
 
-### Environment Variables
-- `KUBECONFIG` - Path to Kubernetes configuration file
-- `AI_OBSERVABILITY_MCP_URL` (optional) - URL for the AI Observability MCP server
+Create and configure Data Science Projects with namespaces, S3 data connections, pipeline server prep, and model serving enablement.
 
-### Cluster Requirements
-- OpenShift cluster with Red Hat OpenShift AI operator installed
-- KServe model serving platform configured
-- NVIDIA GPU nodes available (for GPU-accelerated inference)
+**Use when:** "Create a data science project", "Add S3 data connection", "Enable model serving on my project".
 
-### For NIM Deployments
-- NVIDIA GPU Operator installed
-- Node Feature Discovery (NFD) Operator installed
-- NGC API key
+**What it does:** Applies RHOAI labels, wiring for pipelines and serving; does not deploy models or workbenches.
 
-## MCP Servers
 
-| Server | Type | Requirement | Description |
-|--------|------|-------------|-------------|
-| `openshift` | Container (podman) | **Required** | Kubernetes resource CRUD, pod management, logs, events. The only hard-required server — all RHOAI operations have OpenShift equivalents. |
-| `rhoai` | Local process (uvx) | **Preferred** | RHOAI-specific convenience tools: model deployment, serving runtimes, data connections, project management. Automatic fallback to OpenShift when unavailable or returning errors. |
-| `ai-observability` | Remote HTTP | **Optional** | vLLM metrics, GPU monitoring, distributed tracing. Skipped when unavailable. |
 
-The `openshift` MCP server is the foundation for all skills. It provides reliable Kubernetes resource CRUD operations that serve as automatic fallbacks when RHOAI MCP tools are unavailable or return errors.
+### workbench-manage - Workbench Management
 
-The `rhoai` MCP server provides high-level, RHOAI-domain-specific tools that simplify model deployment (no YAML construction needed), runtime management (including platform template discovery), and project validation. When these tools fail (auth errors, API inconsistencies), skills transparently fall back to equivalent OpenShift operations. See [rhoai-mcp](https://github.com/opendatahub-io/rhoai-mcp) for details.
+Create and manage Jupyter workbenches—images, resources, PVCs, start/stop, and safe deletion.
 
-The `ai-observability` MCP server is optional. When available, it enables GPU pre-flight checks before deployment and post-deployment performance validation. See [ai-observability-summarizer](https://github.com/rh-ai-quickstart/ai-observability-summarizer/tree/main/src/mcp_server) for deployment instructions.
+**Use when:** "Create a notebook workbench", "Start my Jupyter server", "List notebook images".
 
-## Supported Runtimes
+**What it does:** Drives Notebook CR lifecycle while separating concerns from `/model-deploy`.
 
-| Runtime | Use Case | Setup Required |
-|---------|----------|----------------|
-| vLLM | Default for open-source LLMs (Llama, Granite, Mixtral, Mistral) | None |
-| NVIDIA NIM | Optimized inference with TensorRT-LLM on NVIDIA GPUs | `/nim-setup` |
-| Caikit+TGIS | Models in Caikit format with gRPC API | Model conversion |
 
-See [supported-runtimes.md](docs/references/supported-runtimes.md) for detailed runtime comparison.
 
-## Supported Models
+### model-deploy - Model Deployment and Serving
 
-Common models with known hardware profiles:
+Deploy models with KServe using vLLM, NVIDIA NIM, or Caikit+TGIS; validates GPUs and monitors rollouts.
 
-| Model | Parameters | Min GPUs | Default Runtime |
-|-------|-----------|----------|-----------------|
-| Llama 3.1 8B | 8B | 1x (16GB VRAM) | vLLM |
-| Llama 3.1 70B | 70B | 4x A100 80GB | vLLM / NIM |
-| Granite 3.1 8B | 8B | 1x (16GB VRAM) | vLLM |
-| Mixtral 8x7B | 46.7B MoE | 2x A100 80GB | vLLM |
-| Mistral 7B | 7B | 1x (16GB VRAM) | vLLM |
+**Use when:** "Deploy Llama on OpenShift AI", "Create an InferenceService", "Serve with vLLM".
 
-See [known-model-profiles.md](docs/references/known-model-profiles.md) for full profiles. Models not listed are supported via live documentation lookup.
+**What it does:** Selects runtimes, builds CRs, and monitors readiness; run `/nim-setup` first for NIM-only platforms.
+
+
+
+### model-registry - Model Registry Operations
+
+Register, version, catalog, and promote models across environments.
+
+**Use when:** "Register this model", "Promote version to prod", "Show model artifacts".
+
+**What it does:** Integrates with OpenShift AI Model Registry APIs and catalog views.
+
+
+
+### pipeline-manage - Data Science Pipelines
+
+Run, schedule, and monitor Kubeflow Pipelines 2.0 workloads on OpenShift AI.
+
+**Use when:** "Run my pipeline YAML", "Schedule a nightly training pipeline", "Why did this PipelineRun fail?".
+
+**What it does:** Manages DSPA prerequisites, submissions, cron schedules, and logs.
+
+
+
+### nim-setup - NVIDIA NIM Platform Setup
+
+Configure NGC credentials and NIM Account CRs so NIM-based InferenceServices can run.
+
+**Use when:** "Set up NIM", "Configure NVIDIA NIM before deploying models".
+
+**What it does:** One-time platform prerequisites prior to `/model-deploy` with NIM.
+
+
+
+### serving-runtime-config - Custom Serving Runtimes
+
+List, create, or customize `ServingRuntime` CRs for frameworks beyond stock templates.
+
+**Use when:** "Create a custom runtime", "Need ONNX or Triton runtime", "Tune vLLM runtime parameters".
+
+**What it does:** Validates compatibility and applies runtime manifests before serving models.
+
+
+
+### debug-inference - Inference Troubleshooting
+
+Diagnose stuck or unhealthy InferenceServices using conditions, events, logs, and GPU checks.
+
+**Use when:** "InferenceService not ready", "Model endpoint errors", "GPU not scheduling".
+
+**What it does:** Structured triage with optional observability correlations.
+
+
+
+### ai-observability - AI Observability
+
+Query vLLM metrics, GPU utilization, cluster health, and distributed traces.
+
+**Use when:** "How is my model performing?", "Show GPU usage", "Trace a slow request".
+
+**What it does:** Read-only routing to observability backends (optional MCP).
+
+
+
+### model-monitor - TrustyAI Model Monitoring
+
+Configure bias and drift monitoring (SPD, DIR, drift detectors) for deployed models.
+
+**Use when:** "Enable TrustyAI monitoring", "Detect drift on my endpoint", "SPD/DIR metrics".
+
+**What it does:** Deploys TrustyAIService configs after `/model-deploy` completes.
+
+
+
+### guardrails-config - TrustyAI Guardrails
+
+Deploy guardrails orchestrators with PII, toxicity, and prompt-injection detectors.
+
+**Use when:** "Add guardrails to my LLM", "Need a secured inference route".
+
+**What it does:** Creates GuardrailsOrchestrator policies atop existing InferenceServices.
+
+
+
+
+
+## Skills Decision Guide
+
+| User request | Skill to use | Reason |
+|--------------|--------------|--------|
+| New data science project, data connection, pipeline server, enable model serving | ds-project-setup | Bootstraps namespaces, storage, DSPA prerequisites, and serving configuration. |
+| Jupyter workbench, notebook images, start or stop a workbench | workbench-manage | Manages Notebook CR lifecycle separate from model deployment. |
+| Deploy a model, InferenceService, vLLM, KServe, NIM runtime | model-deploy | Creates and rolls out InferenceService resources with runtime selection. |
+| Model registry, catalog, versions, promote a model | model-registry | Registers artifacts and versions for governance and promotion flows. |
+| Kubeflow pipeline, PipelineRun, schedule or troubleshoot DSP pipelines | pipeline-manage | Submits runs, schedules jobs, and surfaces pipeline logs. |
+| First-time NIM platform, NGC credentials, NIM Account CR | nim-setup | One-time prerequisite before `/model-deploy` with NVIDIA NIM. |
+| Custom ServingRuntime, runtime templates, specialized frameworks | serving-runtime-config | Creates or customizes ServingRuntime CRs before deployment. |
+| InferenceService stuck, failing rollout, inference errors, GPU scheduling | debug-inference | Progressive diagnosis of deployments, events, and pods. |
+| Model latency, GPU metrics, cluster health, tracing | ai-observability | Read-only observability across metrics and traces. |
+| TrustyAI bias, drift, SPD, DIR on an InferenceService | model-monitor | Configures TrustyAI monitoring after a model is deployed. |
+| Content safety, PII, guardrails, protected inference endpoint | guardrails-config | Deploys GuardrailsOrchestrator and detectors on top of a served model. |
+
+
+
+
+## Sample Workflows
+
+
+### Bootstrap then deploy a model
+
+1. **ds-project-setup** — create the project, connections, and serving prerequisites.
+2. **workbench-manage** (optional) — attach a notebook for experimentation.
+3. **model-deploy** — roll out the InferenceService; use **nim-setup** first if using NVIDIA NIM.
+
+
+
+### Harden and monitor production inference
+
+1. **model-deploy** — ensure the model is ready.
+2. **ai-observability** — validate latency, GPU, and trace signals.
+3. **model-monitor** or **guardrails-config** — layer TrustyAI monitoring or guardrails as required.
+
+
+
+### Debug a failed rollout
+
+1. **debug-inference** — isolate failing pods, events, or resources.
+2. Re-run **model-deploy** or adjust **serving-runtime-config** based on findings.
+
+
+
+
+## License
+
+
+[Apache-2.0](https://www.redhat.com/en/about/agreements)
+
+
+## References
+
+
+- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections) - agentic-collections
+

@@ -1,0 +1,177 @@
+id: ocp-admin
+name: Red Hat OpenShift Administration Agentic Collection
+provider: Red Hat
+version: 1.0.0
+categories:
+- OpenShift
+- Administration
+personas:
+- OpenShift Engineer
+marketplaces:
+- Claude Code
+- Cursor
+support_level: Unknown
+description: Automation capabilities for OpenShift Container Platform cluster management,
+  workload orchestration, security policies, and operational tasks.
+summary: |
+  Specialized tools for managing OpenShift clusters throughout their lifecycle—**creation**
+  with the Assisted Installer, **inventory** across self-managed and managed services,
+  and **multi-cluster health reporting** from kubeconfig contexts.
+contents:
+  description: The pack provides 3 skills for OpenShift cluster lifecycle, inventory, and fleet health.
+  skills_decision_guide:
+  - user_request: Create, install, or provision an OpenShift cluster (SNO or HA)
+    skill_to_use: cluster-creator
+    reason: End-to-end Assisted Installer workflow with host discovery, networking, and install monitoring.
+  - user_request: List clusters, show status, events, or inventory across ROSA/ARO/OSD and self-managed
+    skill_to_use: cluster-inventory
+    reason: Read-only discovery via Assisted Installer and OCM APIs using OFFLINE_TOKEN.
+  - user_request: Multi-cluster health report, fleet summary, or compare resource usage across contexts
+    skill_to_use: cluster-report
+    reason: Uses kubeconfig contexts and openshift-administration MCP for consolidated cluster metrics.
+  skills:
+  - name: cluster-creator
+    description: End-to-End Cluster Deployment
+    summary_markdown: |
+      Create OpenShift clusters with Red Hat Assisted Installer (SNO or HA) including ISOs, host discovery, networking, and install monitoring.
+
+      **Use when:**
+      - "Create a new OpenShift cluster"
+      - "Install OpenShift on bare metal or vSphere"
+      - "Deploy single-node OpenShift"
+
+      **What it does:**
+      - Drives Assisted Installer MCP workflows end-to-end
+      - Validates hosts, roles, VIPs, and static networking before install
+      - Requires `OFFLINE_TOKEN` (see Prerequisites)
+
+      **Not for:** listing existing clusters (`cluster-inventory`) or post-install day-2 changes without cluster access.
+  - name: cluster-inventory
+    description: Cluster Discovery and Status
+    summary_markdown: |
+      List and inspect clusters across self-managed (OCP, SNO) and managed (ROSA, ARO, OSD) deployments.
+
+      **Use when:**
+      - "List all my clusters"
+      - "Show cluster status and events"
+      - "What clusters exist in my account?"
+
+      **What it does:**
+      - Calls Assisted Installer and OCM MCP APIs (read-only)
+      - Returns identifiers, versions, platforms, and key diagnostics
+
+      **Requires:** `OFFLINE_TOKEN` for API access.
+  - name: cluster-report
+    description: Multi-Cluster Health Report
+    summary_markdown: |
+      Generate a consolidated health and resource report across kubeconfig contexts.
+
+      **Use when:**
+      - "Show me a report across all clusters"
+      - "Compare cluster health"
+      - "Multi-cluster status overview"
+
+      **What it does:**
+      - Verifies each context targets OpenShift before reporting
+      - Aggregates nodes, GPUs, namespaces, and pod health
+
+      **Requires:** `KUBECONFIG` with appropriate cluster access;
+      uses **openshift-administration** MCP (see `.mcp.json`).
+deploy_and_use: |
+  ### Prerequisites
+
+  - Claude Code CLI or IDE extension
+  - **Cluster creation and inventory (`cluster-creator`, `cluster-inventory`):**
+    - Red Hat account and offline token from https://cloud.redhat.com/openshift/token
+    - `export OFFLINE_TOKEN="..."` (never commit the value; plugins use `${OFFLINE_TOKEN}` in `.mcp.json`)
+    - Podman (or Docker) to run Assisted Installer / OCM MCP images from `ocp-admin/.mcp.json`
+  - **Multi-cluster reports (`cluster-report`):**
+    - `oc` or compatible CLI and `KUBECONFIG` with contexts for target clusters
+    - **openshift-administration** MCP configured per `ocp-admin/.mcp.json`
+
+  Copy MCP server definitions from `ocp-admin/.mcp.json` into your Claude Code settings (`/mcp` or `settings.json`). Servers are not auto-installed with the plugin.
+
+  ### Environment Setup
+
+  Configure OpenShift cluster access for reporting:
+
+  ```bash
+  export KUBECONFIG="/path/to/your/kubeconfig"
+  oc get nodes
+  ```
+
+  ### Installation (Claude Code)
+
+  Install the collection as a Claude Code plugin:
+
+  ```bash
+  claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+  claude plugin install ocp-admin
+  ```
+
+  Or for local development:
+
+  ```bash
+  claude plugin marketplace add /path/to/agentic-collections
+  claude plugin install ocp-admin
+  ```
+
+  ### Installation (Cursor)
+
+  Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
+
+  ```bash
+  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+  cp -r agentic-collections/ocp-admin ~/.cursor/plugins/ocp-admin
+  ```
+
+  Or download and extract:
+
+  ```bash
+  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+  cp -r agentic-collections-main/ocp-admin ~/.cursor/plugins/ocp-admin
+  ```
+
+  ### Installation (Open Code)
+
+  Open Code does not support direct marketplace install via CLI. Clone or download the repository:
+
+  ```bash
+  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+  cp -r agentic-collections/ocp-admin ~/.opencode/plugins/ocp-admin
+  ```
+
+  Or with wget:
+
+  ```bash
+  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+  cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
+  ```
+sample_workflows:
+- name: Deploy and verify a new cluster
+  workflow: |
+    1. Run **cluster-creator** to provision the cluster via Assisted Installer.
+    2. Run **cluster-inventory** to confirm status and watch events until the cluster is ready.
+    3. Configure `KUBECONFIG`, then run **cluster-report** for a first health snapshot.
+- name: Fleet health review
+  workflow: |
+    1. Run **cluster-inventory** to list managed and self-managed clusters.
+    2. Align kubeconfig contexts, then run **cluster-report** for resource and pod health across the fleet.
+resources:
+- title: Main Repository
+  description: agentic-collections
+  url: https://github.com/RHEcosystemAppEng/agentic-collections
+legal_resources:
+  license_agreement_url: https://www.redhat.com/en/about/agreements
+  privacy_policy_url: https://www.redhat.com/en/about/privacy-policy
+author:
+  name: Red Hat Ecosystem Engineering
+  email: eco-engineering@redhat.com
+homepage: https://github.com/RHEcosystemAppEng/agentic-collections
+repository: https://github.com/RHEcosystemAppEng/agentic-collections
+license: Apache-2.0
+keywords:
+- red-hat
+- openshift
+- administration
+- management

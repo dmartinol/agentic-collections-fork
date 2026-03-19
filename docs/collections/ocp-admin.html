@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Hat OpenShift Administration Agentic Collection - Red Hat Agentic Catalog</title>
+    <link rel="stylesheet" href="../styles.css?v=21">
+    <style>
+        .collection-back { margin-bottom: 1.5rem; }
+        .collection-content { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; }
+        .collection-content h1 { margin-top: 0; }
+        .collection-content h2 { margin-top: 2rem; border-bottom: 1px solid var(--border, #e5e5e5); padding-bottom: 0.5rem; }
+        .collection-content h3 { margin-top: 1.5rem; }
+        .collection-content pre { background: var(--bg-code, #f5f5f5); padding: 1rem; border-radius: var(--radius, 8px); overflow-x: auto; }
+        .collection-content code { background: var(--bg-code, #f5f5f5); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+        .collection-content pre code { padding: 0; background: none; }
+        .collection-content ul, .collection-content ol { margin: 0.5rem 0 1rem 1.5rem; }
+        .collection-content a { color: var(--primary, #ee0000); }
+        .collection-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border, #e5e5e5); margin: 1.5rem 0 0; }
+        .collection-tab { padding: 0.75rem 1.5rem; font-weight: 600; font-size: 0.95rem; color: var(--text-secondary); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s ease; }
+        .collection-tab:hover { color: var(--primary); }
+        .collection-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .collection-tab-panel { display: none; padding: 1.5rem 0; }
+        .collection-tab-panel.active { display: block; }
+        .install-accordion { margin-top: 1rem; }
+        .install-accordion-item { border: 1px solid var(--border, #e5e5e5); border-radius: var(--radius, 8px); margin-bottom: 0.5rem; overflow: hidden; }
+        .install-accordion-item:last-child { margin-bottom: 0; }
+        .install-accordion-header { padding: 0.75rem 1rem; font-weight: 600; font-size: 1rem; cursor: pointer; list-style: none; background: var(--bg-section, #f8f9fa); transition: background 0.2s ease; }
+        .install-accordion-header::-webkit-details-marker { display: none; }
+        .install-accordion-header::before { content: '▶'; display: inline-block; margin-right: 0.5rem; font-size: 0.7em; transition: transform 0.2s ease; }
+        .install-accordion-item[open] .install-accordion-header::before { transform: rotate(90deg); }
+        .install-accordion-header:hover { background: var(--bg-hover, #fafafa); }
+        .install-accordion-body { padding: 1rem 1rem 1rem 2rem; border-top: 1px solid var(--border, #e5e5e5); }
+        .skill-list { margin: 1rem 0 1rem 1.5rem; padding-left: 1.5rem; }
+        .skill-list li { margin-bottom: 1.5rem; }
+        .skill-list li:last-child { margin-bottom: 0; }
+        .skill-summary { margin-top: 0.5rem; margin-left: 0; font-weight: 400; }
+        .collection-mcp-grid { margin-top: 1rem; }
+        .collection-mcp-card { text-decoration: none; color: inherit; display: block; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <a href="../index.html" class="collection-back">← Back to Catalog</a>
+                <h1>Red Hat OpenShift Administration Agentic Collection</h1>
+                <p class="subtitle">Automation capabilities for OpenShift Container Platform cluster management, workload orchestration, security policies, </p>
+            </div>
+            <div class="toolbar-right">
+                <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" class="toolbar-button">GitHub</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="collection-content">
+            <nav class="collection-tabs" role="tablist">
+                <button class="collection-tab active" role="tab" aria-selected="true" data-tab="overview">Overview</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="skills">Skills</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="resources">Resources</button>
+                <button class="collection-tab" role="tab" aria-selected="false" data-tab="agents">Agents</button>
+            </nav>
+
+            <div id="tab-overview" class="collection-tab-panel active" role="tabpanel">
+                <h2>Overview</h2>
+<p>Specialized tools for managing OpenShift clusters throughout their lifecycle—<strong>creation</strong><br />
+with the Assisted Installer, <strong>inventory</strong> across self-managed and managed services,<br />
+and <strong>multi-cluster health reporting</strong> from kubeconfig contexts.</p>
+<h2>Quick Start</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Claude Code CLI or IDE extension</li>
+<li><strong>Cluster creation and inventory (<code>cluster-creator</code>, <code>cluster-inventory</code>):</strong></li>
+<li>Red Hat account and offline token from https://cloud.redhat.com/openshift/token</li>
+<li><code>export OFFLINE_TOKEN="..."</code> (never commit the value; plugins use <code>${OFFLINE_TOKEN}</code> in <code>.mcp.json</code>)</li>
+<li>Podman (or Docker) to run Assisted Installer / OCM MCP images from <code>ocp-admin/.mcp.json</code></li>
+<li><strong>Multi-cluster reports (<code>cluster-report</code>):</strong></li>
+<li><code>oc</code> or compatible CLI and <code>KUBECONFIG</code> with contexts for target clusters</li>
+<li><strong>openshift-administration</strong> MCP configured per <code>ocp-admin/.mcp.json</code></li>
+</ul>
+<p>Copy MCP server definitions from <code>ocp-admin/.mcp.json</code> into your Claude Code settings (<code>/mcp</code> or <code>settings.json</code>). Servers are not auto-installed with the plugin.</p>
+<h3>Environment Setup</h3>
+<p>Configure OpenShift cluster access for reporting:</p>
+<pre><code class="language-bash">export KUBECONFIG=&quot;/path/to/your/kubeconfig&quot;
+oc get nodes
+</code></pre>
+<div class="install-accordion">
+<details class="install-accordion-item" open>
+<summary class="install-accordion-header">Installation (Claude Code)</summary>
+<div class="install-accordion-body"><p>Install the collection as a Claude Code plugin:</p>
+<pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+claude plugin install ocp-admin
+</code></pre>
+<p>Or for local development:</p>
+<pre><code class="language-bash">claude plugin marketplace add /path/to/agentic-collections
+claude plugin install ocp-admin
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Cursor)</summary>
+<div class="install-accordion-body"><p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/ocp-admin ~/.cursor/plugins/ocp-admin
+</code></pre>
+<p>Or download and extract:</p>
+<pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/ocp-admin ~/.cursor/plugins/ocp-admin
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Open Code)</summary>
+<div class="install-accordion-body"><p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
+<pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/ocp-admin ~/.opencode/plugins/ocp-admin
+</code></pre>
+<p>Or with wget:</p>
+<pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
+</code></pre></div>
+</details>
+</div>
+<h2>License</h2>
+<p><a href="https://www.redhat.com/en/about/agreements">Apache-2.0</a></p>
+            </div>
+            <div id="tab-skills" class="collection-tab-panel" role="tabpanel">
+                <h2>Skills</h2>
+<p>The pack provides 3 skills for OpenShift cluster lifecycle, inventory, and fleet health.</p>
+<ol class="skill-list">
+<li><strong>/cluster-creator</strong> - End-to-End Cluster Deployment
+<div class="skill-summary"><p>Create OpenShift clusters with Red Hat Assisted Installer (SNO or HA) including ISOs, host discovery, networking, and install monitoring.</p>
+<p><strong>Use when:</strong><br />
+- "Create a new OpenShift cluster"<br />
+- "Install OpenShift on bare metal or vSphere"<br />
+- "Deploy single-node OpenShift"</p>
+<p><strong>What it does:</strong><br />
+- Drives Assisted Installer MCP workflows end-to-end<br />
+- Validates hosts, roles, VIPs, and static networking before install<br />
+- Requires <code>OFFLINE_TOKEN</code> (see Prerequisites)</p>
+<p><strong>Not for:</strong> listing existing clusters (<code>cluster-inventory</code>) or post-install day-2 changes without cluster access.</p></div>
+</li>
+<li><strong>/cluster-inventory</strong> - Cluster Discovery and Status
+<div class="skill-summary"><p>List and inspect clusters across self-managed (OCP, SNO) and managed (ROSA, ARO, OSD) deployments.</p>
+<p><strong>Use when:</strong><br />
+- "List all my clusters"<br />
+- "Show cluster status and events"<br />
+- "What clusters exist in my account?"</p>
+<p><strong>What it does:</strong><br />
+- Calls Assisted Installer and OCM MCP APIs (read-only)<br />
+- Returns identifiers, versions, platforms, and key diagnostics</p>
+<p><strong>Requires:</strong> <code>OFFLINE_TOKEN</code> for API access.</p></div>
+</li>
+<li><strong>/cluster-report</strong> - Multi-Cluster Health Report
+<div class="skill-summary"><p>Generate a consolidated health and resource report across kubeconfig contexts.</p>
+<p><strong>Use when:</strong><br />
+- "Show me a report across all clusters"<br />
+- "Compare cluster health"<br />
+- "Multi-cluster status overview"</p>
+<p><strong>What it does:</strong><br />
+- Verifies each context targets OpenShift before reporting<br />
+- Aggregates nodes, GPUs, namespaces, and pod health</p>
+<p><strong>Requires:</strong> <code>KUBECONFIG</code> with appropriate cluster access;<br />
+uses <strong>openshift-administration</strong> MCP (see <code>.mcp.json</code>).</p></div>
+</li>
+</ol>
+<h2>Skills Decision Guide</h2>
+<table><thead><tr><th>User request</th><th>Skill to use</th><th>Reason</th></tr></thead><tbody><tr><td>Create, install, or provision an OpenShift cluster (SNO or HA)</td><td><code>/cluster-creator</code></td><td>End-to-end Assisted Installer workflow with host discovery, networking, and install monitoring.</td></tr><tr><td>List clusters, show status, events, or inventory across ROSA/ARO/OSD and self-managed</td><td><code>/cluster-inventory</code></td><td>Read-only discovery via Assisted Installer and OCM APIs using OFFLINE_TOKEN.</td></tr><tr><td>Multi-cluster health report, fleet summary, or compare resource usage across contexts</td><td><code>/cluster-report</code></td><td>Uses kubeconfig contexts and openshift-administration MCP for consolidated cluster metrics.</td></tr></tbody></table>
+            </div>
+            <div id="tab-resources" class="collection-tab-panel" role="tabpanel">
+                <h2>Documentation</h2>
+<ul>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/credentials-management.md" target="_blank" rel="noopener">Cluster Credentials Management</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/idp.md" target="_blank" rel="noopener">Identity Providers (IDP)</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/multi-cluster-auth.md" target="_blank" rel="noopener">Multi-Cluster Authentication with Service Account Tokens</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/rbac.md" target="_blank" rel="noopener">Role-Based Access Control (RBAC)</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/examples.md" target="_blank" rel="noopener">Cluster Configuration Examples</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/providers.md" target="_blank" rel="noopener">Infrastructure Providers</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/input-validation-guide.md" target="_blank" rel="noopener">Input Validation Guide</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/troubleshooting.md" target="_blank" rel="noopener">OpenShift Cluster Troubleshooting Guide</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/host-requirements.md" target="_blank" rel="noopener">OpenShift Host Requirements</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/platforms.md" target="_blank" rel="noopener">OpenShift Platform Types</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/networking.md" target="_blank" rel="noopener">OpenShift Networking Configuration</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/static-networking-guide.md" target="_blank" rel="noopener">Static Network Configuration Guide for OpenShift Assisted Installer</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/backup-restore.md" target="_blank" rel="noopener">Backup and Restore</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/day-2-operations.md" target="_blank" rel="noopener">Day-2 Operations</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/quick-reference.md" target="_blank" rel="noopener">Quick Reference</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/certificate-management.md" target="_blank" rel="noopener">Certificate Management</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/certificate-rotation.md" target="_blank" rel="noopener">Certificate Rotation</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/security-checklist.md" target="_blank" rel="noopener">OpenShift Security Checklist</a></li>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/storage.md" target="_blank" rel="noopener">OpenShift Storage Configuration</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener">Main Repository</a> - agentic-collections</li>
+</ul>
+            </div>
+            <div id="tab-agents" class="collection-tab-panel" role="tabpanel">
+                <h2>MCP Server Integrations</h2>
+<div class="grid collection-mcp-grid">
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="ocp-admin" data-mcp-name="openshift-self-managed" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span>openshift-self-managed</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: Container</p>
+<div class="env-vars">1 env var</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="ocp-admin" data-mcp-name="openshift-ocm-managed" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span>openshift-ocm-managed</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: Container</p>
+<div class="env-vars">1 env var</div>
+</div>
+<div class="card mcp-card collection-mcp-card" data-mcp-pack="ocp-admin" data-mcp-name="openshift-administration" role="button" tabindex="0">
+<h3 style="display:flex;align-items:center;gap:0.5rem;"><span>openshift-administration</span></h3>
+<p class="mcp-owner" style="color:var(--text-muted);font-size:0.85rem;margin-top:0.25rem;">By Red Hat</p>
+<p class="container">Type: Container</p>
+<div class="env-vars">1 env var</div>
+</div>
+</div>
+<h2>Sample Workflows</h2>
+<h3>Deploy and verify a new cluster</h3>
+<ol>
+<li>Run <strong>cluster-creator</strong> to provision the cluster via Assisted Installer.</li>
+<li>Run <strong>cluster-inventory</strong> to confirm status and watch events until the cluster is ready.</li>
+<li>Configure <code>KUBECONFIG</code>, then run <strong>cluster-report</strong> for a first health snapshot.</li>
+</ol>
+<h3>Fleet health review</h3>
+<ol>
+<li>Run <strong>cluster-inventory</strong> to list managed and self-managed clusters.</li>
+<li>Align kubeconfig contexts, then run <strong>cluster-report</strong> for resource and pod health across the fleet.</li>
+</ol>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>Generated from <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank">agentic-collections</a> repository</p>
+    </footer>
+
+    <!-- Modal for MCP Server Details (same as catalog) -->
+    <div id="mcp-modal" class="modal">
+        <div class="modal-content" id="mcp-details"></div>
+    </div>
+
+    <script src="../app.js?v=22"></script>
+    <script>
+        // Tab switching
+        document.querySelectorAll('.collection-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = 'tab-' + tab.dataset.tab;
+                document.querySelectorAll('.collection-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+                document.querySelectorAll('.collection-tab-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-.PHONY: help install validate validate-skill-design validate-skill-design-changed generate serve clean test test-full check-uv
+.PHONY: help install validate validate-skill-design validate-skill-design-changed generate generate-catalog generate-marketplace generate-plugins generate-readme verify-generated serve clean test test-full check-uv
 
 help:
 	@echo "agentic-collections Documentation Generator"
@@ -8,7 +8,12 @@ help:
 	@echo "  validate                      - Validate pack structure (plugin.json, .mcp.json, frontmatter)"
 	@echo "  validate-skill-design         - Validate all skills (use PACK=rh-sre for a specific pack)"
 	@echo "  validate-skill-design-changed - Validate only changed skills (staged + unstaged, for local dev)"
-	@echo "  generate    - Generate docs/data.json"
+	@echo "  generate-catalog              - Generate marketplace, plugins, README from collection.yaml"
+	@echo "  generate-marketplace          - Generate .claude-plugin and .cursor-plugin marketplace.json"
+	@echo "  generate-plugins              - Generate plugin.json for each pack"
+	@echo "  generate-readme               - Generate README.md for each pack"
+	@echo "  generate                      - Generate catalog + docs/data.json"
+	@echo "  verify-generated              - Verify committed files match generated (for CI)"
 	@echo "  serve       - Start local server on http://localhost:8000"
 	@echo "  test        - Quick test (validate + generate + verify)"
 	@echo "  test-full   - Full test suite (test + serve with browser open)"
@@ -45,10 +50,39 @@ validate-skill-design: check-uv
 validate-skill-design-changed: check-uv
 	@VALIDATE_INCLUDE_UNCOMMITTED=1 ./scripts/ci-validate-changed-skills.sh
 
-generate: check-uv
+generate-catalog: check-uv
+	@echo "Generating catalog (marketplace, plugins, README)..."
+	@uv run python scripts/generate_marketplace.py
+	@uv run python scripts/generate_plugins.py
+	@uv run python scripts/generate_readme.py
+	@echo "✓ Catalog generated!"
+
+generate-marketplace: check-uv
+	@uv run python scripts/generate_marketplace.py
+
+generate-plugins: check-uv
+	@uv run python scripts/generate_plugins.py
+
+generate-readme: check-uv
+	@uv run python scripts/generate_readme.py
+
+generate: check-uv generate-catalog
 	@echo "Generating documentation..."
 	@uv run python scripts/build_website.py
 	@echo "✓ Documentation generated in docs/"
+
+verify-generated: check-uv
+	@echo "Verifying generated files match committed..."
+	@make generate
+	@git diff --exit-code .claude-plugin/ .cursor-plugin/ docs/collections/ docs/data.json \
+	  rh-sre/.claude-plugin/plugin.json rh-sre/.cursor-plugin/plugin.json rh-sre/README.md \
+	  rh-developer/.claude-plugin/plugin.json rh-developer/.cursor-plugin/plugin.json rh-developer/README.md \
+	  ocp-admin/.claude-plugin/plugin.json ocp-admin/.cursor-plugin/plugin.json ocp-admin/README.md \
+	  rh-virt/.claude-plugin/plugin.json rh-virt/.cursor-plugin/plugin.json rh-virt/README.md \
+	  rh-ai-engineer/.claude-plugin/plugin.json rh-ai-engineer/.cursor-plugin/plugin.json rh-ai-engineer/README.md \
+	  rh-support-engineer/.claude-plugin/plugin.json rh-support-engineer/.cursor-plugin/plugin.json rh-support-engineer/README.md \
+	  && echo "✓ Generated files match committed" \
+	  || (echo "Error: Generated files differ. Run 'make generate' and commit."; exit 1)
 
 serve: check-uv
 	@echo "Starting local server on http://localhost:8000"

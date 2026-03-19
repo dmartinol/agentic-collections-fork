@@ -38,30 +38,57 @@ function updateToolbarCounters(packs, mcpServers, communityMCPServers) {
  */
 async function init() {
     try {
-        // Load data.json
-        const response = await fetch('data.json');
+        // Load data.json (path differs for collection pages)
+        const dataUrl = window.location.pathname.includes('/collections/') ? '../data.json' : 'data.json';
+        const response = await fetch(dataUrl);
         data = await response.json();
 
         // Store original data for search
         allPacks = data.packs;
-        
-        // Separate MCP servers by tier
         allMCPServers = data.mcp_servers.filter(server => server.tier !== 'Community');
         allCommunityMCPServers = data.mcp_servers.filter(server => server.tier === 'Community');
 
-        // Update toolbar counters
-        updateToolbarCounters(allPacks, allMCPServers, allCommunityMCPServers);
+        // Collection page: only setup MCP modal and card handlers
+        const isCollectionPage = document.querySelector('.collection-content') && !document.getElementById('packs-grid');
+        if (isCollectionPage) {
+            setupModals();
+            document.querySelectorAll('.collection-mcp-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const pack = card.dataset.mcpPack;
+                    const name = card.dataset.mcpName;
+                    if (pack && name) showMCPDetails(name, pack);
+                });
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        card.click();
+                    }
+                });
+            });
+            return;
+        }
 
-        // Render sections
+        // Catalog page: full init
+        updateToolbarCounters(allPacks, allMCPServers, allCommunityMCPServers);
         renderPacks(allPacks);
         renderMCPServers(allMCPServers);
         renderCommunityMCPServers(allCommunityMCPServers);
-
-        // Setup search
         document.getElementById('searchInput').addEventListener('input', handleSearch);
-
-        // Setup modal close handlers
         setupModals();
+
+        // Open MCP modal if hash specifies one
+        const hash = window.location.hash.slice(1);
+        const mcpMatch = hash.match(/^mcp=(.+)$/);
+        if (mcpMatch) {
+            const parts = mcpMatch[1].split('/');
+            if (parts.length === 2) {
+                const [packName, serverName] = parts;
+                const server = data.mcp_servers.find(s => s.name === serverName && s.pack === packName);
+                if (server) {
+                    setTimeout(() => showMCPDetails(serverName, packName), 100);
+                }
+            }
+        }
 
     } catch (error) {
         console.error('Failed to load data:', error);
@@ -188,16 +215,12 @@ function createPackCard(pack) {
 
     div.appendChild(stats);
 
-    // View details link
-    const link = document.createElement('a');
-    link.className = 'card-link';
-    link.textContent = 'View details';
-    link.href = '#';
-    link.onclick = (e) => {
-        e.preventDefault();
-        showPackDetails(pack.name);
+    // Entire card is clickable - navigates to collection page
+    const collectionId = pack.plugin?.name || pack.name;
+    div.style.cursor = 'pointer';
+    div.onclick = () => {
+        window.location.href = `collections/${collectionId}.html`;
     };
-    div.appendChild(link);
 
     return div;
 }
@@ -328,17 +351,11 @@ function createMCPCard(server) {
         div.appendChild(toolsInfo);
     }
 
-    // View details link
-    const link = document.createElement('a');
-    link.className = 'card-link';
-    link.textContent = 'View details';
-    link.href = '#';
-    link.style.marginTop = 'auto';
-    link.onclick = (e) => {
-        e.preventDefault();
+    // Entire card is clickable - opens MCP details modal
+    div.style.cursor = 'pointer';
+    div.onclick = () => {
         showMCPDetails(server.name, server.pack);
     };
-    div.appendChild(link);
 
     return div;
 }

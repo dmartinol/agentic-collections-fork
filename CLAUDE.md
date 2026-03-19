@@ -10,6 +10,9 @@ This repository contains **agentic collections** - plugin collections that autom
 
 ```
 agentic-collections/
+├── catalog/             # Vendor-agnostic schema and README template
+├── .claude-plugin/      # Claude Code marketplace (generated from collection.yaml)
+├── .cursor-plugin/      # Cursor marketplace (generated from collection.yaml)
 ├── rh-sre/              # Site Reliability Engineering pack (reference implementation)
 ├── rh-developer/        # Developer tools pack
 ├── ocp-admin/           # OpenShift administration pack
@@ -22,11 +25,14 @@ agentic-collections/
 Each pack follows this structure:
 ```
 <pack-name>/
+├── collection.yaml      # Source of truth: vendor-agnostic catalog definition
+├── README.md            # Generated from collection.yaml (do not edit manually)
 ├── CLAUDE.md            # Claude Code instruction routing (persona, skills, rules)
-├── README.md            # Pack description, persona, target marketplaces
-├── .claude-plugin/      # Claude Code plugin metadata
-│   └── plugin.json      # Name, version, description, author, license
-├── .mcp.json           # MCP server configurations (uses env vars for credentials)
+├── .claude-plugin/      # Claude Code plugin metadata (generated)
+│   └── plugin.json
+├── .cursor-plugin/      # Cursor plugin metadata (generated)
+│   └── plugin.json
+├── .mcp.json            # MCP server configurations (uses env vars for credentials)
 ├── skills/             # Specialized task executors (including orchestration skills)
 │   └── <skill>/
 │       └── SKILL.md    # Skill definition with YAML frontmatter
@@ -48,6 +54,18 @@ Each pack follows this structure:
 - Example: `cve-impact` (CVE risk assessment), `playbook-generator` (Ansible generation)
 
 **Key Pattern**: Skills encapsulate tools; orchestration skills invoke other skills. Never call MCP tools directly - always go through skills. For end-to-end CVE remediation, use the `/remediation` skill which orchestrates 6 specialized skills.
+
+### README Skills Section (User-Oriented)
+
+The Skills section in the generated README comes from `collection.yaml` (`contents.skills` and `contents.orchestration_skills`), **not** from SKILL.md. This separation ensures:
+- **SKILL.md** = Agent-facing implementation (workflow, parameters, MCP tools)
+- **collection.yaml contents** = User-facing discovery (Use when, What it does, sample prompts)
+
+Each skill in `contents.skills` has `name`, `description`, and `summary_markdown` (flexible markdown). Orchestration skills use the same structure in `contents.orchestration_skills`.
+
+**Skills Decision Guide** (`contents.skills_decision_guide`): Optional array of `{ user_request, skill_to_use, reason }` entries that help users choose the right skill. Rendered as a table in the generated README. Add relevant decision mappings (e.g., "Show the managed fleet" → fleet-inventory).
+
+When adding a skill, update both `skills/<name>/SKILL.md` and `collection.yaml` (`contents.skills` or `contents.orchestration_skills`). Consider adding a `skills_decision_guide` entry for common user intents.
 
 ## Skill and Agent Requirements
 
@@ -150,10 +168,10 @@ last_updated: YYYY-MM-DD
 ### Creating a New Agentic Pack
 
 1. Create pack folder: `<pack-name>/`
-2. Add `README.md` with description, persona, marketplaces
-3. Add `CLAUDE.md` with persona, skill-first rule, intent routing table, MCP servers, and global rules (see [rh-ai-engineer/CLAUDE.md](rh-ai-engineer/CLAUDE.md) for reference)
-4. Create `skills/` directory
-5. Optional: Add `.claude-plugin/plugin.json` for Claude Code
+2. Create `collection.yaml` (vendor-agnostic definition; see `catalog/schema.yaml`). Include `contents.skills` and `contents.orchestration_skills` with user-oriented `summary_markdown` per skill. Optionally add `contents.skills_decision_guide` (array of `user_request`, `skill_to_use`, `reason`) to help users choose the right skill.
+3. Add `CLAUDE.md` with persona, skill-first rule, intent routing table, MCP servers, and global rules (see [rh-ai-engineer/CLAUDE.md](rh-ai-engineer/CLAUDE.md) for reference).
+4. Run `make generate-catalog` to generate `plugin.json`, `README.md`, and marketplace entries
+5. Create `skills/` directory
 6. Optional: Add `.mcp.json` for MCP server integrations
 7. Update main `README.md` table with link
 
@@ -170,12 +188,14 @@ last_updated: YYYY-MM-DD
    - Workflow with precise parameters
    - Dependencies declaration
 4. Include concrete examples and complete error handling
-5. Update the pack's `CLAUDE.md` intent routing table to include the new skill
-6. Test with `Skill` tool invocation
-7. Validate with `./scripts/run-skill-linter.sh skills/<skill-name>/`
+5. Update `collection.yaml` `contents.skills` (or `contents.orchestration_skills`) with user-oriented entry (`name`, `description`, `summary_markdown`) so the generated README lists the skill correctly. Consider adding a `skills_decision_guide` entry for common user intents.
+6. Update the pack's `CLAUDE.md` intent routing table to include the new skill
+7. Run `make generate-catalog` so the README and plugin metadata stay in sync
+8. Test with `Skill` tool invocation
+9. Validate with `./scripts/run-skill-linter.sh skills/<skill-name>/`
 
 **Collection-Specific Standards:**
-- **rh-virt**: Follow `rh-virt/SKILL_TEMPLATE.md` for enhanced quality standards including mandatory Common Issues and Example Usage sections
+- **rh-virt**: Follow [SKILL_DESIGN_PRINCIPLES.md](SKILL_DESIGN_PRINCIPLES.md) for quality standards including Common Issues and Example Usage sections
 
 ### Adding an Agent
 
@@ -223,7 +243,6 @@ When creating new collection, use `rh-sre` as the architectural reference.
 ### rh-virt (Quality-Controlled Pattern)
 
 The `rh-virt` pack demonstrates skill quality standardization:
-- Comprehensive skill templates (`SKILL_TEMPLATE.md`)
 - Risk-based color coding (cyan/green/blue/yellow/red)
 - Mandatory Common Issues and Example Usage sections
 - Consistent section ordering and formatting
