@@ -67,7 +67,9 @@ This skill uses `openshift-self-managed` MCP server exclusively. This server con
 
 **Cluster Types Supported**:
 - **OCP** (OpenShift Container Platform) - Self-managed HA clusters (3+ control plane nodes)
+  - Platforms: baremetal, vsphere, nutanix, oci
 - **SNO** (Single-Node OpenShift) - Self-managed single-node clusters
+  - Platform: Always "none" (Red Hat API requirement)
 
 **NOT Supported by This Skill** (different APIs, different workflows):
 - **ROSA** (Red Hat OpenShift Service on AWS) - Use `openshift-ocm-managed` MCP server
@@ -105,72 +107,73 @@ This skill uses `openshift-self-managed` MCP server exclusively. This server con
 
 End-to-end cluster creation with interactive guidance and validation.
 
-### Step 1: Prerequisites and Documentation
+### Step 0: Initialize Task Tracking
 
+**Create tasks in logical order:**
 
-**Document Consultation** (REQUIRED):
-1. **Action**: Read [troubleshooting.md](../../docs/troubleshooting.md)
-2. **Output**: "I consulted troubleshooting.md to understand cluster lifecycle states."
+```
+TaskCreate(subject: "#1 Verify prerequisites", description: "Check MCP servers, OFFLINE_TOKEN")
+TaskCreate(subject: "#2 Gather cluster requirements", description: "Type, platform, version, name, domain, arch, SSH, hardware")
+TaskCreate(subject: "#3 Configure networking", description: "CIDRs, VIPs, static IPs")
+TaskCreate(subject: "#4 Review and confirm", description: "Display summary, get approval")
+TaskCreate(subject: "#5 Create cluster definition", description: "Create in Assisted Installer")
+TaskCreate(subject: "#6 Apply platform config", description: "VIPs, static configs")
+TaskCreate(subject: "#7 Generate cluster ISO", description: "Generate ISO URL")
+TaskCreate(subject: "#8 Discover and assign hosts", description: "Check discovery, roles")
+TaskCreate(subject: "#9 Validate readiness", description: "Verify cluster ready")
+TaskCreate(subject: "#10 Start installation", description: "Confirm, trigger install")
+TaskCreate(subject: "#11 Monitor installation", description: "Track progress")
+TaskCreate(subject: "#12 Retrieve credentials", description: "Download kubeconfig")
+```
+
+**During execution**: Update task status to "in_progress" when starting, "completed" when done.
+
+### Step 1: Prerequisites Check
+
+**TaskUpdate**: Mark task #1 as `in_progress`
 
 **Prerequisites Check**: Execute verification from Prerequisites section.
+
+**On Failure**: If prerequisites fail, consult [troubleshooting.md](../../docs/troubleshooting.md) for common setup issues, then stop and report error to user.
 
 ---
 
 ### Step 2: Gather Cluster Requirements
 
 
-Use AskUserQuestion tool to collect:
+**Context**: This skill creates SELF-MANAGED clusters (OCP, SNO) via Assisted Installer. NOT for ROSA/ARO/OSD (use cluster-inventory for those).
 
-1. **Cluster Type**: SNO or HA
-2. **Platform**: SNO=`none` (auto), HA=baremetal/vsphere/nutanix/oci (user selects)
+Use AskUserQuestion to collect configuration:
+
+1. **Cluster Type**: SNO (single-node) or HA (multi-node, 3+ control plane)
+2. **Platform**:
+   - **SNO**: Platform is automatically set to "none" (Red Hat API requirement) - DO NOT ask user
+   - **HA**: Ask user to select: baremetal, vsphere, nutanix, or oci
 3. **Version**: Call `list_versions`, show "Full Support" versions
-4. **Cluster Name**: 1-54 chars, lowercase/numbers/hyphens, starts with letter ([validation](../../docs/input-validation-guide.md#cluster-name))
-5. **Base Domain**: Valid DNS domain ([validation](../../docs/input-validation-guide.md#base-domain))
+4. **Cluster Name**: Ask "Cluster name? (or type your custom name directly)" - Suggest based on context (e.g., "prod-ocp", "edge-site-01", "dev-cluster") OR user types custom name. Validate: 1-54 chars, lowercase/numbers/hyphens, starts with letter ([validation](../../docs/input-validation-guide.md#cluster-name))
+5. **Base Domain**: Ask "Base domain? (e.g., example.com)" - User types domain directly. Validate: valid DNS format ([validation](../../docs/input-validation-guide.md#base-domain))
 6. **CPU Arch**: x86_64 (default), aarch64, ppc64le, s390x
-7. **SSH Key**: Valid SSH public key ([validation](../../docs/input-validation-guide.md#ssh-public-key))
-8. **Hardware Availability**: Confirm user has servers meeting [host requirements](../../docs/host-requirements.md) ready for installation
+7. **SSH Key**: Ask "How to provide?" Options: Generate new (recommended, save to cluster folder) | Existing file (path) | Paste | ⚠️ None (warn, require "PROCEED WITHOUT SSH" confirmation)
+8. **Hardware**: Confirm servers meeting [host requirements](../../docs/host-requirements.md) are ready
+
+**Create folder**: `/tmp/{cluster_name}.{base_domain}/` (permissions 700), display location
 
 **Store all values** for subsequent steps.
 
-**Reference**: [Input Validation Guide](../../docs/input-validation-guide.md)
-
 ---
 
-### Step 3: Platform-Specific Configuration
+### Step 3: Network Configuration
 
+Ask: "How to configure networking?" Options: 1) Default (auto CIDRs, DHCP, HA: ask VIPs) | 2) Custom CIDRs (ask each, validate) | 3) Static IPs (Simple/Advanced/Manual modes, use `generate_nmstate_yaml`) | 4) Describe requirements (AI infers from text like "192.168.1.0/24, 100 pods")
 
-**For HA on baremetal/vsphere/nutanix**:
-- **Gather VIPs**: API VIP and Ingress VIP (IPv4, same subnet as nodes, not assigned)
-- **Validation**: [VIP Requirements](../../docs/input-validation-guide.md#virtual-ips-vips)
-
-**Optional Static Networking**:
-- Ask: "Use DHCP or static networking?"
-- **If static**: For each host, gather network config (Simple/Advanced/Manual mode)
-  - **Simple**: Interface, MAC, IP, prefix, gateway, DNS
-  - **Advanced**: VLANs, bonding, multiple interfaces
-  - **Manual**: User provides NMState YAML
-- **Tools**: `generate_nmstate_yaml`, `validate_nmstate_yaml`
-- **Store**: `static_network_configs` array
-
-**Reference**: [Static Networking Guide](../../docs/static-networking-guide.md), [Networking Guide](../../docs/networking.md)
+**Reference**: [Networking Guide](../../docs/networking.md) has detailed examples for all 4 options
 
 ---
 
 ### Step 4: Configuration Briefing
 
 
-Display summary table:
-
-| Parameter | Value |
-|-----------|-------|
-| Cluster Name | {cluster_name} |
-| Type | {SNO/HA} |
-| Version | {openshift_version} |
-| Platform | {platform} |
-| Architecture | {cpu_architecture} |
-| Domain | {base_domain} |
-| VIPs | {if applicable} |
-| Networking | {DHCP or Static (n hosts)} |
+Display summary: Cluster Name, Type (SNO/HA), Version, Platform, Architecture, Domain, VIPs (if applicable), Networking (DHCP/Static)
 
 **Reference**: [Examples](../../docs/examples.md)
 
@@ -198,6 +201,8 @@ Ask: "Review configuration. Ready to create cluster definition?"
 
 **Output**: Cluster UUID (`cluster_id`) - **CRITICAL for all subsequent operations**
 
+**Save metadata** to `/tmp/{cluster_name}.{base_domain}/cluster-info.json`: cluster_id, cluster_name, base_domain, openshift_version, cluster_type, platform, cpu_architecture, created_at, api_url, console_url
+
 **Error Handling**: Display error, allow retry/abort if duplicate name or invalid parameters.
 
 ---
@@ -220,23 +225,18 @@ Ask: "Review configuration. Ready to create cluster definition?"
 
 ### Step 8: Generate Cluster ISO
 
+**Tool**: `cluster_iso_download_url`, **Parameters**: `{cluster_id}`
 
-**Tool**: `cluster_iso_download_url`
-**Parameters**: `{cluster_id}`
+**Save URL**: `/tmp/{cluster_name}.{base_domain}/iso-download-url.txt`
 
-**Display**:
+**Download ISO**: Execute via Bash:
+```bash
+curl -L -# -o /tmp/{cluster_name}.{base_domain}/discovery.iso "{iso_url}"
 ```
-Cluster Boot ISO Ready
-Download: {url}
 
-Instructions:
-1. Download ISO
-2. Boot {expected_host_count} server(s) from ISO
-3. Wait 5-10 minutes for registration
-4. Say "check for hosts" when ready
+**Verify download**: Check file exists and size > 0
 
-Note: Hosts receive static configs in boot order.
-```
+**Display**: ISO ready at `/tmp/{cluster_name}.{base_domain}/discovery.iso`. Boot {expected_host_count} server(s) from this ISO, wait 5-10 min, say "check for hosts". Static configs applied in boot order.
 
 ---
 
@@ -291,9 +291,10 @@ Display: "Waiting for you to boot hosts. When ready, say 'check for hosts'."
 
 **Check**: Cluster `status` should be "ready"
 
-**If validation fails**: Display errors, offer fix/wait/abort.
-
-**Reference**: [Troubleshooting](../../docs/troubleshooting.md)
+**If validation fails**:
+1. Display errors from cluster_info
+2. Consult [troubleshooting.md](../../docs/troubleshooting.md) for cluster status meanings and validation error diagnosis
+3. Offer options: fix/wait/abort
 
 ---
 
@@ -330,7 +331,11 @@ Ask: "Start installation now?"
 
 **On Success**: Display "Installation started!"
 
-**On Error**: Display error, document in troubleshooting.md if new, offer retry/abort.
+**On Error**:
+1. Display error message
+2. Consult [troubleshooting.md](../../docs/troubleshooting.md) for error diagnosis
+3. If error is new/undocumented, note it for future documentation
+4. Offer retry/abort
 
 ---
 
@@ -357,12 +362,11 @@ Background monitoring? (yes/no)
 
 **If manual**: Wait for "check status", then call `cluster_info`, display progress, repeat until "installed" or "error"
 
-**If fails**:
-1. Download logs (`cluster_logs_download_url`) for diagnosis
-2. Offer options: diagnose errors, cleanup and retry, or manual intervention
-3. **Cleanup**: Failed cluster remains in Assisted Installer - use cluster_info to verify state before deleting or retrying with same cluster_id
-
-**Reference**: [Troubleshooting](../../docs/troubleshooting.md)
+**If installation fails**:
+1. Consult [troubleshooting.md](../../docs/troubleshooting.md) for cluster lifecycle states and common installation errors
+2. Download logs (`cluster_logs_download_url`) for detailed diagnosis
+3. Offer options: diagnose errors, cleanup and retry, or manual intervention
+4. **Cleanup**: Failed cluster remains in Assisted Installer - use cluster_info to verify state before deleting or retrying with same cluster_id
 
 ---
 
@@ -379,17 +383,16 @@ Display: "Installation Completed! Cluster: {cluster_name}, Status: installed, Ti
 1. **Action**: Read [credentials-management.md](../../docs/credentials-management.md)
 2. **Output**: "I consulted credentials-management.md for credential download procedures."
 
-**Execute**: Follow the download procedure from credentials-management.md to retrieve kubeconfig and kubeadmin-password to `/tmp/{cluster_name}/`
+**Execute**: Follow download procedure to save kubeconfig and kubeadmin-password to `/tmp/{cluster_name}.{base_domain}/` (permissions 600)
 
 **Display**:
 ```
-✅ Credentials downloaded to /tmp/{cluster_name}/
-   - kubeconfig
-   - kubeadmin-password
-   Permissions: Secure (600)
+✅ Credentials downloaded to /tmp/{cluster_name}.{base_domain}/
+   - kubeconfig (600)
+   - kubeadmin-password (600)
 
 To use cluster:
-export KUBECONFIG=/tmp/{cluster_name}/kubeconfig
+export KUBECONFIG=/tmp/{cluster_name}.{base_domain}/kubeconfig
 ```
 
 **Security**: Credentials provide full admin access. Never expose presigned URLs.
@@ -400,35 +403,30 @@ export KUBECONFIG=/tmp/{cluster_name}/kubeconfig
 
 **Display**:
 ```
-OpenShift Cluster Ready!
+🎉 OpenShift Cluster Ready!
 
-Cluster: {cluster_name}
+Cluster: {cluster_name}.{base_domain}
 API: https://api.{cluster_name}.{base_domain}:6443
 Console: https://console-openshift-console.apps.{cluster_name}.{base_domain}
 
-Credentials: /tmp/{cluster_name}/
+📁 Artifacts: /tmp/{cluster_name}.{base_domain}/
+   (kubeconfig, kubeadmin-password, ssh-key, discovery.iso, iso-download-url.txt, cluster-info.json)
 
 Next Steps:
-- Verify cluster access via MCP tools (recommended):
-  Set: export KUBECONFIG=/tmp/{cluster_name}/kubeconfig
+- Verify via MCP: export KUBECONFIG=/tmp/{cluster_name}.{base_domain}/kubeconfig
   MCP Tool: resources_list (Parameters: {kind: "Node"})
-  Expected: List of cluster nodes
-
-- Alternative verification (if oc CLI available, unlikely):
-  oc --kubeconfig /tmp/{cluster_name}/kubeconfig get nodes
-  Note: oc CLI may not be installed; MCP tools are preferred
-
-- Web console: Use kubeadmin + password from /tmp/{cluster_name}/kubeadmin-password
-- Configure identity provider (see idp.md for HTPasswd, LDAP, OIDC, GitHub setup)
-- Configure RBAC and user permissions (see rbac.md)
-- Install operators and deploy applications
+- Alternative (oc CLI, unlikely available): oc --kubeconfig <path> get nodes
+- SSH to nodes (if key configured): ssh -i /tmp/{cluster_name}.{base_domain}/ssh-key core@<node-ip>
+- Web console: kubeadmin + password from /tmp/{cluster_name}.{base_domain}/kubeadmin-password
+- Configure identity provider (idp.md), RBAC (rbac.md)
+- Install operators and applications
 
 Congratulations!
 ```
 
-**Ask**: "Copy credentials to permanent storage? (yes/no)"
+**Ask**: "Archive cluster folder to permanent storage? (yes/no)"
 
-**If yes**: Copy to `~/.kube/` with secure permissions.
+**If yes**: Ask destination (default: ~/.kube/clusters/), copy folder with `cp -r`, set permissions 700, display confirmation
 
 **Reference**: [Credentials Management](../../docs/credentials-management.md)
 
@@ -480,20 +478,6 @@ All tools from `openshift-self-managed` MCP server:
 
 **User**: "Create a single-node OpenShift cluster for my edge location."
 
-**Execution**:
-1. Prerequisites verified, docs consulted
-2. SNO selected, platform: none, version: 4.18.2
-3. Name: "edge-site-01", domain: "edge.local"
-4. SSH key provided, VIPs skipped, DHCP networking
-5. Configuration confirmed, cluster created
-6. ISO provided, user boots server
-7. Host discovered, assigned "master"
-8. Validation: ready
-9. Installation confirmed and started
-10. Monitoring: 0% → 100% (~45 min)
-11. Credentials downloaded to /tmp/edge-site-01/
-12. Cluster operational!
-
-**Result**: SNO cluster deployed in ~45 minutes.
+**Result**: SNO deployed in ~45 min. All artifacts in `/tmp/edge-site-01.edge.local/`: kubeconfig, kubeadmin-password, SSH keys, discovery.iso, ISO URL, metadata
 
 **More Examples**: See [examples.md](../../docs/examples.md) for HA, static networking, multi-cluster, and air-gapped configurations.

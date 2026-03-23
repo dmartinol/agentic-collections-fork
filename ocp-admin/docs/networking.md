@@ -10,6 +10,217 @@ OpenShift networking encompasses pod networking, service networking, ingress, an
 
 ---
 
+## Network Configuration Options (cluster-creator Skill)
+
+When creating a cluster with the cluster-creator skill, you have 4 configuration options:
+
+### Option 1: Default Network Configuration (Recommended)
+
+**Best for**: Most deployments, quick setup, standard requirements
+
+**Configuration**:
+- Cluster network: `10.128.0.0/14` (pod IPs)
+- Service network: `172.30.0.0/16` (ClusterIP services)
+- Machine network: Auto-detected from host network interfaces
+- DNS: Auto-configured
+- DHCP: Enabled (hosts get IPs automatically)
+
+**Additional requirements for HA clusters**:
+- API VIP: Single IP on machine network for API server load balancing
+- Ingress VIP: Single IP on machine network for router load balancing
+- Both VIPs must be: unused, same subnet as nodes, IPv4
+
+**Example interaction**:
+```
+Q: How to configure networking?
+A: Option 1 - Default
+
+[If HA]
+Q: API VIP (IPv4, same subnet as nodes)?
+A: 192.168.1.100
+
+Q: Ingress VIP (IPv4, same subnet as nodes, different from API VIP)?
+A: 192.168.1.101
+```
+
+---
+
+### Option 2: Custom Network CIDRs
+
+**Best for**: Networks with specific CIDR requirements, avoiding conflicts with existing infrastructure, specific IP range sizing
+
+**Configuration**:
+- Ask for each CIDR explicitly
+- Validate no overlaps between cluster/service/machine networks
+- Ensure sufficient IP space for workloads
+
+**Example interaction**:
+```
+Q: How to configure networking?
+A: Option 2 - Custom CIDRs
+
+Q: Cluster network CIDR (pod IPs)?
+A: 10.200.0.0/16
+
+Q: Service network CIDR (ClusterIP services)?
+A: 10.100.0.0/16
+
+Q: Machine network CIDR (nodes, or 'auto' to detect)?
+A: 192.168.50.0/24
+
+Q: DNS servers (comma-separated, or 'auto')?
+A: 8.8.8.8,8.8.4.4
+
+[If HA]
+Q: API VIP?
+A: 192.168.50.10
+
+Q: Ingress VIP?
+A: 192.168.50.11
+```
+
+**Validation rules**:
+- Cluster and service networks must not overlap
+- Machine network must not overlap with cluster/service
+- Sufficient IPs: cluster network needs ~512 IPs per node minimum
+- VIPs must be in machine network range
+
+---
+
+### Option 3: Static IP Configuration (No DHCP)
+
+**Best for**: Environments without DHCP, highly controlled networks, compliance requirements
+
+**Three sub-modes**:
+
+#### 3a. Simple Mode
+For each host, collect:
+- Network interface name (e.g., `ens3`, `eth0`)
+- MAC address (for interface matching)
+- Static IP address
+- Gateway IP
+- Subnet prefix (e.g., `/24`)
+- DNS servers
+
+**Example**:
+```
+Q: Static IP mode?
+A: Simple
+
+Q: Number of hosts?
+A: 3
+
+Host 1:
+Q: Interface name?
+A: ens3
+Q: MAC address?
+A: 52:54:00:12:34:56
+Q: IP address?
+A: 192.168.1.10
+Q: Gateway?
+A: 192.168.1.1
+Q: Prefix?
+A: 24
+Q: DNS servers (comma-separated)?
+A: 8.8.8.8,8.8.4.4
+
+[Repeat for hosts 2 and 3]
+```
+
+AI generates NMState YAML for each host automatically.
+
+#### 3b. Advanced Mode
+For complex setups: VLANs, bonding, multiple interfaces, bridges
+
+Collect detailed configuration per host, generate NMState YAML with advanced features.
+
+See [Static Networking Guide](./static-networking-guide.md) for VLAN/bonding examples.
+
+#### 3c. Manual Mode
+User provides complete NMState YAML for each host.
+
+**Example**:
+```
+Q: Static IP mode?
+A: Manual
+
+Q: Number of hosts?
+A: 3
+
+Q: NMState YAML for host 1?
+A: [paste YAML]
+
+[Validate and repeat for each host]
+```
+
+**Note**: Static IPs assigned in boot order. First host to boot gets first config, second host gets second config, etc.
+
+---
+
+### Option 4: AI-Assisted (Describe Requirements)
+
+**Best for**: Users who understand their needs but not OpenShift networking details, natural language interaction
+
+**How it works**:
+1. User describes network in plain text
+2. AI infers configuration (CIDRs, VIPs, static IPs if mentioned)
+3. Displays inferred configuration table
+4. User confirms or modifies
+
+**Example 1 - Simple description**:
+```
+Q: How to configure networking?
+A: Option 4 - Describe requirements
+
+Q: Describe your network setup:
+A: I have a 192.168.1.0/24 network and need space for about 100 pods
+
+[AI infers]
+Inferred Configuration:
+- Machine network: 192.168.1.0/24
+- Cluster network: 10.128.0.0/14 (supports 16,384 pods)
+- Service network: 172.30.0.0/16 (65,536 services)
+- DHCP: Enabled
+- API VIP: 192.168.1.100 (suggested)
+- Ingress VIP: 192.168.1.101 (suggested)
+
+Q: Does this match your needs?
+A: yes
+```
+
+**Example 2 - Detailed requirements**:
+```
+Q: Describe your network setup:
+A: Isolated network 10.50.0.0/16, no DHCP, 3 nodes need static IPs starting at 10.50.0.10, API should be at 10.50.0.5
+
+[AI infers]
+Inferred Configuration:
+- Machine network: 10.50.0.0/16
+- Cluster network: 10.128.0.0/14 (no conflict)
+- Service network: 172.30.0.0/16 (no conflict)
+- DHCP: Disabled
+- Static IPs: 3 hosts (10.50.0.10, 10.50.0.11, 10.50.0.12)
+- API VIP: 10.50.0.5
+- Ingress VIP: 10.50.0.6 (suggested, same subnet)
+
+Q: Does this match your needs? (yes/modify/restart)
+A: modify
+
+Q: What would you like to change?
+A: Change Ingress VIP to 10.50.0.100
+
+[AI updates, re-displays, confirms]
+```
+
+**Supported phrases AI recognizes**:
+- "192.168.x.x network", "10.0.0.0/16 range" → machine network
+- "need space for X pods" → validates cluster network size
+- "no DHCP", "static IPs" → triggers static configuration
+- "API at X.X.X.X" → sets API VIP
+- "X nodes" → expects X static IP configs
+
+---
+
 ## Network Types
 
 ### Cluster Network (Pod Network)
