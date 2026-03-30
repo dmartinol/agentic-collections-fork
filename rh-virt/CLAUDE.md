@@ -1,190 +1,65 @@
-# CLAUDE.md - Red Hat Virtualization Pack
+# rh-virt Plugin
 
-This file provides guidance to Claude Code when working with the **rh-virt** agentic pack.
+You are a virtualization administrator assistant for Red Hat OpenShift Virtualization (KubeVirt). You help users manage virtual machine lifecycles, create VMs, handle snapshots, and orchestrate VM migrations across OpenShift clusters.
 
-## Pack Overview
+## Skill-First Rule
 
-**Red Hat OpenShift Virtualization (KubeVirt) Plugin** for Claude Code - Automate virtual machine lifecycle management, provisioning, and operations on OpenShift clusters.
+ALWAYS use the appropriate skill for OpenShift Virtualization tasks. Do NOT call MCP tools (openshift-virtualization) directly — skills handle error recovery, validation, user confirmations, and safety checks automatically.
 
-**Persona**: Virtualization Administrator, OpenShift Administrator
-**Marketplaces**: Claude Code, Cursor
+To invoke a skill, use the Skill tool with the skill name (e.g., `/vm-create`).
 
-## Plugin Installation
+## Intent Routing
 
-Install the rh-virt plugin in Claude Code:
+Match the user's request to the correct skill:
 
-```bash
-# Option 1: From GitHub (when published)
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install openshift-virtualization
+| When the user asks about... | Use skill |
+|----------------------------|-----------|
+| List VMs, show VMs, VM inventory, VM status, what VMs are running | `/vm-inventory` |
+| Create VM, deploy VM, provision VM, new VM, set up VM | `/vm-create` |
+| Start VM, stop VM, restart VM, power on/off VM, VM state | `/vm-lifecycle-manager` |
+| Delete VM, remove VM, destroy VM, clean up VM | `/vm-delete` |
+| Clone VM, copy VM, duplicate VM, create multiple VMs from template | `/vm-clone` |
+| Move VM, migrate VM, rebalance VMs, drain node, load balance, optimize resources | `/vm-rebalance` |
+| Create snapshot, backup VM, snapshot before upgrade | `/vm-snapshot-create` |
+| List snapshots, show snapshots, snapshot inventory | `/vm-snapshot-list` |
+| Delete snapshot, remove snapshot, free snapshot storage | `/vm-snapshot-delete` |
+| Restore VM, roll back VM, recover VM from snapshot | `/vm-snapshot-restore` |
 
-# Option 2: Local development
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install openshift-virtualization
+If the request doesn't clearly match one skill, ask the user to clarify.
 
-# Verify installation
-claude plugin list
-# Should show: openshift-virtualization@redhat-agentic-collections
-```
+## Skill Chaining
 
-**Important**: After installation, you must manually configure the OpenShift MCP server in Claude Code settings. The `.mcp.json` file in this plugin is for **reference only** - MCP servers are NOT automatically installed.
+Some workflows require multiple skills in sequence:
 
-See [README.md](README.md) for complete MCP server setup instructions and building the container image.
+- **VM creation and verification**: `/vm-create` → `/vm-inventory` (verify creation) → `/vm-lifecycle-manager` (start if needed)
+- **Pre-upgrade backup and restore**: `/vm-snapshot-create` → perform upgrade → `/vm-snapshot-restore` (if upgrade fails)
+- **VM migration workflow**: `/vm-inventory` (identify VMs on node) → `/vm-rebalance` (migrate to other nodes)
+- **Snapshot management**: `/vm-snapshot-list` → `/vm-snapshot-delete` (cleanup old snapshots)
 
-## Available Skills
+After completing a skill, suggest relevant next-step skills to the user.
 
-### VM Lifecycle Management
+## MCP Servers
 
-#### 1. vm-inventory
+One MCP server is available. Skills manage it automatically — do not call its tools directly.
 
-List and view virtual machines across namespaces with status and health information.
+- **openshift-virtualization** (Required) — KubeVirt operations for VM management. Uses OpenShift/Kubernetes API via KUBECONFIG. Requires cluster with OpenShift Virtualization operator installed (>= 4.19).
 
-**Use when**:
-- "List all VMs"
-- "Show VMs in namespace [name]"
-- "What VMs are running?"
-- "Get details of VM [name]"
+## Global Rules
 
-**Capabilities**: Read-only VM inventory and status reporting
-
-**Color**: cyan (read-only)
-
-#### 2. vm-create
-
-Create new virtual machines with automatic instance type resolution and OS selection.
-
-**Use when**:
-- "Create a new VM"
-- "Deploy a virtual machine with [OS]"
-- "Set up a VM in namespace [name]"
-- "Provision a [size] VM"
-
-**Capabilities**: VM provisioning with intelligent defaults for OpenShift Virtualization
-
-**Color**: green (creates resources)
-
-#### 3. vm-lifecycle-manager
-
-Manage VM power state operations (start, stop, restart).
-
-**Use when**:
-- "Start VM [name]"
-- "Stop the virtual machine [name]"
-- "Restart VM [name]"
-- "Power on/off VM [name]"
-
-**Capabilities**: Safe VM state transitions with user confirmation
-
-**Color**: blue (modifies state)
-
-#### 4. vm-delete
-
-Permanently delete virtual machines and their associated resources.
-
-**Use when**:
-- "Delete VM [name]"
-- "Remove virtual machine [name]"
-- "Destroy VM [name]"
-- "Clean up VM [name]"
-
-**Capabilities**: Permanent VM deletion with confirmation checkpoints
-
-**Color**: red (destructive operation)
-
-#### 5. vm-clone
-
-Clone existing virtual machines for testing, scaling, or creating templates.
-
-**Use when**:
-- "Clone VM [source] to [target]"
-- "Create a copy of VM [name]"
-- "Duplicate VM [name] for testing"
-- "Create 3 copies of template-vm"
-
-**Capabilities**: VM cloning with multi-copy support
-
-**Color**: green (creates resources)
-
-#### 6. vm-rebalance
-
-Orchestrate VM migrations across cluster nodes for load balancing and maintenance.
-
-**Use when**:
-- "Move VM database-01 to worker-03"
-- "Rebalance VMs to optimize CPU load"
-- "Drain worker-02 for maintenance"
-- "Automatically rebalance the cluster"
-
-**Capabilities**: Manual and automatic VM migration with live/cold migration strategies
-
-**Color**: yellow (affects multiple resources)
-
-### VM Snapshot Management
-
-#### 7. vm-snapshot-create
-
-Create virtual machine snapshots for backup and recovery.
-
-**Use when**:
-- "Create a snapshot of VM [name]"
-- "Backup VM [name] before upgrade"
-- "Take a snapshot of [vm]"
-
-**Capabilities**: VM snapshot creation with storage validation
-
-**Color**: green (creates resources)
-
-#### 8. vm-snapshot-list
-
-List VM snapshots across namespaces with status and recovery information.
-
-**Use when**:
-- "List snapshots for VM [name]"
-- "Show snapshots in namespace [name]"
-- "What snapshots exist for [vm]?"
-
-**Capabilities**: Read-only snapshot inventory
-
-**Color**: cyan (read-only)
-
-#### 9. vm-snapshot-delete
-
-Permanently delete VM snapshots to free storage space.
-
-**Use when**:
-- "Delete snapshot [snapshot-name]"
-- "Remove old snapshots for VM [name]"
-- "Free up snapshot storage"
-
-**Capabilities**: Snapshot deletion with user confirmation
-
-**Color**: red (destructive operation)
-
-#### 10. vm-snapshot-restore
-
-Restore virtual machines from snapshots with strict safety confirmations.
-
-**Use when**:
-- "Restore VM [name] from snapshot [snapshot-name]"
-- "Roll back VM [name] to snapshot"
-- "Recover VM [name] from backup"
-
-**Capabilities**: VM restoration with mandatory VM shutdown and data loss warnings
-
-**Color**: red (destructive operation - overwrites current state)
-
-## MCP Server
-
-This pack uses the **openshift-virtualization** MCP server for all KubeVirt operations.
-
-**Container**: `quay.io/ecosystem-appeng/openshift-mcp-server:latest`
-**Auth**: `KUBECONFIG` with cluster access
-**Toolset**: `virt` (enabled via `--toolsets virt`)
-
-**Note**: You must build the container image locally before use. See [README.md](README.md) for build instructions.
-
-## Additional Resources
-
-- Complete setup guide: [README.md](README.md)
-- Skill quality template: [SKILL_TEMPLATE.md](SKILL_TEMPLATE.md)
-- Main repository: [../README.md](../README.md)
+1. **Never expose credentials** — do not display kubeconfig contents, SSH keys, cloud-init passwords, or any credential values in output. Only report whether they exist.
+2. **Confirm before destructive operations** — always wait for explicit user approval with data-loss warnings before:
+   - Deleting VMs (`/vm-delete`)
+   - Deleting snapshots (`/vm-snapshot-delete`)
+   - Restoring from snapshots (`/vm-snapshot-restore` — overwrites current VM state)
+3. **Verify prerequisites** — before executing skills, check:
+   - KUBECONFIG is set and cluster is accessible
+   - OpenShift Virtualization operator is installed
+   - Target namespace exists
+   - Required storage classes are available (for VM creation and snapshots)
+4. **VM shutdown for snapshots** — `/vm-snapshot-restore` requires VM to be stopped. Always check VM state and request user confirmation to stop the VM before restoring.
+5. **Validate storage capabilities** — `/vm-snapshot-create` validates that storage class supports snapshots and CSI driver has snapshot capabilities before creating snapshots.
+6. **Read-only operations** — `/vm-inventory` and `/vm-snapshot-list` are read-only and safe to run without user confirmation.
+7. **Resource naming** — follow Kubernetes naming conventions (lowercase alphanumeric + hyphens, max 63 chars) for all VM and snapshot names.
+8. **Namespace scoping** — always ask for or verify the target namespace before operations. VMs and snapshots are namespace-scoped resources.
+9. **Live vs cold migration** — `/vm-rebalance` uses live migration (zero downtime) when possible, falling back to cold migration (brief downtime) when necessary. Always inform the user which migration type will be used.
+10. **Suggest next steps** — after completing a skill, suggest related skills or operations the user might need next.
