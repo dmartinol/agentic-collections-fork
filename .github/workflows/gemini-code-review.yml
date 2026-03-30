@@ -38,6 +38,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           gh api \
             -H "Accept: application/vnd.github.v3.diff" \
             "/repos/${{ github.repository }}/pulls/${{ steps.pr.outputs.number }}" \
@@ -61,6 +62,7 @@ jobs:
       - name: Build review context
         if: steps.diff.outputs.diff_size != '0'
         run: |
+          set -euo pipefail
           {
             echo "=== PROJECT RULES: CLAUDE.md ==="
             cat CLAUDE.md 2>/dev/null || echo "(not found)"
@@ -85,6 +87,7 @@ jobs:
       - name: Build system instruction
         if: steps.diff.outputs.diff_size != '0'
         run: |
+          set -euo pipefail
           cp .github/gemini-review-prompt.md /tmp/system_instruction.txt
 
           if [ "${{ steps.diff.outputs.truncated }}" = "true" ]; then
@@ -103,8 +106,9 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
+          set -euo pipefail
           if [ -z "$GEMINI_API_KEY" ]; then
-            echo "GEMINI_API_KEY not available (expected for fork PRs). Skipping review."
+            echo "::warning::GEMINI_API_KEY not available (expected for fork PRs). Skipping review."
             exit 0
           fi
 
@@ -134,7 +138,7 @@ jobs:
 
           if [ "$HTTP_CODE" -ne 200 ]; then
             echo "::error::Gemini API returned HTTP $HTTP_CODE"
-            cat /tmp/response.json
+            jq '{error: .error, status: .status}' /tmp/response.json
             exit 1
           fi
 
@@ -142,7 +146,7 @@ jobs:
 
           if [ -z "$REVIEW" ]; then
             echo "::error::Gemini returned empty review"
-            jq . /tmp/response.json
+            jq '{promptFeedback: .promptFeedback, finishReason: .candidates[0].finishReason}' /tmp/response.json
             exit 1
           fi
 
@@ -153,6 +157,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           MARKER="<!-- gemini-code-review -->"
 
           {
