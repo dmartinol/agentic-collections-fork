@@ -43,9 +43,9 @@ This skill uses `openshift-administration` MCP server exclusively. This server p
 
 | MCP Server | Used By This Skill? | Purpose | Cluster Types |
 |------------|---------------------|---------|---------------|
-| `openshift-administration` | ✅ YES | Multi-cluster reporting, resource queries | OpenShift, Kubernetes |
-| `openshift-self-managed` | ❌ NO | Cluster creation via Assisted Installer | OCP, SNO |
-| `openshift-ocm-managed` | ❌ NO | Managed service cluster listing | ROSA, ARO, OSD |
+| `openshift-administration` | ✅ YES | Multi-cluster reporting, resource queries via KUBECONFIG | OpenShift, Kubernetes |
+| `openshift-self-managed` | ❌ NO (used by cluster-creator) | Cluster creation via Assisted Installer | OCP, SNO |
+| `openshift-ocm-managed` | ❌ NO (used by cluster-inventory) | Managed service cluster listing | ROSA, ARO, OSD |
 
 **Required MCP Tools** (all from `openshift-administration` server):
 - `configuration_contexts_list` — list all kubeconfig contexts and server URLs
@@ -340,7 +340,7 @@ Would you like to:
 ### Required MCP Servers
 - `openshift-administration` - Multi-cluster administration and reporting ([setup](../../README.md#environment-setup))
 
-**Important**: This skill uses ONLY `openshift-administration` MCP server for querying cluster resources. Do NOT use cluster creation servers (`openshift-self-managed`, `openshift-ocm-managed`).
+**Important**: This skill uses ONLY `openshift-administration` MCP server for querying existing cluster resources via KUBECONFIG. The cluster creation/inventory servers (`openshift-self-managed`, `openshift-ocm-managed`) are not needed for this skill as it operates on already-configured clusters.
 
 ### Required MCP Tools
 - `configuration_contexts_list` (from openshift-administration) — list all kubeconfig contexts and server URLs
