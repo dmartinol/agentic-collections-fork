@@ -15,7 +15,7 @@ description: |
 
   NOT for:
   - Listing existing clusters → Use cluster-inventory skill
-  - Modifying running clusters → Use openshift-administration MCP tools
+  - Modifying running clusters → Out of scope (Day-2 operations require direct cluster access)
   - Cluster upgrades (not yet supported)
 model: inherit
 color: green
@@ -97,7 +97,7 @@ This skill uses `openshift-self-managed` MCP server exclusively. This server con
 
 **Do NOT use when**:
 - Listing/inspecting clusters → Use `cluster-inventory` skill
-- Managing workloads → Use `openshift-administration` MCP tools
+- Managing workloads → Out of scope (use `oc` CLI with credentials from this skill)
 - Troubleshooting → Use `cluster-inventory` skill
 - Upgrading clusters (not supported)
 
