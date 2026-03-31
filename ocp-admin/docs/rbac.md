@@ -1,3 +1,20 @@
+---
+title: Role-Based Access Control (RBAC)
+category: authentication
+sources:
+  - title: Using RBAC to define and apply permissions
+    url: https://docs.openshift.com/container-platform/latest/authentication/using-rbac.html
+    date_accessed: 2026-03-31
+  - title: Managing security context constraints
+    url: https://docs.openshift.com/container-platform/latest/authentication/managing-security-context-constraints.html
+    date_accessed: 2026-03-31
+tags: [rbac, roles, permissions, cluster-roles, role-bindings, scc, security]
+semantic_keywords: [rbac concepts, roles and role bindings, cluster roles, permissions management, security context constraints, namespace access control]
+use_cases: [user-management, access-control, security-configuration]
+related_docs: [idp.md, security-checklist.md, day-2-operations.md]
+last_updated: 2026-03-31
+---
+
 # Role-Based Access Control (RBAC)
 
 General concepts for understanding and managing OpenShift RBAC.

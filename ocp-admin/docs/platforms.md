@@ -1,3 +1,26 @@
+---
+title: OpenShift Platform Types
+category: cluster-management
+sources:
+  - title: Red Hat OpenShift Service on AWS
+    url: https://docs.openshift.com/rosa/welcome/index.html
+    date_accessed: 2026-03-31
+  - title: Azure Red Hat OpenShift
+    url: https://docs.openshift.com/aro/welcome/index.html
+    date_accessed: 2026-03-31
+  - title: OpenShift Dedicated
+    url: https://docs.openshift.com/dedicated/welcome/index.html
+    date_accessed: 2026-03-31
+  - title: Single-Node OpenShift Documentation
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_sno/install-sno-installing-sno.html
+    date_accessed: 2026-03-31
+tags: [platforms, ocp, sno, rosa, aro, osd, managed-services, self-managed]
+semantic_keywords: [platform types, openshift deployment models, sno vs ha, managed vs self-managed, rosa aro osd comparison, platform selection]
+use_cases: [cluster-inventory, platform-selection, architecture-planning]
+related_docs: [providers.md, host-requirements.md, troubleshooting.md]
+last_updated: 2026-03-31
+---
+
 # OpenShift Platform Types
 
 Overview of different OpenShift deployment models and their characteristics.

@@ -1,3 +1,20 @@
+---
+title: Certificate Management
+category: security
+sources:
+  - title: Updating cluster certificates
+    url: https://docs.openshift.com/container-platform/latest/security/certificate_types_descriptions/user-provided-certificates-for-api-server.html
+    date_accessed: 2026-03-31
+  - title: Certificate types and descriptions
+    url: https://docs.openshift.com/container-platform/latest/security/certificate_types_descriptions/index.html
+    date_accessed: 2026-03-31
+tags: [certificates, ssl, tls, certificate-rotation, security, api-server-certs]
+semantic_keywords: [certificate management, certificate expiration, tls certificates, certificate rotation, api server certificates, ingress certificates]
+use_cases: [certificate-monitoring, security-operations, certificate-renewal]
+related_docs: [certificate-rotation.md, security-checklist.md, day-2-operations.md]
+last_updated: 2026-03-31
+---
+
 # Certificate Management
 
 Certificate lifecycle management in OpenShift clusters.

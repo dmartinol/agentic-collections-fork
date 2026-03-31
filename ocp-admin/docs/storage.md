@@ -1,3 +1,23 @@
+---
+title: OpenShift Storage Configuration
+category: storage
+sources:
+  - title: Understanding persistent storage
+    url: https://docs.openshift.com/container-platform/latest/storage/understanding-persistent-storage.html
+    date_accessed: 2026-03-31
+  - title: Dynamic provisioning
+    url: https://docs.openshift.com/container-platform/latest/storage/dynamic-provisioning.html
+    date_accessed: 2026-03-31
+  - title: OpenShift Data Foundation
+    url: https://docs.openshift.com/container-platform/latest/storage/container_storage_interface/persistent-storage-csi-ebs.html
+    date_accessed: 2026-03-31
+tags: [storage, persistent-storage, csi, storage-classes, pv, pvc, odf]
+semantic_keywords: [storage configuration, persistent volumes, storage classes, csi drivers, storage backends, dynamic provisioning, nfs storage, local storage]
+use_cases: [cluster-configuration, storage-planning, application-deployment]
+related_docs: [providers.md, host-requirements.md, day-2-operations.md]
+last_updated: 2026-03-31
+---
+
 # OpenShift Storage Configuration
 
 Comprehensive guide to storage options and configuration for OpenShift clusters.

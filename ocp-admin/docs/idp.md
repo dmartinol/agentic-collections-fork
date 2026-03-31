@@ -1,3 +1,20 @@
+---
+title: Identity Providers (IDP)
+category: authentication
+sources:
+  - title: Understanding identity provider configuration
+    url: https://docs.openshift.com/container-platform/latest/authentication/understanding-identity-provider.html
+    date_accessed: 2026-03-31
+  - title: Configuring LDAP identity provider
+    url: https://docs.openshift.com/container-platform/latest/authentication/identity_providers/configuring-ldap-identity-provider.html
+    date_accessed: 2026-03-31
+tags: [idp, authentication, ldap, oauth, htpasswd, sso, identity-management]
+semantic_keywords: [identity providers, user authentication, ldap configuration, oauth setup, htpasswd, openid connect, sso integration]
+use_cases: [cluster-configuration, user-management, authentication-setup]
+related_docs: [rbac.md, security-checklist.md, day-2-operations.md]
+last_updated: 2026-03-31
+---
+
 # Identity Providers (IDP)
 
 Configuration of identity providers for user authentication in OpenShift.

@@ -1,3 +1,20 @@
+---
+title: Day-2 Operations
+category: operations
+sources:
+  - title: Post-installation configuration
+    url: https://docs.openshift.com/container-platform/latest/post_installation_configuration/index.html
+    date_accessed: 2026-03-31
+  - title: Monitoring overview
+    url: https://docs.openshift.com/container-platform/latest/monitoring/monitoring-overview.html
+    date_accessed: 2026-03-31
+tags: [day-2-operations, monitoring, logging, upgrades, scaling, maintenance]
+semantic_keywords: [post-installation operations, cluster monitoring, cluster upgrades, node scaling, cluster maintenance, logging configuration]
+use_cases: [cluster-maintenance, operational-tasks, monitoring-setup]
+related_docs: [backup-restore.md, certificate-management.md, troubleshooting.md]
+last_updated: 2026-03-31
+---
+
 # Day-2 Operations
 
 Post-installation operations and cluster maintenance for OpenShift.

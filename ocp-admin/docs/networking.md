@@ -1,3 +1,23 @@
+---
+title: OpenShift Networking Configuration
+category: networking
+sources:
+  - title: Understanding networking
+    url: https://docs.openshift.com/container-platform/latest/networking/understanding-networking.html
+    date_accessed: 2026-03-31
+  - title: Configuring ingress cluster traffic
+    url: https://docs.openshift.com/container-platform/latest/networking/configuring_ingress_cluster_traffic/index.html
+    date_accessed: 2026-03-31
+  - title: Network configuration with nmstate
+    url: https://docs.openshift.com/container-platform/latest/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html
+    date_accessed: 2026-03-31
+tags: [networking, cidr, vip, static-ip, dhcp, cni, ovn-kubernetes, nmstate]
+semantic_keywords: [network configuration, cluster network, service network, machine network, api vip, ingress vip, static ip configuration, dhcp networking, nmstate yaml, network cidr planning]
+use_cases: [cluster-creator, network-planning, multi-cluster-networking]
+related_docs: [static-networking-guide.md, input-validation-guide.md, troubleshooting.md]
+last_updated: 2026-03-31
+---
+
 # OpenShift Networking Configuration
 
 Comprehensive guide to networking configuration for OpenShift clusters.

@@ -1,3 +1,20 @@
+---
+title: Input Validation Guide
+category: cluster-management
+sources:
+  - title: Installing on bare metal with the Assisted Installer
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_with_agent_based_installer/preparing-to-install-with-agent-based-installer.html
+    date_accessed: 2026-03-31
+  - title: DNS requirements
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_bare_metal/installing-bare-metal.html#installation-dns-user-infra_installing-bare-metal
+    date_accessed: 2026-03-31
+tags: [validation, input-validation, parameters, cluster-configuration, validation-rules]
+semantic_keywords: [input validation, parameter requirements, validation rules, cluster name validation, domain validation, network validation]
+use_cases: [cluster-creator, parameter-validation, configuration-verification]
+related_docs: [networking.md, examples.md, troubleshooting.md]
+last_updated: 2026-03-31
+---
+
 # Input Validation Guide
 
 Validation requirements for cluster configuration parameters before OpenShift installation.

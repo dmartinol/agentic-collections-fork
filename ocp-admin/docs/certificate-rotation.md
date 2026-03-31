@@ -1,3 +1,20 @@
+---
+title: Certificate Rotation
+category: security
+sources:
+  - title: Updating cluster certificates
+    url: https://docs.openshift.com/container-platform/latest/security/certificate_types_descriptions/user-provided-certificates-for-api-server.html
+    date_accessed: 2026-03-31
+  - title: Certificate types and descriptions
+    url: https://docs.openshift.com/container-platform/latest/security/certificate_types_descriptions/index.html
+    date_accessed: 2026-03-31
+tags: [certificate-rotation, certificates, security, tls, certificate-renewal]
+semantic_keywords: [certificate rotation procedures, automatic rotation, manual rotation, certificate renewal, system certificates, user certificates]
+use_cases: [certificate-renewal, security-maintenance, certificate-lifecycle]
+related_docs: [certificate-management.md, security-checklist.md, day-2-operations.md]
+last_updated: 2026-03-31
+---
+
 # Certificate Rotation
 
 Certificate management and rotation procedures for OpenShift clusters.

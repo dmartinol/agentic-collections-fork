@@ -1,3 +1,20 @@
+---
+title: Cluster Configuration Examples
+category: cluster-management
+sources:
+  - title: Installing on bare metal with the Assisted Installer
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_with_agent_based_installer/preparing-to-install-with-agent-based-installer.html
+    date_accessed: 2026-03-31
+  - title: Installing a single-node OpenShift cluster
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_sno/install-sno-installing-sno.html
+    date_accessed: 2026-03-31
+tags: [examples, cluster-configurations, use-cases, reference-architectures]
+semantic_keywords: [cluster configuration examples, real-world configurations, sno examples, ha cluster examples, deployment scenarios]
+use_cases: [cluster-creator, configuration-reference, architecture-planning]
+related_docs: [platforms.md, providers.md, networking.md, host-requirements.md]
+last_updated: 2026-03-31
+---
+
 # Cluster Configuration Examples
 
 Real-world examples of valid OpenShift cluster configurations for different use cases.

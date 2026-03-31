@@ -1,3 +1,20 @@
+---
+title: Backup and Restore
+category: operations
+sources:
+  - title: Backing up etcd data
+    url: https://docs.openshift.com/container-platform/latest/backup_and_restore/control_plane_backup_and_restore/backing-up-etcd.html
+    date_accessed: 2026-03-31
+  - title: Disaster recovery
+    url: https://docs.openshift.com/container-platform/latest/backup_and_restore/control_plane_backup_and_restore/disaster_recovery/about-disaster-recovery.html
+    date_accessed: 2026-03-31
+tags: [backup, restore, etcd, disaster-recovery, cluster-recovery]
+semantic_keywords: [etcd backup, disaster recovery, cluster restore, backup procedures, recovery procedures, control plane backup]
+use_cases: [disaster-recovery, backup-planning, cluster-restoration]
+related_docs: [day-2-operations.md, troubleshooting.md]
+last_updated: 2026-03-31
+---
+
 # Backup and Restore
 
 etcd backup and restore procedures for OpenShift disaster recovery.

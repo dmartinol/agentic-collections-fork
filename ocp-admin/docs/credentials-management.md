@@ -1,3 +1,20 @@
+---
+title: Cluster Credentials Management
+category: authentication
+sources:
+  - title: Assisted Installer for OpenShift Container Platform
+    url: https://console.redhat.com/openshift/assisted-installer/clusters
+    date_accessed: 2026-03-31
+  - title: Understanding authentication
+    url: https://docs.openshift.com/container-platform/latest/authentication/understanding-authentication.html
+    date_accessed: 2026-03-31
+tags: [credentials, kubeconfig, kubeadmin, authentication, cluster-access]
+semantic_keywords: [credentials management, kubeconfig download, kubeadmin password, credential storage, multi-cluster authentication, secure credentials]
+use_cases: [cluster-access, credentials-download, multi-cluster-management]
+related_docs: [multi-cluster-auth.md, security-checklist.md, troubleshooting.md]
+last_updated: 2026-03-31
+---
+
 # Cluster Credentials Management
 
 Guide for downloading, managing, and using OpenShift cluster credentials with MCP tools.

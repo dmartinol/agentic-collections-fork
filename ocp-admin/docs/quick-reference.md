@@ -1,3 +1,20 @@
+---
+title: Quick Reference
+category: references
+sources:
+  - title: OpenShift CLI tools
+    url: https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/getting-started-cli.html
+    date_accessed: 2026-03-31
+  - title: Administrator CLI commands
+    url: https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/administrator-cli-commands.html
+    date_accessed: 2026-03-31
+tags: [quick-reference, commands, cli, operations, troubleshooting]
+semantic_keywords: [common commands, cluster operations, oc commands, kubectl commands, quick reference, command cheatsheet]
+use_cases: [cluster-operations, troubleshooting, daily-operations]
+related_docs: [credentials-management.md, troubleshooting.md, day-2-operations.md]
+last_updated: 2026-03-31
+---
+
 # Quick Reference
 
 Common commands and operations for OpenShift cluster management.

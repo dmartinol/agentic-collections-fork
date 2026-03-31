@@ -1,3 +1,20 @@
+---
+title: OpenShift Host Requirements
+category: cluster-management
+sources:
+  - title: Minimum hardware requirements
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_bare_metal/installing-bare-metal.html#minimum-resource-requirements_installing-bare-metal
+    date_accessed: 2026-03-31
+  - title: Installing a single-node OpenShift cluster
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_sno/install-sno-installing-sno.html
+    date_accessed: 2026-03-31
+tags: [host-requirements, hardware, cpu, memory, storage, network, sno, ha-cluster]
+semantic_keywords: [hardware requirements, cpu memory storage, sno requirements, control plane sizing, worker node sizing, bare metal vs vm, resource planning]
+use_cases: [cluster-creator, hardware-planning, capacity-planning]
+related_docs: [platforms.md, providers.md, storage.md, troubleshooting.md]
+last_updated: 2026-03-31
+---
+
 # Host Requirements
 
 Hardware and system requirements for OpenShift cluster nodes.

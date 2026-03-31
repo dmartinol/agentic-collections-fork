@@ -1,3 +1,17 @@
+---
+title: Documentation Index
+category: references
+sources:
+  - title: OpenShift Container Platform Documentation
+    url: https://docs.openshift.com/container-platform/latest/welcome/index.html
+    date_accessed: 2026-03-31
+tags: [index, navigation, documentation, reference]
+semantic_keywords: [documentation index, doc navigation, reference guide, topic index, ai discovery guide]
+use_cases: [documentation-navigation, topic-discovery, reference-lookup]
+related_docs: []
+last_updated: 2026-03-31
+---
+
 # Documentation Index
 
 Complete reference guide for OpenShift cluster deployment and management using the Assisted Installer.

@@ -1,3 +1,20 @@
+---
+title: Static Network Configuration Guide for OpenShift Assisted Installer
+category: networking
+sources:
+  - title: Network configuration with nmstate
+    url: https://docs.openshift.com/container-platform/latest/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html
+    date_accessed: 2026-03-31
+  - title: Configuring host network interfaces
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_bare_metal_ipi/ipi-install-configuration-files.html
+    date_accessed: 2026-03-31
+tags: [static-networking, nmstate, network-configuration, vlan, bonding, static-ip]
+semantic_keywords: [static ip configuration, nmstate yaml, network bonding, vlan configuration, no dhcp networking, static network setup, network interface configuration]
+use_cases: [cluster-creator, static-network-setup, advanced-networking]
+related_docs: [networking.md, input-validation-guide.md, troubleshooting.md]
+last_updated: 2026-03-31
+---
+
 # Static Network Configuration Guide for OpenShift Assisted Installer
 
 ## Overview

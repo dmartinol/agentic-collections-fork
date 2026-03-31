@@ -1,3 +1,23 @@
+---
+title: Infrastructure Providers
+category: cluster-management
+sources:
+  - title: Installing on bare metal with the Assisted Installer
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_with_agent_based_installer/preparing-to-install-with-agent-based-installer.html
+    date_accessed: 2026-03-31
+  - title: Installing on vSphere
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_vsphere/ipi/ipi-vsphere-installation-reqs.html
+    date_accessed: 2026-03-31
+  - title: Installing on Nutanix
+    url: https://docs.openshift.com/container-platform/latest/installing/installing_nutanix/preparing-to-install-on-nutanix.html
+    date_accessed: 2026-03-31
+tags: [providers, infrastructure, baremetal, vsphere, nutanix, oci, cloud, platform-values]
+semantic_keywords: [infrastructure providers, platform values, baremetal vs cloud, vsphere requirements, nutanix deployment, oci integration]
+use_cases: [cluster-creator, infrastructure-selection, platform-configuration]
+related_docs: [platforms.md, host-requirements.md, networking.md]
+last_updated: 2026-03-31
+---
+
 # Infrastructure Providers
 
 Supported infrastructure providers for OpenShift cluster deployment and their specific requirements.

@@ -1,3 +1,20 @@
+---
+title: OpenShift Security Checklist
+category: security
+sources:
+  - title: Managing security context constraints
+    url: https://docs.openshift.com/container-platform/latest/authentication/managing-security-context-constraints.html
+    date_accessed: 2026-03-31
+  - title: Updating cluster certificates
+    url: https://docs.openshift.com/container-platform/latest/security/certificate_types_descriptions/user-provided-certificates-for-api-server.html
+    date_accessed: 2026-03-31
+tags: [security, security-checklist, credentials, network-security, rbac, certificates]
+semantic_keywords: [security verification, security checklist, cluster hardening, credentials management, network security, certificate security, rbac security]
+use_cases: [cluster-validation, security-audit, compliance-verification]
+related_docs: [rbac.md, idp.md, certificate-management.md, credentials-management.md]
+last_updated: 2026-03-31
+---
+
 # OpenShift Security Checklist
 
 Comprehensive security verification checklist for OpenShift clusters.
