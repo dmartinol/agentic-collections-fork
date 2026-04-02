@@ -13,6 +13,7 @@ from typing import Any, Dict
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
+from collection_markdown_includes import apply_markdown_includes
 from generation_notice import markdown_generation_banner
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -37,6 +38,7 @@ def discover_collections() -> list[tuple[str, Dict[str, Any]]]:
             continue
         data = load_collection(item.name)
         if data:
+            data = apply_markdown_includes(item.name, data, repo_root=REPO_ROOT)
             result.append((item.name, data))
     return result
 

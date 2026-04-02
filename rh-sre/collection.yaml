@@ -11,12 +11,10 @@ marketplaces:
 - Claude Code
 - Cursor
 support_level: Unknown
-description: Site reliability engineering tools and automation for managing Red Hat
-  platforms and infrastructure.
+description: Site reliability engineering tools and automation for managing Red Hat platforms and infrastructure.
 summary: The rh-sre collection provides skills for site reliability tasks.
 contents:
-  description: The pack provides 13 skills for common SRE operations, including one
-    orchestration skill for end-to-end remediation.
+  description: The pack provides 13 skills for common SRE operations, including one orchestration skill for end-to-end remediation.
   skills:
   - name: fleet-inventory
     description: System Discovery and Fleet Management
@@ -240,69 +238,10 @@ contents:
       - Cross-environment patching (dev → staging → prod)
       - Automated job tracking and reporting
       - Partial failure handling
-deploy_and_use: |
-  ### Prerequisites
-
-  - Claude Code CLI or IDE extension
-  - Podman or Docker installed
-  - Red Hat Lightspeed service account ([setup guide](https://console.redhat.com/))
-
-  ### Environment Setup
-
-  Configure Red Hat Lightspeed credentials:
-
-  ```bash
-  export LIGHTSPEED_CLIENT_ID="your-service-account-client-id"
-  export LIGHTSPEED_CLIENT_SECRET="your-service-account-client-secret"
-  ```
-
-  ### Installation (Claude Code)
-
-  Install the collection as a Claude Code plugin:
-
-  ```bash
-  claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-  claude plugin install rh-sre
-  ```
-
-  Or for local development:
-
-  ```bash
-  claude plugin marketplace add /path/to/agentic-collections
-  claude plugin install rh-sre
-  ```
-
-  ### Installation (Cursor)
-
-  Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-sre ~/.cursor/plugins/rh-sre
-  ```
-
-  Or download and extract:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/rh-sre ~/.cursor/plugins/rh-sre
-  ```
-
-  ### Installation (Open Code)
-
-  Open Code does not support direct marketplace install via CLI. Clone or download the repository:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-sre ~/.opencode/plugins/rh-sre
-  ```
-
-  Or with wget:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/rh-sre ~/.opencode/plugins/rh-sre
-  ```
+deploy_and_use_file: .catalog/deploy_and_use.md
+documentation_section_file: .catalog/documentation.md
+mcp_section_file: .catalog/mcp.md
+security_model_file: .catalog/security.md
 sample_workflows:
 - name: Fleet Discovery → CVE Analysis → Remediation
   workflow: |
@@ -347,72 +286,44 @@ sample_workflows:
       3. Offers dry-run first (check mode)
       4. Proceeds to actual execution after approval
       5. Monitors job status and reports results
-documentation_section: |
-  ### Why use this collection instead of calling MCP tools directly?
-
-  - **Reliability** — Skills apply validation gates (CVE IDs, inventory, AAP connectivity) before expensive operations.
-  - **Safety** — Human-in-the-loop for remediation plans, playbook execution, and broad job launches.
-  - **Consistency** — Documented workflows, error handling, and follow-up skills (for example `/remediation` vs ad hoc tool calls).
-  - **Troubleshooting** — Skills bundle recovery paths; use `/mcp-lightspeed-validator` and `/mcp-aap-validator` when prerequisites fail.
-
-  ### In-repository documentation
-
-  This pack ships an AI-oriented knowledge base under **`docs/`**. Start at **[docs/INDEX.md](docs/INDEX.md)** and use **`docs/.ai-index/`** (semantic index, task mapping) for token-efficient discovery.
-
-  ### Configuration and architecture
-
-  - Environment variables for Lightspeed and AAP are declared only as `${VAR}` placeholders in **`.mcp.json`**.
-  - Orchestration (**`/remediation`**) chains impact, validation, context, playbook generation, execution, and verification; see pack **CLAUDE.md** for routing when you need a single step only.
-mcp_section: |
-  | Server | Role |
-  |--------|------|
-  | **lightspeed-mcp** | CVEs, inventory, remediation inputs, playbook-related Lightspeed workflows. |
-  | **aap-mcp-job-management** | Job templates, projects, launches, execution status. |
-  | **aap-mcp-inventory-management** | Inventories and hosts for execution planning. |
-
-  Configure servers through **`.mcp.json`**; skills must be invoked instead of calling MCP tools directly from the agent.
-security_model: |
-  - Do **not** expose `LIGHTSPEED_CLIENT_ID`, `LIGHTSPEED_CLIENT_SECRET`, AAP tokens, or any API credentials in chat—only whether they appear configured.
-  - Require explicit user approval before running remediation playbooks or destructive changes at scale.
-  - Prefer **`/remediation`** for end-to-end CVE response so validation and verification steps are not skipped accidentally.
 resources:
-  - title: Red Hat Lightspeed
-    url: https://console.redhat.com/insights
-    description: Red Hat Insights and Lightspeed console for fleet and vulnerability management.
-  - title: Red Hat Lightspeed Remediations Guide
-    url: https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/red_hat_lightspeed_remediations_guide/index
-    description: Creating remediation plans, playbook generation.
-    embedded_doc: docs/ansible/cve-remediation-templates.md
-  - title: Red Hat Lightspeed MCP
-    url: https://github.com/RedHatInsights/insights-mcp
-    description: MCP server used by this collection; parameter reference.
-    embedded_doc: docs/references/lightspeed-mcp-parameters.md
-  - title: Assessing and Monitoring Security Vulnerabilities on RHEL Systems
-    url: https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview
-    description: CVE identification, classification, threat intelligence.
-    embedded_doc: docs/insights/vulnerability-logic.md
-  - title: Managing Software with the DNF Tool (RHEL 9)
-    url: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/managing_software_with_the_dnf_tool/index
-    description: DNF commands, updating packages, repository management.
-    embedded_doc: docs/rhel/package-management.md
-  - title: Severity Ratings (Red Hat Customer Portal)
-    url: https://access.redhat.com/security/updates/classification
-    description: Red Hat severity ratings, CVSS usage.
-    embedded_doc: docs/references/cvss-scoring.md
-  - title: Red Hat Ansible Automation Platform Documentation
-    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6
-    description: AAP 2.6 docs; projects, job templates, playbook integration.
-    embedded_doc: docs/ansible/playbook-integration-aap.md
-  - title: AAP Job Execution
-    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/using_automation_execution/controller-job-templates
-    description: Job templates, check mode, dry-run execution.
-    embedded_doc: docs/ansible/aap-job-execution.md
-  - title: Ansible Automation Platform
-    url: https://www.redhat.com/en/technologies/management/ansible
-    description: AAP product overview for playbook execution.
-  - title: AAP REST API Documentation
-    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/
-    description: AAP API reference for job and inventory management.
+- title: Red Hat Lightspeed
+  url: https://console.redhat.com/insights
+  description: Red Hat Insights and Lightspeed console for fleet and vulnerability management.
+- title: Red Hat Lightspeed Remediations Guide
+  url: https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/red_hat_lightspeed_remediations_guide/index
+  description: Creating remediation plans, playbook generation.
+  embedded_doc: docs/ansible/cve-remediation-templates.md
+- title: Red Hat Lightspeed MCP
+  url: https://github.com/RedHatInsights/insights-mcp
+  description: MCP server used by this collection; parameter reference.
+  embedded_doc: docs/references/lightspeed-mcp-parameters.md
+- title: Assessing and Monitoring Security Vulnerabilities on RHEL Systems
+  url: https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview
+  description: CVE identification, classification, threat intelligence.
+  embedded_doc: docs/insights/vulnerability-logic.md
+- title: Managing Software with the DNF Tool (RHEL 9)
+  url: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/managing_software_with_the_dnf_tool/index
+  description: DNF commands, updating packages, repository management.
+  embedded_doc: docs/rhel/package-management.md
+- title: Severity Ratings (Red Hat Customer Portal)
+  url: https://access.redhat.com/security/updates/classification
+  description: Red Hat severity ratings, CVSS usage.
+  embedded_doc: docs/references/cvss-scoring.md
+- title: Red Hat Ansible Automation Platform Documentation
+  url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6
+  description: AAP 2.6 docs; projects, job templates, playbook integration.
+  embedded_doc: docs/ansible/playbook-integration-aap.md
+- title: AAP Job Execution
+  url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/using_automation_execution/controller-job-templates
+  description: Job templates, check mode, dry-run execution.
+  embedded_doc: docs/ansible/aap-job-execution.md
+- title: Ansible Automation Platform
+  url: https://www.redhat.com/en/technologies/management/ansible
+  description: AAP product overview for playbook execution.
+- title: AAP REST API Documentation
+  url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/
+  description: AAP API reference for job and inventory management.
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy

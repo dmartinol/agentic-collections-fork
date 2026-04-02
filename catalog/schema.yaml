@@ -49,9 +49,19 @@ contents:
       skill_to_use: string  # Skill name to invoke
       reason: string        # Why this skill fits the request
 
-# Required: Deploy and use instructions (markdown)
+# Required: Deploy and use instructions (markdown), unless using deploy_and_use_file
 # Include prerequisites, env setup, install per agent (Claude Code, Cursor, Open Code)
 deploy_and_use: string  # multiline markdown
+# Optional: Pack-relative path under .catalog/ (e.g. .catalog/deploy_and_use.md); merged to deploy_and_use at generate time
+# deploy_and_use_file: string
+
+# Optional: Extra README sections (inline markdown or *_file under .catalog/)
+# documentation_section: string
+# documentation_section_file: string
+# mcp_section: string
+# mcp_section_file: string
+# security_model: string
+# security_model_file: string
 
 # Required: Sample workflows
 sample_workflows:

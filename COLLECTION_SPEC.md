@@ -20,6 +20,20 @@ Each pack has a `collection.yaml` at its root (e.g. `rh-sre/collection.yaml`). I
 - `.claude-plugin/marketplace.json` / `.cursor-plugin/marketplace.json` — Marketplace listings
 - `docs/collections/<id>.html` — Collection detail pages
 
+### Optional: long-form markdown in `.catalog/`
+
+For Markdown preview in the IDE, long prose may live under **`<pack>/.catalog/`** and be referenced from `collection.yaml` with **paths relative to the pack root** (so consumers do not need to assume a hidden folder name):
+
+| YAML key | Resolves to | Example value |
+|----------|-------------|-----------------|
+| `deploy_and_use_file` | `deploy_and_use` | `.catalog/deploy_and_use.md` |
+| `documentation_section_file` | `documentation_section` | `.catalog/documentation.md` |
+| `mcp_section_file` | `mcp_section` | `.catalog/mcp.md` |
+| `security_model_file` | `security_model` | `.catalog/security.md` |
+
+**Rule:** each `*_file` value must start with `.catalog/` and resolve to a file under that pack (no `..`). Set either a non-empty `deploy_and_use` string **or** `deploy_and_use_file` pointing at a non-empty file.  
+**Generation:** `make generate-catalog`, `collection.json`, and docs collection pages merge file contents into the same fields as fully inline YAML; published output uses pack-root-relative paths. In fragments, prefer `](../docs/...` in links; the generator rewrites them to `](docs/...` for the README and JSON.
+
 ## Schema
 
 Full schema: [catalog/schema.yaml](catalog/schema.yaml)

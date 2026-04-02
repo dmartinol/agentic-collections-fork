@@ -90,7 +90,6 @@ wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/
 cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
 ```
 
-
 ## Skills
 
 The pack provides 3 skills for OpenShift cluster lifecycle, inventory, and fleet health.
@@ -180,7 +179,6 @@ For consolidated **cluster-report** across many contexts, set up kubeconfig and 
 - Point `KUBECONFIG` at a merged kubeconfig when reporting across fleets; verify with `oc config get-contexts`.
 
 
-
 ## MCP Server Integrations
 
 Skills wrap MCP servers defined in **`.mcp.json`** (copy entries into Claude Code `/mcp` or your settings file). Typical layout:
@@ -190,7 +188,6 @@ Skills wrap MCP servers defined in **`.mcp.json`** (copy entries into Claude Cod
 - **openshift-administration** — Kubernetes/OpenShift access for **cluster-report** (node and workload metrics). Requires `KUBECONFIG`.
 
 Images and commands reference `ocp-admin/.mcp.json`; use Podman or Docker as documented there.
-
 
 ## Sample Workflows
 
@@ -228,7 +225,6 @@ User: "Show me a report across all clusters"
 - **Secrets:** Never print `OFFLINE_TOKEN`, kubeconfig contents, pull secrets, or install keys. Confirm only that required environment variables are set.
 - **Human approval:** **cluster-creator** waits for explicit confirmation before VIP assignment, host roles, static networking, and install triggers.
 - **Read vs write:** **cluster-inventory** is discovery-focused; **cluster-report** should use least-privilege kubeconfig where possible.
-
 
 ## License
 

@@ -11,76 +11,20 @@ marketplaces:
 - Claude Code
 - Cursor
 support_level: Unknown
-description: Technical support and troubleshooting tools for Red Hat products and
-  platforms.
+description: Technical support and troubleshooting tools for Red Hat products and platforms.
 summary: The rh-support-engineer collection provides skills for development tasks.
 contents:
   description: The pack will provide skills for technical support and troubleshooting (skills in development).
   skills: []
-deploy_and_use: |
-  ### Prerequisites
-
-  - Claude Code CLI or IDE extension
-
-  ### Environment Setup
-
-  Environment variables depend on which skills you use. Configure as needed for the Red Hat products and platforms you are troubleshooting.
-
-  ### Installation (Claude Code)
-
-  Install the collection as a Claude Code plugin:
-
-  ```bash
-  claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-  claude plugin install rh-support-engineer
-  ```
-
-  Or for local development:
-
-  ```bash
-  claude plugin marketplace add /path/to/agentic-collections
-  claude plugin install rh-support-engineer
-  ```
-
-  ### Installation (Cursor)
-
-  Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-support-engineer ~/.cursor/plugins/rh-support-engineer
-  ```
-
-  Or download and extract:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/rh-support-engineer ~/.cursor/plugins/rh-support-engineer
-  ```
-
-  ### Installation (Open Code)
-
-  Open Code does not support direct marketplace install via CLI. Clone or download the repository:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-support-engineer ~/.opencode/plugins/rh-support-engineer
-  ```
-
-  Or with wget:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/rh-support-engineer ~/.opencode/plugins/rh-support-engineer
-  ```
+deploy_and_use_file: .catalog/deploy_and_use.md
 sample_workflows: []
 resources:
-  - title: Red Hat Customer Portal
-    url: https://access.redhat.com/
-    description: Knowledge base, support cases, and product documentation.
-  - title: Red Hat Product Documentation
-    url: https://docs.redhat.com/
-    description: Official Red Hat product documentation hub.
+- title: Red Hat Customer Portal
+  url: https://access.redhat.com/
+  description: Knowledge base, support cases, and product documentation.
+- title: Red Hat Product Documentation
+  url: https://docs.redhat.com/
+  description: Official Red Hat product documentation hub.
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy

@@ -80,7 +80,6 @@ wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/
 cp -r agentic-collections-main/rh-sre ~/.opencode/plugins/rh-sre
 ```
 
-
 ## Skills
 
 The pack provides 13 skills for common SRE operations, including one orchestration skill for end-to-end remediation.
@@ -354,7 +353,6 @@ This pack ships an AI-oriented knowledge base under **`docs/`**. Start at **[doc
 - Orchestration (**`/remediation`**) chains impact, validation, context, playbook generation, execution, and verification; see pack **CLAUDE.md** for routing when you need a single step only.
 
 
-
 ## MCP Server Integrations
 
 | Server | Role |
@@ -364,7 +362,6 @@ This pack ships an AI-oriented knowledge base under **`docs/`**. Start at **[doc
 | **aap-mcp-inventory-management** | Inventories and hosts for execution planning. |
 
 Configure servers through **`.mcp.json`**; skills must be invoked instead of calling MCP tools directly from the agent.
-
 
 ## Sample Workflows
 
@@ -433,7 +430,6 @@ User: "Execute the CVE remediation playbook"
 - Do **not** expose `LIGHTSPEED_CLIENT_ID`, `LIGHTSPEED_CLIENT_SECRET`, AAP tokens, or any API credentials in chat—only whether they appear configured.
 - Require explicit user approval before running remediation playbooks or destructive changes at scale.
 - Prefer **`/remediation`** for end-to-end CVE response so validation and verification steps are not skipped accidentally.
-
 
 ## License
 

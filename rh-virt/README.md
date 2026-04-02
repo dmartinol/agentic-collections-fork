@@ -119,7 +119,6 @@ wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/
 cp -r agentic-collections-main/rh-virt ~/.opencode/plugins/openshift-virtualization
 ```
 
-
 ## Skills
 
 The pack provides 10 skills for virtual machine management on OpenShift Virtualization.
@@ -313,14 +312,12 @@ Restore virtual machines from existing snapshots.
 - Namespace-scoped resources: always confirm namespace and VM name before delete, restore, or rebalance.
 
 
-
 ## MCP Server Integrations
 
 The pack uses **openshift-virtualization** (OpenShift MCP server) as defined in **`.mcp.json`**. The server talks to the cluster Kubernetes API using your kubeconfig.
 
 - Requires OpenShift **4.19+** with OpenShift Virtualization installed.
 - Build the MCP image from [openshift/openshift-mcp-server](https://github.com/openshift/openshift-mcp-server) if you do not use a pre-built image (see Quick Start).
-
 
 ## Sample Workflows
 
@@ -403,7 +400,6 @@ User: "Skills fail with API errors when I manage VMs"
 - Never share kubeconfig contents, cloud-init passwords, or SSH keys in chat.
 - Destructive operations (**vm-delete**, **vm-snapshot-delete**, **vm-snapshot-restore**) require explicit user confirmation.
 - **vm-snapshot-restore** typically requires the VM to be stopped first; the skill workflow enforces checks—do not bypass them.
-
 
 ## License
 

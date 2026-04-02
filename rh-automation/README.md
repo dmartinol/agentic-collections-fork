@@ -73,7 +73,6 @@ git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation
 ```
 
-
 ## Skills
 
 The pack provides 11 skills for AAP governance, execution safety, and forensic troubleshooting, including 3 orchestration skills.
@@ -304,7 +303,6 @@ Entry: **`forensic-troubleshooter`** → events, host facts, doc-backed resoluti
 | `resolution-advisor`, `execution-summary` | Advisory / reporting (consult docs) |
 
 
-
 ## MCP Server Integrations
 
 Six HTTP MCP servers (see **`rh-automation/.mcp.json`** and [AAP MCP Server](https://github.com/ansible/aap-mcp-server)):
@@ -319,7 +317,6 @@ Six HTTP MCP servers (see **`rh-automation/.mcp.json`** and [AAP MCP Server](htt
 | **aap-mcp-user-management** | Users, teams, organizations, RBAC |
 
 Full governance audits require reachability across **all six**; execution paths may use a subset. Set **`AAP_MCP_SERVER`** and **`AAP_API_TOKEN`** as documented under Quick Start.
-
 
 ## Sample Workflows
 
@@ -361,7 +358,6 @@ User: "Job 12345 failed - help me troubleshoot"
 - Never print **`AAP_API_TOKEN`** or raw Bearer material.
 - Production job launches require explicit approval paths in **`governed-job-launcher`** / **`governance-executor`**.
 - Treat extra_vars and inventory names as sensitive; skills scan for secrets before execution.
-
 
 ## License
 

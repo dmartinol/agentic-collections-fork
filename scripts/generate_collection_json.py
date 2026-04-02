@@ -2,6 +2,8 @@
 """
 Emit collection.json for each pack: JSON mirror of collection.yaml plus generation metadata.
 
+Resolves optional `{pack}/.catalog/*.md` includes per collection.yaml *_file paths (same as README).
+
 Output: {pack}/collection.json
 """
 
@@ -11,6 +13,7 @@ from typing import Any, Dict
 
 import yaml
 
+from collection_markdown_includes import apply_markdown_includes
 from generation_notice import (
     attach_json_generation_metadata,
     collection_yaml_source,
@@ -38,6 +41,7 @@ def discover_collections() -> list[tuple[str, Dict[str, Any]]]:
             continue
         data = load_collection(item.name)
         if data:
+            data = apply_markdown_includes(item.name, data, repo_root=REPO_ROOT)
             result.append((item.name, data))
     return result
 

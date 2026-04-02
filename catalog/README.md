@@ -34,6 +34,7 @@ Scripts that consume these files:
 - `scripts/generate_plugins.py` — Produces plugin.json per pack
 - `scripts/generate_collection_json.py` — Produces `collection.json` per pack (JSON mirror + `_generated` metadata)
 - `scripts/generate_readme.py` — Renders README_TEMPLATE.md.j2 per pack (HTML comment banner)
+- `scripts/collection_markdown_includes.py` — Merges optional `<pack>/.catalog/*.md` referenced by `collection.yaml` `*_file` keys (e.g. `.catalog/mcp.md`)
 - `scripts/build_website.py` — Produces docs/data.json and docs/collections/*.html
 
 ## Full Specification

@@ -19,6 +19,8 @@ from typing import List, Set, Tuple
 
 import yaml
 
+from collection_markdown_includes import deploy_and_use_satisfied, validate_markdown_include_refs
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # List of agentic collections to validate (order matches Makefile verify-generated)
@@ -91,10 +93,19 @@ def validate_collection_yaml(pack_dir: str) -> List[str]:
         return errors
 
     for field in REQUIRED_COLLECTION_TOP:
+        if field == "deploy_and_use":
+            if not deploy_and_use_satisfied(pack_dir, data):
+                errors.append(
+                    f"{pack_dir}: collection.yaml must set non-empty deploy_and_use "
+                    f"or a valid deploy_and_use_file (e.g. .catalog/deploy_and_use.md)"
+                )
+            continue
         if field not in data:
             errors.append(f"{pack_dir}: collection.yaml missing required field '{field}'")
         elif data[field] is None:
             errors.append(f"{pack_dir}: collection.yaml field '{field}' must not be empty")
+
+    errors.extend(validate_markdown_include_refs(pack_dir, data))
 
     contents = data.get("contents")
     if contents is not None:

@@ -14,8 +14,8 @@ support_level: Unknown
 description: Plugins for building and deploying applications on Red Hat platforms.
 summary: The rh-developer collection provides skills for development tasks.
 contents:
-  description: The pack provides 14 skills for building and deploying applications
-    on Red Hat platforms, including one orchestration skill for end-to-end containerization.
+  description: The pack provides 14 skills for building and deploying applications on Red Hat platforms, including one orchestration
+    skill for end-to-end containerization.
   skills:
   - name: detect-project
     description: Project Analysis
@@ -235,109 +235,10 @@ contents:
       - Automatic project detection
       - S2I or custom build
       - OpenShift or RHEL deployment targets
-deploy_and_use: |
-  ### Prerequisites
-
-  - Claude Code CLI or IDE extension
-  - **OpenShift** cluster with build/deploy capabilities (for OpenShift skills)
-  - **`oc`** CLI and **`KUBECONFIG`** for cluster-scoped skills
-  - **Podman** installed locally (S2I builds, **podman** MCP, local image workflows)
-  - **Git**; **GitHub personal access token** when analyzing private GitHub repos via **`github`** MCP
-  - **Helm** CLI (for **`/helm-deploy`**)
-  - **Optional — Red Hat Insights / Lightspeed** (`LIGHTSPEED_CLIENT_ID`, `LIGHTSPEED_CLIENT_SECRET`) for **`/debug-rhel`** and **`/rhel-deploy`** advisor data
-
-  **Supported languages** (detection / S2I): Node.js, Python, Java, Go, Ruby, .NET, PHP, Perl — see also [docs/builder-images.md](docs/builder-images.md).
-
-  ### Environment Setup
-
-  Configure OpenShift cluster access:
-
-  ```bash
-  export KUBECONFIG="/path/to/your/kubeconfig"
-  ```
-
-  Verify access:
-
-  ```bash
-  oc get projects
-  ```
-
-  Copy MCP server definitions from **`rh-developer/.mcp.json`** into your assistant MCP settings. **macOS Podman note:** the **openshift** MCP stanza may use `--userns=keep-id`; Podman on macOS runs in a VM and this can prevent startup. If the server fails to start, remove or adjust the `--userns` arguments in `.mcp.json` per your platform (see upstream README guidance; Linux typically keeps the mapping for `chmod 600` kubeconfigs).
-documentation_section: |
-  ### Skill index (quick reference)
-
-  | Area | Skills |
-  |------|--------|
-  | **Build & deploy** | `/detect-project`, `/recommend-image`, `/s2i-build`, `/deploy`, `/helm-deploy`, `/rhel-deploy`, `/containerize-deploy` |
-  | **Diagnostics** | `/debug-pod`, `/debug-build`, `/debug-pipeline`, `/debug-network`, `/debug-container`, `/debug-rhel` |
-  | **Preflight** | `/validate-environment` |
-
-  Deep workflows remain in each **`skills/<name>/SKILL.md`**.
-
-  ### Documentation in this pack
-
-  - Builder and image notes: [docs/builder-images.md](docs/builder-images.md)
-mcp_section: |
-  | Server | Role |
-  |--------|------|
-  | **openshift** | Cluster CRUD, builds, deployments, Helm on OpenShift. |
-  | **podman** | Local images and container tooling. |
-  | **github** | Repository browse/analysis (e.g. **`/detect-project`** from GitHub URLs). |
-  | **lightspeed-mcp** | Optional Insights vulnerability/advisor context for RHEL paths. |
-
-  Configure all via **`rh-developer/.mcp.json`**; skills must not call MCP tools directly.
-security_model: |
-  - Never print kubeconfig, GitHub tokens, or Lightspeed client secrets.
-  - **openshift** MCP user-namespace mapping can affect kubeconfig readability on some hosts; fix MCP config rather than loosening secret file permissions.
-  - Destructive changes require explicit user approval per skill workflows.
-
-  ### Installation (Claude Code)
-
-  Install the collection as a Claude Code plugin:
-
-  ```bash
-  claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-  claude plugin install rh-developer
-  ```
-
-  Or for local development:
-
-  ```bash
-  claude plugin marketplace add /path/to/agentic-collections
-  claude plugin install rh-developer
-  ```
-
-  ### Installation (Cursor)
-
-  Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-developer ~/.cursor/plugins/rh-developer
-  ```
-
-  Or download and extract:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/rh-developer ~/.cursor/plugins/rh-developer
-  ```
-
-  ### Installation (Open Code)
-
-  Open Code does not support direct marketplace install via CLI. Clone or download the repository:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-developer ~/.opencode/plugins/rh-developer
-  ```
-
-  Or with wget:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
-  ```
+deploy_and_use_file: .catalog/deploy_and_use.md
+documentation_section_file: .catalog/documentation.md
+mcp_section_file: .catalog/mcp.md
+security_model_file: .catalog/security.md
 sample_workflows:
 - name: Source-to-Image Build and Deploy
   workflow: |
@@ -360,19 +261,19 @@ sample_workflows:
     - detect-project skill (if Helm chart detected) or provide chart path
     - helm-deploy skill deploys with release name and namespace
 resources:
-  - title: OpenShift Source-to-Image (S2I)
-    url: https://docs.openshift.com/container-platform/latest/openshift_images/using_images/using-s21-images.html
-    description: S2I builder images and language detection.
-    embedded_doc: docs/builder-images.md
-  - title: Red Hat Container Catalog
-    url: https://catalog.redhat.com/software/containers/search
-    description: UBI images and S2I builders.
-  - title: Red Hat Universal Base Images
-    url: https://developers.redhat.com/products/rhel/ubi
-    description: UBI9 images and language runtimes.
-  - title: OpenShift Deployments
-    url: https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html
-    description: Deployment strategies and application lifecycle.
+- title: OpenShift Source-to-Image (S2I)
+  url: https://docs.openshift.com/container-platform/latest/openshift_images/using_images/using-s21-images.html
+  description: S2I builder images and language detection.
+  embedded_doc: docs/builder-images.md
+- title: Red Hat Container Catalog
+  url: https://catalog.redhat.com/software/containers/search
+  description: UBI images and S2I builders.
+- title: Red Hat Universal Base Images
+  url: https://developers.redhat.com/products/rhel/ubi
+  description: UBI9 images and language runtimes.
+- title: OpenShift Deployments
+  url: https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html
+  description: Deployment strategies and application lifecycle.
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy

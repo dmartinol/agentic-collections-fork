@@ -1,22 +1,3 @@
-<!--
-  GENERATED FILE — do not edit manually.
-  Source of truth: rh-support-engineer/collection.yaml
-  Regenerate with: make generate-catalog
--->
-
-# Red Hat Support Engineer Agentic Collection
-
-Technical support and troubleshooting tools for Red Hat products and platforms.
-
-**Persona**: Development Engineer
-**Marketplaces**: Claude Code, Cursor
-
-## Overview
-
-The rh-support-engineer collection provides skills for development tasks.
-
-## Quick Start
-
 ### Prerequisites
 
 - Claude Code CLI or IDE extension
@@ -72,31 +53,3 @@ Or with wget:
 wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
 cp -r agentic-collections-main/rh-support-engineer ~/.opencode/plugins/rh-support-engineer
 ```
-
-## Skills
-
-The pack will provide skills for technical support and troubleshooting (skills in development).
-
-
-
-
-
-
-## Sample Workflows
-
-
-
-## License
-
-
-[Apache-2.0](https://www.redhat.com/en/about/agreements)
-
-
-## References
-
-
-- [Red Hat Customer Portal](https://access.redhat.com/) - Knowledge base, support cases, and product documentation.
-
-
-- [Red Hat Product Documentation](https://docs.redhat.com/) - Official Red Hat product documentation hub.
-

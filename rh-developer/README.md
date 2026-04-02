@@ -45,7 +45,6 @@ oc get projects
 
 Copy MCP server definitions from **`rh-developer/.mcp.json`** into your assistant MCP settings. **macOS Podman note:** the **openshift** MCP stanza may use `--userns=keep-id`; Podman on macOS runs in a VM and this can prevent startup. If the server fails to start, remove or adjust the `--userns` arguments in `.mcp.json` per your platform (see upstream README guidance; Linux typically keeps the mapping for `chmod 600` kubeconfigs).
 
-
 ## Skills
 
 The pack provides 14 skills for building and deploying applications on Red Hat platforms, including one orchestration skill for end-to-end containerization.
@@ -315,7 +314,6 @@ Deep workflows remain in each **`skills/<name>/SKILL.md`**.
 - Builder and image notes: [docs/builder-images.md](docs/builder-images.md)
 
 
-
 ## MCP Server Integrations
 
 | Server | Role |
@@ -326,7 +324,6 @@ Deep workflows remain in each **`skills/<name>/SKILL.md`**.
 | **lightspeed-mcp** | Optional Insights vulnerability/advisor context for RHEL paths. |
 
 Configure all via **`rh-developer/.mcp.json`**; skills must not call MCP tools directly.
-
 
 ## Sample Workflows
 
@@ -414,7 +411,6 @@ Or with wget:
 wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
 cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
 ```
-
 
 ## License
 

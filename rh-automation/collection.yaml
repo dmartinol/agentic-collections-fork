@@ -19,13 +19,12 @@ keywords:
 - governance
 - troubleshooting
 - execution
-description: Ansible Automation Platform governance, execution safety, and forensic
-  troubleshooting tools for Red Hat automation engineers.
-summary: The rh-automation collection provides 11 skills for AAP governance assessment,
-  governed execution, and forensic troubleshooting.
+description: Ansible Automation Platform governance, execution safety, and forensic troubleshooting tools for Red Hat automation
+  engineers.
+summary: The rh-automation collection provides 11 skills for AAP governance assessment, governed execution, and forensic troubleshooting.
 contents:
-  description: The pack provides 11 skills for AAP governance, execution safety, and
-    forensic troubleshooting, including 3 orchestration skills.
+  description: The pack provides 11 skills for AAP governance, execution safety, and forensic troubleshooting, including 3
+    orchestration skills.
   skills:
   - name: aap-mcp-validator
     description: Validate AAP MCP Server Connectivity
@@ -191,112 +190,10 @@ contents:
       - job-failure-analyzer (event extraction, error classification)
       - host-fact-inspector (host correlation)
       - resolution-advisor (Red Hat doc-backed recommendations)
-deploy_and_use: |
-  ### Prerequisites
-
-  - Claude Code CLI or IDE extension (or Cursor)
-  - Red Hat Ansible Automation Platform 2.5+
-  - AAP API token (Personal Access Token)
-
-  ### Environment Setup
-
-  Configure AAP MCP server and API token:
-
-  ```bash
-  export AAP_MCP_SERVER="your-aap-mcp-server.example.com"
-  export AAP_API_TOKEN="your-personal-access-token"
-  ```
-
-  ### Installation (Claude Code)
-
-  Install the collection as a Claude Code plugin:
-
-  ```bash
-  claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-  claude plugin install rh-automation
-  ```
-
-  Or for local development:
-
-  ```bash
-  claude plugin marketplace add /path/to/agentic-collections
-  claude plugin install rh-automation
-  ```
-
-  ### Installation (Cursor)
-
-  Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-automation ~/.cursor/plugins/rh-automation
-  ```
-
-  Or download and extract:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/rh-automation ~/.cursor/plugins/rh-automation
-  ```
-
-  ### Installation (Open Code)
-
-  Open Code does not support direct marketplace install via CLI. Clone or download the repository:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation
-  ```
-documentation_section: |
-  ### What this collection adds over raw MCP access
-
-  Raw MCP access can list templates, launch jobs, and read events. This pack adds:
-
-  1. **Knowledge** — In-repo docs distilled from Red Hat sources (cited at runtime). Start with embedded references: [docs/aap/governance-readiness.md](docs/aap/governance-readiness.md), [docs/aap/execution-governance.md](docs/aap/execution-governance.md), [docs/aap/job-troubleshooting.md](docs/aap/job-troubleshooting.md), [docs/references/error-classification.md](docs/references/error-classification.md).
-  2. **Judgment** — Skills interpret MCP data through governance and risk patterns (secret scans, inventory classification, error taxonomy).
-  3. **Workflow** — Orchestration skills (**`governance-assessor`**, **`governance-executor`**, **`forensic-troubleshooter`**) chain sub-skills with human-in-the-loop gates.
-
-  ### Three primary use cases
-
-  **1. Governance assessment** — *"Assess my AAP platform's governance readiness."*  
-  Entry: **`governance-assessor`** → audits seven domains across all MCP endpoints; see **governance-readiness** doc above.
-
-  **2. Governed execution** — *"Execute the security patch on production urgently."*  
-  Entry: **`governance-executor`** → risk analysis, check mode, approval before production.
-
-  **3. Forensic troubleshooting** — *"Job #4451 failed. What happened?"*  
-  Entry: **`forensic-troubleshooter`** → events, host facts, doc-backed resolutions (**job-troubleshooting**, **error-classification**).
-
-  ### Skills × MCP coverage (summary)
-
-  | Skill | Typical MCP scope |
-  |-------|-------------------|
-  | `governance-assessor` | All 6 servers (orchestrated audit) |
-  | `governance-executor` | job-management, inventory-management |
-  | `forensic-troubleshooter` | job-management, inventory-management |
-  | `aap-mcp-validator` | All 6 (connectivity) |
-  | `governance-readiness-assessor` | All 6 |
-  | `execution-risk-analyzer`, `governed-job-launcher` | job-management (+ inventory as needed) |
-  | `job-failure-analyzer` | job-management |
-  | `host-fact-inspector` | inventory-management |
-  | `resolution-advisor`, `execution-summary` | Advisory / reporting (consult docs) |
-mcp_section: |
-  Six HTTP MCP servers (see **`rh-automation/.mcp.json`** and [AAP MCP Server](https://github.com/ansible/aap-mcp-server)):
-
-  | Server | Purpose |
-  |--------|---------|
-  | **aap-mcp-job-management** | Job templates, launches, events, workflows |
-  | **aap-mcp-inventory-management** | Inventories, hosts, groups, facts |
-  | **aap-mcp-configuration** | Notifications, execution environments, platform settings |
-  | **aap-mcp-security-compliance** | Credentials, credential types, testing |
-  | **aap-mcp-system-monitoring** | Instance groups, activity stream, mesh, status |
-  | **aap-mcp-user-management** | Users, teams, organizations, RBAC |
-
-  Full governance audits require reachability across **all six**; execution paths may use a subset. Set **`AAP_MCP_SERVER`** and **`AAP_API_TOKEN`** as documented under Quick Start.
-security_model: |
-  - Never print **`AAP_API_TOKEN`** or raw Bearer material.
-  - Production job launches require explicit approval paths in **`governed-job-launcher`** / **`governance-executor`**.
-  - Treat extra_vars and inventory names as sensitive; skills scan for secrets before execution.
+deploy_and_use_file: .catalog/deploy_and_use.md
+documentation_section_file: .catalog/documentation.md
+mcp_section_file: .catalog/mcp.md
+security_model_file: .catalog/security.md
 sample_workflows:
 - name: Governance Assessment
   workflow: |
@@ -321,25 +218,25 @@ sample_workflows:
       3. Correlates host facts and failures
       4. Provides resolution recommendations
 resources:
-  - title: Red Hat Ansible Automation Platform
-    url: https://www.redhat.com/en/technologies/management/ansible
-    description: Product overview and capabilities for AAP.
-  - title: AAP 2.5 Security Best Practices
-    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices
-    description: Credential security, RBAC, separation of duties.
-    embedded_doc: docs/aap/governance-readiness.md
-  - title: AAP 2.6 Troubleshooting Guide (Jobs)
-    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs
-    description: Job failure analysis, common errors, event interpretation.
-    embedded_doc: docs/aap/job-troubleshooting.md
-  - title: AAP 2.5 Job Templates and Configuration
-    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/automation_controller_user_guide/controller-job-templates
-    description: Job execution, check mode, extra_vars, job slicing.
-    embedded_doc: docs/aap/execution-governance.md
-  - title: AAP 2.6 Troubleshooting Guide
-    url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs
-    description: Error classification taxonomy and resolution paths.
-    embedded_doc: docs/references/error-classification.md
-  - title: AAP MCP Server
-    url: https://github.com/ansible/aap-mcp-server
-    description: MCP server for AAP API integration used by this collection.
+- title: Red Hat Ansible Automation Platform
+  url: https://www.redhat.com/en/technologies/management/ansible
+  description: Product overview and capabilities for AAP.
+- title: AAP 2.5 Security Best Practices
+  url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices
+  description: Credential security, RBAC, separation of duties.
+  embedded_doc: docs/aap/governance-readiness.md
+- title: AAP 2.6 Troubleshooting Guide (Jobs)
+  url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs
+  description: Job failure analysis, common errors, event interpretation.
+  embedded_doc: docs/aap/job-troubleshooting.md
+- title: AAP 2.5 Job Templates and Configuration
+  url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/automation_controller_user_guide/controller-job-templates
+  description: Job execution, check mode, extra_vars, job slicing.
+  embedded_doc: docs/aap/execution-governance.md
+- title: AAP 2.6 Troubleshooting Guide
+  url: https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs
+  description: Error classification taxonomy and resolution paths.
+  embedded_doc: docs/references/error-classification.md
+- title: AAP MCP Server
+  url: https://github.com/ansible/aap-mcp-server
+  description: MCP server for AAP API integration used by this collection.

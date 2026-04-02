@@ -11,8 +11,8 @@ marketplaces:
 - Claude Code
 - Cursor
 support_level: Unknown
-description: Automation capabilities for OpenShift Container Platform cluster management,
-  workload orchestration, security policies, and operational tasks.
+description: Automation capabilities for OpenShift Container Platform cluster management, workload orchestration, security
+  policies, and operational tasks.
 summary: |
   Specialized tools for managing OpenShift clusters throughout their lifecycle—**creation**
   with the Assisted Installer, **inventory** across self-managed and managed services,
@@ -79,76 +79,10 @@ contents:
 
       **Requires:** `KUBECONFIG` with appropriate cluster access;
       uses **openshift-administration** MCP (see `.mcp.json`).
-deploy_and_use: |
-  ### Prerequisites
-
-  - Claude Code CLI or IDE extension
-  - **Cluster creation and inventory (`cluster-creator`, `cluster-inventory`):**
-    - Red Hat account and offline token from https://cloud.redhat.com/openshift/token
-    - `export OFFLINE_TOKEN="..."` (never commit the value; plugins use `${OFFLINE_TOKEN}` in `.mcp.json`)
-    - Podman (or Docker) to run Assisted Installer / OCM MCP images from `ocp-admin/.mcp.json`
-  - **Multi-cluster reports (`cluster-report`):**
-    - `oc` or compatible CLI and `KUBECONFIG` with contexts for target clusters
-    - **openshift-administration** MCP configured per `ocp-admin/.mcp.json`
-
-  Copy MCP server definitions from `ocp-admin/.mcp.json` into your Claude Code settings (`/mcp` or `settings.json`). Servers are not auto-installed with the plugin.
-
-  ### Environment Setup
-
-  Configure OpenShift cluster access for reporting:
-
-  ```bash
-  export KUBECONFIG="/path/to/your/kubeconfig"
-  oc get nodes
-  ```
-
-  ### Installation (Claude Code)
-
-  Install the collection as a Claude Code plugin:
-
-  ```bash
-  claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-  claude plugin install openshift-administration
-  ```
-
-  Or for local development:
-
-  ```bash
-  claude plugin marketplace add /path/to/agentic-collections
-  claude plugin install openshift-administration
-  ```
-
-  ### Installation (Cursor)
-
-  Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/ocp-admin ~/.cursor/plugins/ocp-admin
-  ```
-
-  Or download and extract:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/ocp-admin ~/.cursor/plugins/ocp-admin
-  ```
-
-  ### Installation (Open Code)
-
-  Open Code does not support direct marketplace install via CLI. Clone or download the repository:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/ocp-admin ~/.opencode/plugins/ocp-admin
-  ```
-
-  Or with wget:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
-  ```
+deploy_and_use_file: .catalog/deploy_and_use.md
+documentation_section_file: .catalog/documentation.md
+mcp_section_file: .catalog/mcp.md
+security_model_file: .catalog/security.md
 sample_workflows:
 - name: Deploy and verify a new cluster
   workflow: |
@@ -168,40 +102,14 @@ sample_workflows:
     - **cluster-report** collects node resources (CPU, memory, GPUs)
     - **cluster-report** aggregates namespace counts and pod status
     - **cluster-report** produces a comparison view
-documentation_section: |
-  ### Multi-cluster authentication
-
-  For consolidated **cluster-report** across many contexts, set up kubeconfig and RBAC using the pack guide: [docs/multi-cluster-auth.md](docs/multi-cluster-auth.md).
-
-  ### Further documentation
-
-  - **[Documentation index](docs/INDEX.md)** — navigation for networking, host requirements, troubleshooting, and static networking.
-  - **Troubleshooting** — see [docs/troubleshooting.md](docs/troubleshooting.md) for Assisted Installer and cluster-specific issues.
-
-  ### Configuration notes
-
-  - Ensure `OFFLINE_TOKEN` is exported before Assisted Installer or OCM MCP calls.
-  - Point `KUBECONFIG` at a merged kubeconfig when reporting across fleets; verify with `oc config get-contexts`.
-mcp_section: |
-  Skills wrap MCP servers defined in **`.mcp.json`** (copy entries into Claude Code `/mcp` or your settings file). Typical layout:
-
-  - **openshift-self-managed** — Assisted Installer API for **cluster-creator** / parts of **cluster-inventory** (self-managed OCP, SNO). Requires `OFFLINE_TOKEN`.
-  - **openshift-ocm-managed** — OpenShift Cluster Manager API for ROSA, ARO, OSD in **cluster-inventory**. Requires `OFFLINE_TOKEN`.
-  - **openshift-administration** — Kubernetes/OpenShift access for **cluster-report** (node and workload metrics). Requires `KUBECONFIG`.
-
-  Images and commands reference `ocp-admin/.mcp.json`; use Podman or Docker as documented there.
-security_model: |
-  - **Secrets:** Never print `OFFLINE_TOKEN`, kubeconfig contents, pull secrets, or install keys. Confirm only that required environment variables are set.
-  - **Human approval:** **cluster-creator** waits for explicit confirmation before VIP assignment, host roles, static networking, and install triggers.
-  - **Read vs write:** **cluster-inventory** is discovery-focused; **cluster-report** should use least-privilege kubeconfig where possible.
 resources:
-  - title: OpenShift Container Platform Documentation
-    url: https://docs.openshift.com/container-platform/latest/welcome/index.html
-    description: Official OpenShift cluster management and administration docs.
-  - title: OpenShift Multi-Cluster Management
-    url: https://docs.openshift.com/container-platform/latest/operators/operator_sdk/osdk-cli-managing-multicluster.html
-    description: Managing multiple OpenShift clusters.
-    embedded_doc: docs/multi-cluster-auth.md
+- title: OpenShift Container Platform Documentation
+  url: https://docs.openshift.com/container-platform/latest/welcome/index.html
+  description: Official OpenShift cluster management and administration docs.
+- title: OpenShift Multi-Cluster Management
+  url: https://docs.openshift.com/container-platform/latest/operators/operator_sdk/osdk-cli-managing-multicluster.html
+  description: Managing multiple OpenShift clusters.
+  embedded_doc: docs/multi-cluster-auth.md
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy

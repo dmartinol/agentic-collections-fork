@@ -52,6 +52,53 @@ oc get datascienceprojects -A
 
 MCP definitions live in **`rh-ai-engineer/.mcp.json`** — copy entries into Claude Code `/mcp` or settings; use **`${...}`** placeholders only for secrets.
 
+### Installation (Claude Code)
+
+Install the collection as a Claude Code plugin:
+
+```bash
+claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+claude plugin install rh-ai-engineer
+```
+
+Or for local development:
+
+```bash
+claude plugin marketplace add /path/to/agentic-collections
+claude plugin install rh-ai-engineer
+```
+
+### Installation (Cursor)
+
+Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+```
+
+Or download and extract:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+```
+
+### Installation (Open Code)
+
+Open Code does not support direct marketplace install via CLI. Clone or download the repository:
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+```
+
+Or with wget:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+```
 
 ## Skills
 
@@ -198,7 +245,7 @@ Deploy guardrails orchestrators with PII, toxicity, and prompt-injection detecto
 | **NVIDIA NIM** | TensorRT-LLM on NVIDIA GPUs | Run **`/nim-setup`** first |
 | **Caikit+TGIS** | Caikit-format models, gRPC | Model conversion as required |
 
-Full comparison: **[docs/references/supported-runtimes.md](docs/references/supported-runtimes.md)**.
+Full comparison: **[supported-runtimes.md](docs/references/supported-runtimes.md)**.
 
 ### Example model / GPU profiles
 
@@ -210,12 +257,11 @@ Full comparison: **[docs/references/supported-runtimes.md](docs/references/suppo
 | Mixtral 8x7B | 46.7B MoE | 2× A100 80GB | vLLM |
 | Mistral 7B | 7B | 1× (16GB VRAM) | vLLM |
 
-Extended tables and guidance: **[docs/references/known-model-profiles.md](docs/references/known-model-profiles.md)**. Models not listed are still supported via product docs and live cluster checks.
+Extended tables and guidance: **[known-model-profiles.md](docs/references/known-model-profiles.md)**. Models not listed are still supported via product docs and live cluster checks.
 
 ### In-repo examples
 
-- NIM walkthrough: [docs/examples/nim-setup.md](docs/examples/nim-setup.md) (also linked from **References** below).
-
+- NIM walkthrough: [nim-setup.md](docs/examples/nim-setup.md) (also linked from **References** below).
 
 
 ## MCP Server Integrations
@@ -227,7 +273,6 @@ Extended tables and guidance: **[docs/references/known-model-profiles.md](docs/r
 | **`ai-observability`** | Remote HTTP | **Optional** | Metrics, GPU checks, tracing; skipped if unset. See [ai-observability-summarizer MCP](https://github.com/rh-ai-quickstart/ai-observability-summarizer/tree/main/src/mcp_server). |
 
 The **`openshift`** server is the reliable baseline. **`rhoai`** speeds YAML-light flows; when it fails, skills transparently use equivalent OpenShift operations (refresh `oc login` if tokens expire).
-
 
 ## Sample Workflows
 
@@ -282,55 +327,6 @@ User: "Create a new data science project with a Jupyter workbench"
 - Never print NGC keys, kubeconfig, or pull secrets — only confirm that required env vars exist.
 - Follow each skill’s confirmation gates before creating or deleting DataScienceProject, InferenceService, or storage resources.
 - Optional **`ai-observability`** must not receive production secrets in URLs; use network policies and TLS as appropriate.
-
-### Installation (Claude Code)
-
-Install the collection as a Claude Code plugin:
-
-```bash
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install rh-ai-engineer
-```
-
-Or for local development:
-
-```bash
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install rh-ai-engineer
-```
-
-### Installation (Cursor)
-
-Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
-
-```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
-```
-
-Or download and extract:
-
-```bash
-wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-cp -r agentic-collections-main/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
-```
-
-### Installation (Open Code)
-
-Open Code does not support direct marketplace install via CLI. Clone or download the repository:
-
-```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
-```
-
-Or with wget:
-
-```bash
-wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
-```
-
 
 ## License
 

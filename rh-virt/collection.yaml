@@ -11,8 +11,7 @@ marketplaces:
 - Claude Code
 - Cursor
 support_level: Unknown
-description: Virtual machine management and automation for OpenShift Virtualization
-  and KubeVirt workloads.
+description: Virtual machine management and automation for OpenShift Virtualization and KubeVirt workloads.
 summary: The rh-virt collection provides skills for virtualization tasks.
 contents:
   description: The pack provides 10 skills for virtual machine management on OpenShift Virtualization.
@@ -173,108 +172,10 @@ contents:
   - user_request: '"Move VM database-01 to worker-03" or "Rebalance VMs"'
     skill_to_use: vm-rebalance
     reason: Orchestrates live migration across nodes for load balancing.
-deploy_and_use: |
-  ### Prerequisites
-
-  - Claude Code CLI or IDE extension
-  - OpenShift cluster (>= 4.19) with Virtualization operator installed
-  - ServiceAccount with appropriate RBAC permissions for VirtualMachine resources
-  - KUBECONFIG environment variable configured with cluster access
-
-  ### Environment Setup
-
-  Configure OpenShift cluster access:
-
-  ```bash
-  export KUBECONFIG="/path/to/your/kubeconfig"
-  ```
-
-  Verify access to the cluster:
-
-  ```bash
-  oc get virtualmachines -A
-  # or
-  kubectl get vms -A
-  ```
-
-  ### Building the MCP Server Container Image
-
-  The OpenShift MCP server is not published to public registries, so you need to build it locally before using this collection.
-
-  **Prerequisites**: Git, Podman (or Docker)
-
-  **Build Steps**:
-
-  1. Clone the openshift-mcp-server repository:
-     ```bash
-     git clone https://github.com/openshift/openshift-mcp-server.git
-     cd openshift-mcp-server
-     ```
-
-  2. Build the container image using Podman:
-     ```bash
-     podman build -t localhost/openshift-mcp-server:latest -f Dockerfile .
-     ```
-     Or using Docker:
-     ```bash
-     docker build -t localhost/openshift-mcp-server:latest -f Dockerfile .
-     ```
-
-  3. Verify the image was built successfully:
-     ```bash
-     podman images localhost/openshift-mcp-server:latest
-     podman tag localhost/openshift-mcp-server:latest quay.io/ecosystem-appeng/openshift-mcp-server:latest
-     ```
-
-  **Note**: The build process takes several minutes. The final image size is approximately 192 MB.
-
-  ### Installation (Claude Code)
-
-  Install the collection as a Claude Code plugin:
-
-  ```bash
-  claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-  claude plugin install openshift-virtualization
-  ```
-
-  Or for local development:
-
-  ```bash
-  claude plugin marketplace add /path/to/agentic-collections
-  claude plugin install openshift-virtualization
-  ```
-
-  ### Installation (Cursor)
-
-  Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-virt ~/.cursor/plugins/openshift-virtualization
-  ```
-
-  Or download and extract:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/rh-virt ~/.cursor/plugins/openshift-virtualization
-  ```
-
-  ### Installation (Open Code)
-
-  Open Code does not support direct marketplace install via CLI. Clone or download the repository:
-
-  ```bash
-  git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-  cp -r agentic-collections/rh-virt ~/.opencode/plugins/openshift-virtualization
-  ```
-
-  Or with wget:
-
-  ```bash
-  wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-  cp -r agentic-collections-main/rh-virt ~/.opencode/plugins/openshift-virtualization
-  ```
+deploy_and_use_file: .catalog/deploy_and_use.md
+documentation_section_file: .catalog/documentation.md
+mcp_section_file: .catalog/mcp.md
+security_model_file: .catalog/security.md
 sample_workflows:
 - name: Create and Start a VM
   workflow: |
@@ -324,37 +225,17 @@ sample_workflows:
     - Verify `KUBECONFIG` and `oc get virtualmachines -A` outside the agent
     - Confirm the openshift-mcp-server image was built and referenced in `.mcp.json`
     - Consult [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) and **CLAUDE.md** safety rules
-documentation_section: |
-  ### Troubleshooting and operations
-
-  - **MCP server** — Build and run the OpenShift MCP server image as described in **Quick Start** (this collection’s `deploy_and_use`). Confirm the local image tag matches `.mcp.json`.
-  - **VM failures** — See [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) for conditions, storage, and migration issues.
-  - **Skills not matching** — Use the **Skills Decision Guide** above or **CLAUDE.md** intent routing.
-
-  ### Architecture
-
-  - Skills under **`skills/`** wrap the **openshift-virtualization** MCP server; they enforce confirmations for destructive actions.
-  - Namespace-scoped resources: always confirm namespace and VM name before delete, restore, or rebalance.
-mcp_section: |
-  The pack uses **openshift-virtualization** (OpenShift MCP server) as defined in **`.mcp.json`**. The server talks to the cluster Kubernetes API using your kubeconfig.
-
-  - Requires OpenShift **4.19+** with OpenShift Virtualization installed.
-  - Build the MCP image from [openshift/openshift-mcp-server](https://github.com/openshift/openshift-mcp-server) if you do not use a pre-built image (see Quick Start).
-security_model: |
-  - Never share kubeconfig contents, cloud-init passwords, or SSH keys in chat.
-  - Destructive operations (**vm-delete**, **vm-snapshot-delete**, **vm-snapshot-restore**) require explicit user confirmation.
-  - **vm-snapshot-restore** typically requires the VM to be stopped first; the skill workflow enforces checks—do not bypass them.
 resources:
-  - title: OpenShift Virtualization Documentation
-    url: https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html
-    description: OpenShift Virtualization overview and VM management.
-  - title: KubeVirt User Guide
-    url: https://kubevirt.io/user-guide/
-    description: KubeVirt VM lifecycle, status conditions, and node placement.
-    embedded_doc: docs/troubleshooting/INDEX.md
-  - title: OpenShift MCP Server
-    url: https://github.com/openshift/openshift-mcp-server
-    description: MCP server for OpenShift/KubeVirt used by this collection.
+- title: OpenShift Virtualization Documentation
+  url: https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html
+  description: OpenShift Virtualization overview and VM management.
+- title: KubeVirt User Guide
+  url: https://kubevirt.io/user-guide/
+  description: KubeVirt VM lifecycle, status conditions, and node placement.
+  embedded_doc: docs/troubleshooting/INDEX.md
+- title: OpenShift MCP Server
+  url: https://github.com/openshift/openshift-mcp-server
+  description: MCP server for OpenShift/KubeVirt used by this collection.
 legal_resources:
   license_agreement_url: https://www.redhat.com/en/about/agreements
   privacy_policy_url: https://www.redhat.com/en/about/privacy-policy
