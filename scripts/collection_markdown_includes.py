@@ -97,6 +97,13 @@ def apply_markdown_includes(
             raise ValueError(f"{pack_dir}: {file_key} -> {path} is empty")
         out[body_key] = _normalize_catalog_markdown_links(text)
 
+    # YAML block scalars include a trailing newline; strip all markdown text fields
+    # so inline values match the behavior of file-based values (which are .strip()'ed above).
+    for _, body_key in FILE_BODY_FIELDS:
+        v = out.get(body_key)
+        if isinstance(v, str):
+            out[body_key] = _normalize_catalog_markdown_links(v.strip())
+
     return out
 
 

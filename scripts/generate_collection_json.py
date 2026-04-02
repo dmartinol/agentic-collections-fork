@@ -7,6 +7,7 @@ Resolves optional `{pack}/.catalog/*.md` includes per collection.yaml *_file pat
 Output: {pack}/collection.json
 """
 
+import argparse
 import sys
 from pathlib import Path
 from typing import Any, Dict
@@ -18,6 +19,7 @@ from generation_notice import (
     attach_json_generation_metadata,
     collection_yaml_source,
     write_json,
+    write_json_or_check,
     yaml_tree_to_json_ready,
 )
 
@@ -46,24 +48,38 @@ def discover_collections() -> list[tuple[str, Dict[str, Any]]]:
     return result
 
 
-def main() -> int:
+def main(check: bool = False) -> int:
     collections = discover_collections()
     if not collections:
         print("No collection.yaml files found.")
         return 1
 
+    any_diff = False
     for pack_dir, data in collections:
         body = yaml_tree_to_json_ready(data)
         out = attach_json_generation_metadata(
             body,
             source_of_truth=collection_yaml_source(pack_dir),
         )
-        write_json(REPO_ROOT / pack_dir / "collection.json", out)
-        print(f"Generated {pack_dir}/collection.json")
+        out_path = REPO_ROOT / pack_dir / "collection.json"
+        ok = write_json_or_check(out_path, out, check=check)
+        if not ok:
+            any_diff = True
+        elif not check:
+            print(f"Generated {pack_dir}/collection.json")
 
-    print(f"Generated collection.json for {len(collections)} packs")
+    if check:
+        if any_diff:
+            print("collection.json files are out of sync. Run 'make generate-catalog'.")
+            return 1
+        print(f"✓ collection.json files match sources for {len(collections)} packs")
+    else:
+        print(f"Generated collection.json for {len(collections)} packs")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Verify files match sources without writing")
+    args = parser.parse_args()
+    sys.exit(main(check=args.check))

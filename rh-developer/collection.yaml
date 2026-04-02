@@ -236,9 +236,33 @@ contents:
       - S2I or custom build
       - OpenShift or RHEL deployment targets
 deploy_and_use_file: .catalog/deploy_and_use.md
-documentation_section_file: .catalog/documentation.md
-mcp_section_file: .catalog/mcp.md
-security_model_file: .catalog/security.md
+documentation_section: |
+  ### Skill index (quick reference)
+
+  | Area | Skills |
+  |------|--------|
+  | **Build & deploy** | `/detect-project`, `/recommend-image`, `/s2i-build`, `/deploy`, `/helm-deploy`, `/rhel-deploy`, `/containerize-deploy` |
+  | **Diagnostics** | `/debug-pod`, `/debug-build`, `/debug-pipeline`, `/debug-network`, `/debug-container`, `/debug-rhel` |
+  | **Preflight** | `/validate-environment` |
+
+  Deep workflows remain in each **`skills/<name>/SKILL.md`**.
+
+  ### Documentation in this pack
+
+  - Builder and image notes: [docs/builder-images.md](docs/builder-images.md)
+mcp_section: |
+  | Server | Role |
+  |--------|------|
+  | **openshift** | Cluster CRUD, builds, deployments, Helm on OpenShift. |
+  | **podman** | Local images and container tooling. |
+  | **github** | Repository browse/analysis (e.g. **`/detect-project`** from GitHub URLs). |
+  | **lightspeed-mcp** | Optional Insights vulnerability/advisor context for RHEL paths. |
+
+  Configure all via **`rh-developer/.mcp.json`**; skills must not call MCP tools directly.
+security_model: |
+  - Never print kubeconfig, GitHub tokens, or Lightspeed client secrets.
+  - **openshift** MCP user-namespace mapping can affect kubeconfig readability on some hosts; fix MCP config rather than loosening secret file permissions.
+  - Destructive changes require explicit user approval per skill workflows.
 sample_workflows:
 - name: Source-to-Image Build and Deploy
   workflow: |

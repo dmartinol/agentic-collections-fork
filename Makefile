@@ -73,18 +73,13 @@ generate: check-uv generate-catalog
 	@echo "✓ Documentation generated in docs/"
 
 verify-generated: check-uv
-	@echo "Verifying generated files match committed..."
-	@make generate
-	@git diff --exit-code .claude-plugin/ .cursor-plugin/ docs/collections/ docs/data.json \
-	  rh-sre/.claude-plugin/plugin.json rh-sre/.cursor-plugin/plugin.json rh-sre/README.md rh-sre/collection.json \
-	  rh-developer/.claude-plugin/plugin.json rh-developer/.cursor-plugin/plugin.json rh-developer/README.md rh-developer/collection.json \
-	  ocp-admin/.claude-plugin/plugin.json ocp-admin/.cursor-plugin/plugin.json ocp-admin/README.md ocp-admin/collection.json \
-	  rh-virt/.claude-plugin/plugin.json rh-virt/.cursor-plugin/plugin.json rh-virt/README.md rh-virt/collection.json \
-	  rh-ai-engineer/.claude-plugin/plugin.json rh-ai-engineer/.cursor-plugin/plugin.json rh-ai-engineer/README.md rh-ai-engineer/collection.json \
-	  rh-automation/.claude-plugin/plugin.json rh-automation/.cursor-plugin/plugin.json rh-automation/README.md rh-automation/collection.json \
-	  rh-support-engineer/.claude-plugin/plugin.json rh-support-engineer/.cursor-plugin/plugin.json rh-support-engineer/README.md rh-support-engineer/collection.json \
-	  && echo "✓ Generated files match committed" \
-	  || (echo "Error: Generated files differ. Run 'make generate' and commit."; exit 1)
+	@echo "Verifying generated files match sources (no files written)..."
+	@uv run python scripts/generate_marketplace.py --check
+	@uv run python scripts/generate_plugins.py --check
+	@uv run python scripts/generate_collection_json.py --check
+	@uv run python scripts/generate_readme.py --check
+	@uv run python scripts/build_website.py --check
+	@echo "✓ All generated files are up to date"
 
 serve: check-uv
 	@echo "Starting local server on http://localhost:8000"

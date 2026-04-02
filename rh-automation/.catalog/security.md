@@ -1,3 +1,0 @@
-- Never print **`AAP_API_TOKEN`** or raw Bearer material.
-- Production job launches require explicit approval paths in **`governed-job-launcher`** / **`governance-executor`**.
-- Treat extra_vars and inventory names as sensitive; skills scan for secrets before execution.

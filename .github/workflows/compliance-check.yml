@@ -35,3 +35,33 @@ jobs:
         run: |
           source $HOME/.cargo/env
           ./scripts/ci-validate-changed-skills.sh
+
+  verify-generated:
+    name: Verify generated files match sources
+    runs-on: ubuntu-latest
+    needs: compliance-check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        run: |
+          source $HOME/.cargo/env
+          make install
+
+      - name: Verify generated files are in sync
+        run: |
+          source $HOME/.cargo/env
+          make verify-generated || {
+            echo ""
+            echo "Generated files are out of sync with their sources."
+            echo "Run 'make generate' locally, stage the updated files, and push."
+            exit 1
+          }

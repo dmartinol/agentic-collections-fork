@@ -173,9 +173,26 @@ contents:
     skill_to_use: vm-rebalance
     reason: Orchestrates live migration across nodes for load balancing.
 deploy_and_use_file: .catalog/deploy_and_use.md
-documentation_section_file: .catalog/documentation.md
-mcp_section_file: .catalog/mcp.md
-security_model_file: .catalog/security.md
+documentation_section: |
+  ### Troubleshooting and operations
+
+  - **MCP server** — Build and run the OpenShift MCP server image as described in **Quick Start** (this collection's `deploy_and_use`). Confirm the local image tag matches `.mcp.json`.
+  - **VM failures** — See [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) for conditions, storage, and migration issues.
+  - **Skills not matching** — Use the **Skills Decision Guide** above or **CLAUDE.md** intent routing.
+
+  ### Architecture
+
+  - Skills under **`skills/`** wrap the **openshift-virtualization** MCP server; they enforce confirmations for destructive actions.
+  - Namespace-scoped resources: always confirm namespace and VM name before delete, restore, or rebalance.
+mcp_section: |
+  The pack uses **openshift-virtualization** (OpenShift MCP server) as defined in **`.mcp.json`**. The server talks to the cluster Kubernetes API using your kubeconfig.
+
+  - Requires OpenShift **4.19+** with OpenShift Virtualization installed.
+  - Build the MCP image from [openshift/openshift-mcp-server](https://github.com/openshift/openshift-mcp-server) if you do not use a pre-built image (see Quick Start).
+security_model: |
+  - Never share kubeconfig contents, cloud-init passwords, or SSH keys in chat.
+  - Destructive operations (**vm-delete**, **vm-snapshot-delete**, **vm-snapshot-restore**) require explicit user confirmation.
+  - **vm-snapshot-restore** typically requires the VM to be stopped first; the skill workflow enforces checks—do not bypass them.
 sample_workflows:
 - name: Create and Start a VM
   workflow: |

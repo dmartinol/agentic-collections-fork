@@ -1,3 +1,0 @@
-- Never share kubeconfig contents, cloud-init passwords, or SSH keys in chat.
-- Destructive operations (**vm-delete**, **vm-snapshot-delete**, **vm-snapshot-restore**) require explicit user confirmation.
-- **vm-snapshot-restore** typically requires the VM to be stopped first; the skill workflow enforces checks—do not bypass them.

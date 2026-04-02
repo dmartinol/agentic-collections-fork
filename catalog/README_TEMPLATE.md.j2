@@ -27,7 +27,9 @@
 
 {% endfor %}
 {% endif %}
-{% for skill in contents.skills %}
+{% if contents.orchestration_skills and contents.skills %}## Basic Skills
+
+{% endif %}{% for skill in contents.skills %}
 ### {{ skill.name }} - {{ skill.description }}
 
 {{ skill.summary_markdown }}

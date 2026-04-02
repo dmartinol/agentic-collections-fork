@@ -3,6 +3,7 @@
 Build the documentation website by combining pack data and MCP data into data.json.
 """
 
+import argparse
 import json
 import sys
 from datetime import datetime, timezone
@@ -15,6 +16,7 @@ import yaml
 from generate_pack_data import generate_pack_data
 from generate_mcp_data import generate_mcp_data
 from generate_collection_pages import main as generate_collection_pages
+from generation_notice import write_text_or_check
 
 
 def load_marketplace_icons() -> Dict[str, str]:
@@ -37,42 +39,52 @@ def load_marketplace_icons() -> Dict[str, str]:
         return {}
 
 
-def build_website():
+def build_website(check: bool = False) -> int:
     """
-    Generate the complete website data file.
+    Generate the complete website data file, or verify it is up to date.
     """
-    print("🔨 Building documentation website...")
-    print()
+    if not check:
+        print("🔨 Building documentation website...")
+        print()
 
     # Load collection icons from marketplace
-    print("🎨 Loading collection icons...")
+    if not check:
+        print("🎨 Loading collection icons...")
     collection_icons = load_marketplace_icons()
-    print()
+    if not check:
+        print()
 
     # Generate pack data
-    print("📦 Parsing agentic collections...")
+    if not check:
+        print("📦 Parsing agentic collections...")
     pack_data = generate_pack_data()
-    
+
     # Merge collection icons and sort alphabetically by collection name
     for pack in pack_data:
         pack['icon'] = collection_icons.get(pack['name'], '')
     pack_data = sorted(pack_data, key=lambda p: p['name'])
-    
-    print()
+
+    if not check:
+        print()
 
     # Generate MCP server data (needed for collection pages)
-    print("🔌 Parsing MCP servers...")
+    if not check:
+        print("🔌 Parsing MCP servers...")
     mcp_data = generate_mcp_data()
-    
-    print()
 
-    # Generate collection pages (with tabbed view)
-    print("📄 Generating collection pages...")
-    generate_collection_pages(pack_data=pack_data, mcp_data=mcp_data)
-    
-    print()
+    if not check:
+        print()
 
-    # Combine into final output
+    # Generate (or verify) collection pages
+    if not check:
+        print("📄 Generating collection pages...")
+    pages_result = generate_collection_pages(pack_data=pack_data, mcp_data=mcp_data, check=check)
+
+    if not check:
+        print()
+
+    # Combine into final output (note: generated_at is omitted in check mode
+    # because the timestamp would differ every run)
     output = {
         'repository': {
             'name': 'agentic-collections',
@@ -85,12 +97,36 @@ def build_website():
         'generated_at': datetime.now(timezone.utc).isoformat()
     }
 
-    # Ensure docs directory exists
     docs_dir = Path('docs')
     docs_dir.mkdir(exist_ok=True)
-
-    # Write data.json
     output_file = docs_dir / 'data.json'
+
+    if check:
+        # For data.json, compare everything except generated_at (it changes every run)
+        if output_file.exists():
+            try:
+                existing = json.loads(output_file.read_text(encoding='utf-8'))
+                existing.pop('generated_at', None)
+                candidate = dict(output)
+                candidate.pop('generated_at', None)
+                if existing != candidate:
+                    print(f"  OUT OF SYNC: {output_file}")
+                    data_json_ok = False
+                else:
+                    data_json_ok = True
+            except Exception:
+                print(f"  MISSING or UNREADABLE: {output_file}")
+                data_json_ok = False
+        else:
+            print(f"  MISSING: {output_file}")
+            data_json_ok = False
+
+        if pages_result != 0 or not data_json_ok:
+            print("Website files are out of sync. Run 'make generate'.")
+            return 1
+        print("✓ Website files (data.json + collection pages) match sources")
+        return 0
+
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
 
@@ -109,4 +145,7 @@ def build_website():
 
 
 if __name__ == '__main__':
-    sys.exit(build_website())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Verify files match sources without writing")
+    args = parser.parse_args()
+    sys.exit(build_website(check=args.check))

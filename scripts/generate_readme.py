@@ -6,6 +6,7 @@ For each pack with collection.yaml, produces:
 - {pack}/README.md (leading HTML comment: source of truth + do not edit)
 """
 
+import argparse
 import sys
 from pathlib import Path
 from typing import Any, Dict
@@ -14,7 +15,7 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 
 from collection_markdown_includes import apply_markdown_includes
-from generation_notice import markdown_generation_banner
+from generation_notice import markdown_generation_banner, write_text_or_check
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = REPO_ROOT / "catalog"
@@ -55,7 +56,7 @@ def prepare_template_context(data: Dict[str, Any], pack_dir: str) -> Dict[str, A
     return ctx
 
 
-def main() -> int:
+def main(check: bool = False) -> int:
     env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
     template = env.get_template(TEMPLATE_NAME)
 
@@ -64,19 +65,29 @@ def main() -> int:
         print("No collection.yaml files found.")
         return 1
 
+    any_diff = False
     for pack_dir, data in collections:
         ctx = prepare_template_context(data, pack_dir)
         out_path = REPO_ROOT / pack_dir / "README.md"
-        rendered = template.render(**ctx)
-        out_path.write_text(
-            markdown_generation_banner(pack_dir) + rendered,
-            encoding="utf-8",
-        )
-        print(f"Generated {pack_dir}/README.md")
+        content = markdown_generation_banner(pack_dir) + template.render(**ctx)
+        ok = write_text_or_check(out_path, content, check=check)
+        if not ok:
+            any_diff = True
+        elif not check:
+            print(f"Generated {pack_dir}/README.md")
 
-    print(f"Generated README for {len(collections)} packs")
+    if check:
+        if any_diff:
+            print("README.md files are out of sync. Run 'make generate-catalog'.")
+            return 1
+        print(f"✓ {len(collections)} README.md files match sources")
+    else:
+        print(f"Generated README for {len(collections)} packs")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Verify files match sources without writing")
+    args = parser.parse_args()
+    sys.exit(main(check=args.check))

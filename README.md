@@ -210,14 +210,19 @@ uv run python scripts/validate_skill_design.py --warnings-as-errors
 
 ## Security
 
-This repository uses [gitleaks](https://github.com/gitleaks/gitleaks) to prevent accidental commits of sensitive data.
+This repository uses [gitleaks](https://github.com/gitleaks/gitleaks) to prevent accidental commits of sensitive data, and enforces that generated files are kept in sync with their sources.
 
 ### Quick Start
 
 ```bash
-# Install gitleaks and pre-commit hook (one-time setup)
-scripts/install-hooks.sh
+# Install pre-commit hooks (one-time setup after cloning)
+./scripts/install-hooks.sh
 ```
+
+The hook runs two stages on every `git commit`:
+
+1. **Secrets scan** (gitleaks) — blocks credentials from being committed.
+2. **Generated files check** (`make verify-generated`) — ensures `README.md`, `collection.json`, `plugin.json`, `marketplace.json`, and `docs/` pages match their sources (`collection.yaml`, `SKILL.md`). If out of sync, run `make generate`, stage the updated files, and recommit.
 
 ### What's Protected
 

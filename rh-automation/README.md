@@ -127,6 +127,8 @@ Orchestrates forensic failure analysis with error classification.
 
 
 
+## Basic Skills
+
 
 ### aap-mcp-validator - Validate AAP MCP Server Connectivity
 
@@ -279,13 +281,13 @@ Raw MCP access can list templates, launch jobs, and read events. This pack adds:
 
 ### Three primary use cases
 
-**1. Governance assessment** — *"Assess my AAP platform's governance readiness."*  
+**1. Governance assessment** — *"Assess my AAP platform's governance readiness."*
 Entry: **`governance-assessor`** → audits seven domains across all MCP endpoints; see **governance-readiness** doc above.
 
-**2. Governed execution** — *"Execute the security patch on production urgently."*  
+**2. Governed execution** — *"Execute the security patch on production urgently."*
 Entry: **`governance-executor`** → risk analysis, check mode, approval before production.
 
-**3. Forensic troubleshooting** — *"Job #4451 failed. What happened?"*  
+**3. Forensic troubleshooting** — *"Job #4451 failed. What happened?"*
 Entry: **`forensic-troubleshooter`** → events, host facts, doc-backed resolutions (**job-troubleshooting**, **error-classification**).
 
 ### Skills × MCP coverage (summary)

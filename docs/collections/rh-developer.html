@@ -84,39 +84,47 @@
 <pre><code class="language-bash">oc get projects
 </code></pre>
 <p>Copy MCP server definitions from <strong><code>rh-developer/.mcp.json</code></strong> into your assistant MCP settings. <strong>macOS Podman note:</strong> the <strong>openshift</strong> MCP stanza may use <code>--userns=keep-id</code>; Podman on macOS runs in a VM and this can prevent startup. If the server fails to start, remove or adjust the <code>--userns</code> arguments in <code>.mcp.json</code> per your platform (see upstream README guidance; Linux typically keeps the mapping for <code>chmod 600</code> kubeconfigs).</p>
-<h2>Security Model</h2>
-<ul>
-<li>Never print kubeconfig, GitHub tokens, or Lightspeed client secrets.</li>
-<li><strong>openshift</strong> MCP user-namespace mapping can affect kubeconfig readability on some hosts; fix MCP config rather than loosening secret file permissions.</li>
-<li>Destructive changes require explicit user approval per skill workflows.</li>
-</ul>
-<h3>Installation (Claude Code)</h3>
-<p>Install the collection as a Claude Code plugin:</p>
+<div class="install-accordion">
+<details class="install-accordion-item" open>
+<summary class="install-accordion-header">Installation (Claude Code)</summary>
+<div class="install-accordion-body"><p>Install the collection as a Claude Code plugin:</p>
 <pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
 claude plugin install rh-developer
 </code></pre>
 <p>Or for local development:</p>
 <pre><code class="language-bash">claude plugin marketplace add /path/to/agentic-collections
 claude plugin install rh-developer
-</code></pre>
-<h3>Installation (Cursor)</h3>
-<p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Cursor)</summary>
+<div class="install-accordion-body"><p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
 <pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-developer ~/.cursor/plugins/rh-developer
 </code></pre>
 <p>Or download and extract:</p>
 <pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
 cp -r agentic-collections-main/rh-developer ~/.cursor/plugins/rh-developer
-</code></pre>
-<h3>Installation (Open Code)</h3>
-<p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
+</code></pre></div>
+</details>
+<details class="install-accordion-item">
+<summary class="install-accordion-header">Installation (Open Code)</summary>
+<div class="install-accordion-body"><p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
 <pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-developer ~/.opencode/plugins/rh-developer
 </code></pre>
 <p>Or with wget:</p>
 <pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
 cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
-</code></pre>
+</code></pre></div>
+</details>
+</div>
+<h2>Security Model</h2>
+<ul>
+<li>Never print kubeconfig, GitHub tokens, or Lightspeed client secrets.</li>
+<li><strong>openshift</strong> MCP user-namespace mapping can affect kubeconfig readability on some hosts; fix MCP config rather than loosening secret file permissions.</li>
+<li>Destructive changes require explicit user approval per skill workflows.</li>
+</ul>
 <h2>License</h2>
 <p><a href="https://www.redhat.com/en/about/agreements">Apache-2.0</a></p>
             </div>
@@ -141,7 +149,7 @@ cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
 - OpenShift or RHEL deployment targets</p></div>
 </li>
 </ol>
-<h2>Skills</h2>
+<h2>Basic Skills</h2>
 <ol class="skill-list">
 <li><strong>/detect-project</strong> - Project Analysis
 <div class="skill-summary"><p>Analyze a project folder or GitHub repository to detect programming language, framework, and version requirements.</p>

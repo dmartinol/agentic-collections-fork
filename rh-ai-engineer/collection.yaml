@@ -145,9 +145,44 @@ contents:
       **What it does:** Creates GuardrailsOrchestrator policies atop existing InferenceServices.
 # Long-form catalog Markdown: paths are relative to this pack (see .catalog/*.md).
 deploy_and_use_file: .catalog/deploy_and_use.md
-documentation_section_file: .catalog/documentation.md
-mcp_section_file: .catalog/mcp.md
-security_model_file: .catalog/security.md
+documentation_section: |
+  ### Supported runtimes
+
+  | Runtime | Typical use | Setup |
+  |---------|------------|--------|
+  | **vLLM** | Open-source LLMs (Llama, Granite, Mixtral, Mistral) | None beyond cluster/serving |
+  | **NVIDIA NIM** | TensorRT-LLM on NVIDIA GPUs | Run **`/nim-setup`** first |
+  | **Caikit+TGIS** | Caikit-format models, gRPC | Model conversion as required |
+
+  Full comparison: **[supported-runtimes.md](docs/references/supported-runtimes.md)**.
+
+  ### Example model / GPU profiles
+
+  | Model | Params | Min GPUs (typical) | Default runtime |
+  |-------|--------|--------------------|-----------------|
+  | Llama 3.1 8B | 8B | 1× (16GB VRAM) | vLLM |
+  | Llama 3.1 70B | 70B | 4× A100 80GB | vLLM / NIM |
+  | Granite 3.1 8B | 8B | 1× (16GB VRAM) | vLLM |
+  | Mixtral 8x7B | 46.7B MoE | 2× A100 80GB | vLLM |
+  | Mistral 7B | 7B | 1× (16GB VRAM) | vLLM |
+
+  Extended tables and guidance: **[known-model-profiles.md](docs/references/known-model-profiles.md)**. Models not listed are still supported via product docs and live cluster checks.
+
+  ### In-repo examples
+
+  - NIM walkthrough: [nim-setup.md](docs/examples/nim-setup.md) (also linked from **References** below).
+mcp_section: |
+  | Server | Type | Requirement | Role |
+  |--------|------|-------------|------|
+  | **`openshift`** | Container (e.g. podman) | **Required** | Kubernetes CRUD, pods, logs, events — foundation for all skills. |
+  | **`rhoai`** | Local process (e.g. `uvx`) | **Preferred** | RHOAI-focused helpers (deployments, runtimes, projects); skills **fall back to openshift** on auth/API errors. See [opendatahub-io/rhoai-mcp](https://github.com/opendatahub-io/rhoai-mcp). |
+  | **`ai-observability`** | Remote HTTP | **Optional** | Metrics, GPU checks, tracing; skipped if unset. See [ai-observability-summarizer MCP](https://github.com/rh-ai-quickstart/ai-observability-summarizer/tree/main/src/mcp_server). |
+
+  The **`openshift`** server is the reliable baseline. **`rhoai`** speeds YAML-light flows; when it fails, skills transparently use equivalent OpenShift operations (refresh `oc login` if tokens expire).
+security_model: |
+  - Never print NGC keys, kubeconfig, or pull secrets — only confirm that required env vars exist.
+  - Follow each skill's confirmation gates before creating or deleting DataScienceProject, InferenceService, or storage resources.
+  - Optional **`ai-observability`** must not receive production secrets in URLs; use network policies and TLS as appropriate.
 sample_workflows:
 - name: Bootstrap then deploy a model
   workflow: |

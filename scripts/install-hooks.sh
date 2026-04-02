@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 #
-# Install gitleaks pre-commit hook
+# Install pre-commit hooks
 #
-# This script sets up gitleaks to run automatically before each commit
-# to prevent sensitive data from being committed.
+# Stage 1: gitleaks — scans staged changes for secrets.
+# Stage 2: generated-files — verifies that generated files (README.md,
+#   collection.json, plugin.json, marketplace.json, docs) are in sync with
+#   their sources (collection.yaml, SKILL.md). Uses 'make verify-generated'
+#   which runs in --check mode: no files are written, no git operations.
+#
+# If Stage 2 fails, run 'make generate' locally, stage the updated files,
+# and recommit.
 #
 
 set -euo pipefail
@@ -79,21 +85,22 @@ if [ -f "$HOOK_FILE" ]; then
     mv "$HOOK_FILE" "$BACKUP"
 fi
 
-# Write gitleaks pre-commit hook
+# Write pre-commit hook (two stages: gitleaks + generated files)
 cat > "$HOOK_FILE" << 'EOF'
 #!/usr/bin/env bash
 #
-# Gitleaks pre-commit hook
-# Scans staged changes for secrets before allowing commit
+# Pre-commit hook
+# Stage 1: gitleaks secrets scan
+# Stage 2: verify generated files are in sync with sources
 #
 
 set -e
 
-# Run gitleaks on staged changes
+# ── Stage 1: Secrets scan ──────────────────────────────────────────────────
 if ! gitleaks protect --staged --redact --verbose; then
     echo ""
     echo "========================================="
-    echo "🚨 COMMIT BLOCKED - Secrets Detected"
+    echo "COMMIT BLOCKED - Secrets Detected"
     echo "========================================="
     echo ""
     echo "Gitleaks found potential secrets in your staged changes."
@@ -112,6 +119,41 @@ if ! gitleaks protect --staged --redact --verbose; then
 fi
 
 echo "✓ No secrets detected"
+
+# ── Stage 2: Generated files consistency check ─────────────────────────────
+if command -v uv >/dev/null 2>&1; then
+    echo ""
+    echo "Verifying generated files are in sync with sources..."
+    if ! make verify-generated; then
+        echo ""
+        echo "========================================="
+        echo "COMMIT BLOCKED - Generated Files Out of Sync"
+        echo "========================================="
+        echo ""
+        echo "One or more generated files differ from what would be produced"
+        echo "by 'make generate'. This means either:"
+        echo "  • You edited a source file (collection.yaml / SKILL.md) without"
+        echo "    regenerating, or"
+        echo "  • You manually edited a generated file (README.md, plugin.json,"
+        echo "    collection.json, marketplace.json, docs/...)."
+        echo ""
+        echo "To fix:"
+        echo "  make generate"
+        echo "  git add <updated files>"
+        echo "  git commit"
+        echo ""
+        echo "To bypass (use only when you are certain):"
+        echo "  git commit --no-verify"
+        echo "========================================="
+        exit 1
+    fi
+    echo "✓ Generated files are in sync"
+else
+    echo ""
+    echo "Note: 'uv' not found — skipping generated file check."
+    echo "Install uv to enable this check: curl -LsSf https://astral.sh/uv/install.sh | sh"
+fi
+
 exit 0
 EOF
 
@@ -133,12 +175,18 @@ echo "========================================="
 echo "Installation Complete"
 echo "========================================="
 echo ""
-echo "Test the hook:"
-echo "  1. Make a test commit with a secret"
-echo "  2. Hook should block it"
+echo "The hook runs two stages on every commit:"
+echo "  Stage 1 — gitleaks: scans staged changes for secrets"
+echo "  Stage 2 — verify-generated: ensures generated files match sources"
 echo ""
-echo "Manual scan:"
-echo "  gitleaks detect --source . --verbose"
+echo "If Stage 2 blocks your commit:"
+echo "  make generate"
+echo "  git add <updated files>"
+echo "  git commit"
+echo ""
+echo "Manual checks:"
+echo "  gitleaks detect --source . --verbose   # secrets"
+echo "  make verify-generated                   # generated files"
 echo ""
 echo "Update hook:"
 echo "  Re-run this script: scripts/install-hooks.sh"

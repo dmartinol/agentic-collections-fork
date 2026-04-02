@@ -87,3 +87,33 @@ def write_json(path: Path, data: Mapping[str, Any]) -> None:
     with open(path, "w", encoding="utf-8") as f:
         json.dump(dict(data), f, indent=2, ensure_ascii=False)
         f.write("\n")
+
+
+def write_text_or_check(path: Path, content: str, *, check: bool = False) -> bool:
+    """Write text content, or in check mode verify it matches what is on disk.
+
+    Returns True if the file was written successfully, or if check mode found no diff.
+    Returns False (and prints a message) when check mode detects a mismatch.
+    """
+    if check:
+        if not path.exists():
+            print(f"  MISSING: {path}")
+            return False
+        existing = path.read_text(encoding="utf-8")
+        if existing != content:
+            print(f"  OUT OF SYNC: {path}")
+            return False
+        return True
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    return True
+
+
+def write_json_or_check(path: Path, data: Mapping[str, Any], *, check: bool = False) -> bool:
+    """Write JSON, or in check mode verify the file matches generated content.
+
+    Returns True if written successfully or check found no diff.
+    Returns False (and prints a message) when check mode detects a mismatch.
+    """
+    content = json.dumps(dict(data), indent=2, ensure_ascii=False) + "\n"
+    return write_text_or_check(path, content, check=check)

@@ -17,6 +17,7 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 
 from collection_markdown_includes import apply_markdown_includes
+from generation_notice import write_text_or_check
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -161,7 +162,7 @@ def build_skills_html(data: Dict[str, Any]) -> str:
     # Skills (regular)
     if skills:
         if orch:
-            parts.append("<h2>Skills</h2>")
+            parts.append("<h2>Basic Skills</h2>")
         parts.append("<ol class=\"skill-list\">")
         for s in skills:
             name = s.get("name", "")
@@ -295,6 +296,7 @@ def load_mcp_custom() -> Dict[str, Any]:
 def main(
     pack_data: List[Dict[str, Any]] | None = None,
     mcp_data: List[Dict[str, Any]] | None = None,
+    check: bool = False,
 ) -> int:
     collections = discover_collections()
     if not collections:
@@ -313,13 +315,15 @@ def main(
     collections_dir = REPO_ROOT / "docs" / "collections"
     collections_dir.mkdir(parents=True, exist_ok=True)
 
-    # Remove pages for excluded packs (e.g. WIP)
-    for pack_id in EXCLUDE_FROM_PAGES:
-        excluded_path = collections_dir / f"{pack_id}.html"
-        if excluded_path.exists():
-            excluded_path.unlink()
-            print(f"Removed docs/collections/{pack_id}.html (excluded)")
+    # Remove pages for excluded packs (e.g. WIP) — skip in check mode
+    if not check:
+        for pack_id in EXCLUDE_FROM_PAGES:
+            excluded_path = collections_dir / f"{pack_id}.html"
+            if excluded_path.exists():
+                excluded_path.unlink()
+                print(f"Removed docs/collections/{pack_id}.html (excluded)")
 
+    any_diff = False
     for pack_dir, data in collections:
         mcp_servers = mcp_by_pack.get(pack_dir) or [
             {"name": s["name"], "description": s.get("description", "")}
@@ -344,12 +348,25 @@ def main(
             agents_html=agents_html,
         )
         out_path = collections_dir / f"{collection_id}.html"
-        out_path.write_text(page, encoding="utf-8")
-        print(f"Generated docs/collections/{collection_id}.html")
+        ok = write_text_or_check(out_path, page, check=check)
+        if not ok:
+            any_diff = True
+        elif not check:
+            print(f"Generated docs/collections/{collection_id}.html")
 
-    print(f"Generated {len(collections)} collection pages")
+    if check:
+        if any_diff:
+            print("Collection pages are out of sync. Run 'make generate'.")
+            return 1
+        print(f"✓ {len(collections)} collection pages match sources")
+    else:
+        print(f"Generated {len(collections)} collection pages")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Verify files match sources without writing")
+    args = parser.parse_args()
+    sys.exit(main(check=args.check))

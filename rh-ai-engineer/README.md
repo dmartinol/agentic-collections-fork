@@ -325,7 +325,7 @@ User: "Create a new data science project with a Jupyter workbench"
 ## Security Model
 
 - Never print NGC keys, kubeconfig, or pull secrets — only confirm that required env vars exist.
-- Follow each skill’s confirmation gates before creating or deleting DataScienceProject, InferenceService, or storage resources.
+- Follow each skill's confirmation gates before creating or deleting DataScienceProject, InferenceService, or storage resources.
 - Optional **`ai-observability`** must not receive production secrets in URLs; use network policies and TLS as appropriate.
 
 ## License

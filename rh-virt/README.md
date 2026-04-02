@@ -302,7 +302,7 @@ Restore virtual machines from existing snapshots.
 
 ### Troubleshooting and operations
 
-- **MCP server** — Build and run the OpenShift MCP server image as described in **Quick Start** (this collection’s `deploy_and_use`). Confirm the local image tag matches `.mcp.json`.
+- **MCP server** — Build and run the OpenShift MCP server image as described in **Quick Start** (this collection's `deploy_and_use`). Confirm the local image tag matches `.mcp.json`.
 - **VM failures** — See [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) for conditions, storage, and migration issues.
 - **Skills not matching** — Use the **Skills Decision Guide** above or **CLAUDE.md** intent routing.
 

@@ -20,9 +20,15 @@ Each pack has a `collection.yaml` at its root (e.g. `rh-sre/collection.yaml`). I
 - `.claude-plugin/marketplace.json` / `.cursor-plugin/marketplace.json` — Marketplace listings
 - `docs/collections/<id>.html` — Collection detail pages
 
+**Development guardrails** keep generated files in sync automatically:
+
+- **Pre-commit hook** (`scripts/install-hooks.sh`): runs `make verify-generated` before every commit. If a generated file is out of sync, the commit is blocked and you are prompted to run `make generate` and re-stage. Install once after cloning: `./scripts/install-hooks.sh`.
+- **CI job** (`verify-generated` in `.github/workflows/compliance-check.yml`): runs the same `make verify-generated` check on every pull request. PRs with stale generated files are blocked until the author regenerates and pushes the updated files.
+- **`make verify-generated`**: read-only check that generates content in memory and compares it to what is on disk. Safe to run at any time — no files are written.
+
 ### Optional: long-form markdown in `.catalog/`
 
-For Markdown preview in the IDE, long prose may live under **`<pack>/.catalog/`** and be referenced from `collection.yaml` with **paths relative to the pack root** (so consumers do not need to assume a hidden folder name):
+Long prose can be kept as external Markdown files under **`<pack>/.catalog/`** and referenced from `collection.yaml` with **paths relative to the pack root**. The generator merges file contents into the matching field at build time.
 
 | YAML key | Resolves to | Example value |
 |----------|-------------|-----------------|
@@ -33,6 +39,8 @@ For Markdown preview in the IDE, long prose may live under **`<pack>/.catalog/`*
 
 **Rule:** each `*_file` value must start with `.catalog/` and resolve to a file under that pack (no `..`). Set either a non-empty `deploy_and_use` string **or** `deploy_and_use_file` pointing at a non-empty file.  
 **Generation:** `make generate-catalog`, `collection.json`, and docs collection pages merge file contents into the same fields as fully inline YAML; published output uses pack-root-relative paths. In fragments, prefer `](../docs/...` in links; the generator rewrites them to `](docs/...` for the README and JSON.
+
+**When to use external files vs inline:** Externalizing Markdown adds maintenance overhead (more files to track, edit, and keep in sync). Use `.catalog/` **only when the content exceeds ~50 lines** and you want IDE Markdown preview — typically `deploy_and_use` installation instructions. For short sections like `documentation_section`, `mcp_section`, and `security_model` (usually under 20 lines), keep the content inline in `collection.yaml` as a YAML block scalar (`|`). All current packs follow this guideline.
 
 ## Schema
 

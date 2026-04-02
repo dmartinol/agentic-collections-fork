@@ -9,13 +9,14 @@ Discovers all */collection.yaml files and produces:
 Each file includes `_generated` metadata ($schema remains first in the Claude file).
 """
 
+import argparse
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
 import yaml
 
-from generation_notice import attach_json_generation_metadata, write_json
+from generation_notice import attach_json_generation_metadata, write_json, write_json_or_check
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -104,7 +105,7 @@ def build_cursor_marketplace(collections: List[tuple]) -> Dict[str, Any]:
     }
 
 
-def main() -> int:
+def main(check: bool = False) -> int:
     collections = discover_collections()
     if not collections:
         print("No collection.yaml files found.")
@@ -125,13 +126,27 @@ def main() -> int:
     claude_dir.mkdir(exist_ok=True)
     cursor_dir.mkdir(exist_ok=True)
 
-    write_json(claude_dir / "marketplace.json", claude_data)
-    write_json(cursor_dir / "marketplace.json", cursor_data)
+    any_diff = False
+    for path, data, label in [
+        (claude_dir / "marketplace.json", claude_data, ".claude-plugin/marketplace.json"),
+        (cursor_dir / "marketplace.json", cursor_data, ".cursor-plugin/marketplace.json"),
+    ]:
+        ok = write_json_or_check(path, data, check=check)
+        if not ok:
+            any_diff = True
+        elif not check:
+            print(f"Generated {label} ({len(collections)} plugins)")
 
-    print(f"Generated .claude-plugin/marketplace.json ({len(collections)} plugins)")
-    print(f"Generated .cursor-plugin/marketplace.json ({len(collections)} plugins)")
+    if check:
+        if any_diff:
+            print("Marketplace files are out of sync. Run 'make generate-catalog'.")
+            return 1
+        print("✓ Marketplace files match sources")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Verify files match sources without writing")
+    args = parser.parse_args()
+    sys.exit(main(check=args.check))

@@ -116,6 +116,8 @@ The remediation skill orchestrates 6 specialized skills to provide complete CVE 
 
 
 
+## Basic Skills
+
 
 ### fleet-inventory - System Discovery and Fleet Management
 

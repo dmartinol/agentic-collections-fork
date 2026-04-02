@@ -1,3 +1,0 @@
-- **Secrets:** Never print `OFFLINE_TOKEN`, kubeconfig contents, pull secrets, or install keys. Confirm only that required environment variables are set.
-- **Human approval:** **cluster-creator** waits for explicit confirmation before VIP assignment, host roles, static networking, and install triggers.
-- **Read vs write:** **cluster-inventory** is discovery-focused; **cluster-report** should use least-privilege kubeconfig where possible.
