@@ -1,3 +1,9 @@
+<!--
+  GENERATED FILE — do not edit manually.
+  Source of truth: rh-virt/collection.yaml
+  Regenerate with: make generate-catalog
+-->
+
 # Red Hat OpenShift Virtualization Agentic Collection
 
 Virtual machine management and automation for OpenShift Virtualization and KubeVirt workloads.
@@ -293,8 +299,47 @@ Restore virtual machines from existing snapshots.
 
 
 
+## Documentation
+
+### Troubleshooting and operations
+
+- **MCP server** — Build and run the OpenShift MCP server image as described in **Quick Start** (this collection’s `deploy_and_use`). Confirm the local image tag matches `.mcp.json`.
+- **VM failures** — See [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) for conditions, storage, and migration issues.
+- **Skills not matching** — Use the **Skills Decision Guide** above or **CLAUDE.md** intent routing.
+
+### Architecture
+
+- Skills under **`skills/`** wrap the **openshift-virtualization** MCP server; they enforce confirmations for destructive actions.
+- Namespace-scoped resources: always confirm namespace and VM name before delete, restore, or rebalance.
+
+
+
+## MCP Server Integrations
+
+The pack uses **openshift-virtualization** (OpenShift MCP server) as defined in **`.mcp.json`**. The server talks to the cluster Kubernetes API using your kubeconfig.
+
+- Requires OpenShift **4.19+** with OpenShift Virtualization installed.
+- Build the MCP image from [openshift/openshift-mcp-server](https://github.com/openshift/openshift-mcp-server) if you do not use a pre-built image (see Quick Start).
+
 
 ## Sample Workflows
+
+
+### Create and Start a VM
+
+User: "Create a RHEL VM named web-app in namespace vms and start it"
+- vm-create skill provisions the VM (instance type, storage, network)
+- vm-lifecycle-manager starts the VM after creation if it is not running
+- vm-inventory verifies status and node placement
+
+
+
+### VM Inventory Check
+
+User: "List all VMs in namespace prod and show which are running"
+- vm-inventory skill lists VMs, status, and resource usage for the namespace
+- Filter or expand to other namespaces as needed
+
 
 
 ### VM Lifecycle Management
@@ -304,6 +349,14 @@ User: "Start VM web-server in namespace vms"
   1. Gathers VM name, namespace, and action
   2. Confirms before executing
   3. Executes start/stop/restart via MCP
+
+
+
+### VM Cloning for Test Environment
+
+User: "Clone VM database-01 to database-01-test in namespace test-vms"
+- vm-clone skill duplicates the VM and disks
+- vm-inventory confirms the new VM exists before cutover or testing
 
 
 
@@ -325,6 +378,31 @@ User: "Rebalance VMs across nodes to balance workload"
   3. Executes migrations with user approval
 
 
+
+### VM Deletion and Cleanup
+
+User: "Delete VM obsolete-lab in namespace test-vms and free storage"
+- vm-delete skill removes the VM and associated PVCs/DataVolumes
+- Confirm destructive action when prompted
+- vm-inventory verifies the VM no longer appears
+
+
+
+### Diagnose MCP or cluster issues
+
+User: "Skills fail with API errors when I manage VMs"
+- Verify `KUBECONFIG` and `oc get virtualmachines -A` outside the agent
+- Confirm the openshift-mcp-server image was built and referenced in `.mcp.json`
+- Consult [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) and **CLAUDE.md** safety rules
+
+
+
+
+## Security Model
+
+- Never share kubeconfig contents, cloud-init passwords, or SSH keys in chat.
+- Destructive operations (**vm-delete**, **vm-snapshot-delete**, **vm-snapshot-restore**) require explicit user confirmation.
+- **vm-snapshot-restore** typically requires the VM to be stopped first; the skill workflow enforces checks—do not bypass them.
 
 
 ## License

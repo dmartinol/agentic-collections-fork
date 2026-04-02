@@ -111,6 +111,12 @@ cp -r agentic-collections-main/rh-sre ~/.opencode/plugins/rh-sre
 </code></pre></div>
 </details>
 </div>
+<h2>Security Model</h2>
+<ul>
+<li>Do <strong>not</strong> expose <code>LIGHTSPEED_CLIENT_ID</code>, <code>LIGHTSPEED_CLIENT_SECRET</code>, AAP tokens, or any API credentials in chat—only whether they appear configured.</li>
+<li>Require explicit user approval before running remediation playbooks or destructive changes at scale.</li>
+<li>Prefer <strong><code>/remediation</code></strong> for end-to-end CVE response so validation and verification steps are not skipped accidentally.</li>
+</ul>
 <h2>License</h2>
 <p><a href="https://www.redhat.com/en/about/agreements">Apache-2.0</a></p>
             </div>

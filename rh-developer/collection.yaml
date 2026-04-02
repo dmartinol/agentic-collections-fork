@@ -239,8 +239,14 @@ deploy_and_use: |
   ### Prerequisites
 
   - Claude Code CLI or IDE extension
-  - OpenShift cluster with build and deployment capabilities
-  - `oc` CLI and `KUBECONFIG` configured for cluster access
+  - **OpenShift** cluster with build/deploy capabilities (for OpenShift skills)
+  - **`oc`** CLI and **`KUBECONFIG`** for cluster-scoped skills
+  - **Podman** installed locally (S2I builds, **podman** MCP, local image workflows)
+  - **Git**; **GitHub personal access token** when analyzing private GitHub repos via **`github`** MCP
+  - **Helm** CLI (for **`/helm-deploy`**)
+  - **Optional — Red Hat Insights / Lightspeed** (`LIGHTSPEED_CLIENT_ID`, `LIGHTSPEED_CLIENT_SECRET`) for **`/debug-rhel`** and **`/rhel-deploy`** advisor data
+
+  **Supported languages** (detection / S2I): Node.js, Python, Java, Go, Ruby, .NET, PHP, Perl — see also [docs/builder-images.md](docs/builder-images.md).
 
   ### Environment Setup
 
@@ -255,6 +261,35 @@ deploy_and_use: |
   ```bash
   oc get projects
   ```
+
+  Copy MCP server definitions from **`rh-developer/.mcp.json`** into your assistant MCP settings. **macOS Podman note:** the **openshift** MCP stanza may use `--userns=keep-id`; Podman on macOS runs in a VM and this can prevent startup. If the server fails to start, remove or adjust the `--userns` arguments in `.mcp.json` per your platform (see upstream README guidance; Linux typically keeps the mapping for `chmod 600` kubeconfigs).
+documentation_section: |
+  ### Skill index (quick reference)
+
+  | Area | Skills |
+  |------|--------|
+  | **Build & deploy** | `/detect-project`, `/recommend-image`, `/s2i-build`, `/deploy`, `/helm-deploy`, `/rhel-deploy`, `/containerize-deploy` |
+  | **Diagnostics** | `/debug-pod`, `/debug-build`, `/debug-pipeline`, `/debug-network`, `/debug-container`, `/debug-rhel` |
+  | **Preflight** | `/validate-environment` |
+
+  Deep workflows remain in each **`skills/<name>/SKILL.md`**.
+
+  ### Documentation in this pack
+
+  - Builder and image notes: [docs/builder-images.md](docs/builder-images.md)
+mcp_section: |
+  | Server | Role |
+  |--------|------|
+  | **openshift** | Cluster CRUD, builds, deployments, Helm on OpenShift. |
+  | **podman** | Local images and container tooling. |
+  | **github** | Repository browse/analysis (e.g. **`/detect-project`** from GitHub URLs). |
+  | **lightspeed-mcp** | Optional Insights vulnerability/advisor context for RHEL paths. |
+
+  Configure all via **`rh-developer/.mcp.json`**; skills must not call MCP tools directly.
+security_model: |
+  - Never print kubeconfig, GitHub tokens, or Lightspeed client secrets.
+  - **openshift** MCP user-namespace mapping can affect kubeconfig readability on some hosts; fix MCP config rather than loosening secret file permissions.
+  - Destructive changes require explicit user approval per skill workflows.
 
   ### Installation (Claude Code)
 

@@ -1,3 +1,9 @@
+<!--
+  GENERATED FILE — do not edit manually.
+  Source of truth: rh-ai-engineer/collection.yaml
+  Regenerate with: make generate-catalog
+-->
+
 # Red Hat AI Engineer Agentic Collection
 
 Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, registries, workbenches, and serving runtimes on OpenShift AI.
@@ -17,8 +23,12 @@ Deploy and operate models on OpenShift AI with skills for **data science project
 ### Prerequisites
 
 - Claude Code CLI or IDE extension
-- Red Hat OpenShift AI (RHOAI) cluster with model serving capabilities
-- `oc` CLI and `KUBECONFIG` configured for cluster access
+- **`podman`** (or Docker) for containerized MCP servers where configured in `.mcp.json`
+- **`oc`** CLI and **`KUBECONFIG`** for cluster access
+- OpenShift cluster with **Red Hat OpenShift AI** operator installed and **KServe** model serving available
+- **GPU nodes** for GPU-accelerated inference (see [known-model-profiles.md](docs/references/known-model-profiles.md) for sizing hints)
+
+**For NVIDIA NIM deployments:** NVIDIA GPU Operator, Node Feature Discovery (NFD), and an **NGC API key** (see **`/nim-setup`** and [NIM on OpenShift AI](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed)).
 
 ### Environment Setup
 
@@ -28,61 +38,19 @@ Configure OpenShift AI cluster access:
 export KUBECONFIG="/path/to/your/kubeconfig"
 ```
 
+Optional observability MCP URL (when using the remote summarizer pattern):
+
+```bash
+export AI_OBSERVABILITY_MCP_URL="https://your-observability-mcp.example"
+```
+
 Verify access to OpenShift AI:
 
 ```bash
 oc get datascienceprojects -A
 ```
 
-Skills rely on **`openshift`** (required), **`rhoai`** (preferred), and optional **`ai-observability`** MCP servers defined in `rh-ai-engineer/.mcp.json`. Copy entries into your Claude Code MCP settings; use `${...}` env placeholders only.
-
-### Installation (Claude Code)
-
-Install the collection as a Claude Code plugin:
-
-```bash
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install rh-ai-engineer
-```
-
-Or for local development:
-
-```bash
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install rh-ai-engineer
-```
-
-### Installation (Cursor)
-
-Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
-
-```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
-```
-
-Or download and extract:
-
-```bash
-wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-cp -r agentic-collections-main/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
-```
-
-### Installation (Open Code)
-
-Open Code does not support direct marketplace install via CLI. Clone or download the repository:
-
-```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
-```
-
-Or with wget:
-
-```bash
-wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
-```
+MCP definitions live in **`rh-ai-engineer/.mcp.json`** — copy entries into Claude Code `/mcp` or settings; use **`${...}`** placeholders only for secrets.
 
 
 ## Skills
@@ -220,6 +188,46 @@ Deploy guardrails orchestrators with PII, toxicity, and prompt-injection detecto
 
 
 
+## Documentation
+
+### Supported runtimes
+
+| Runtime | Typical use | Setup |
+|---------|------------|--------|
+| **vLLM** | Open-source LLMs (Llama, Granite, Mixtral, Mistral) | None beyond cluster/serving |
+| **NVIDIA NIM** | TensorRT-LLM on NVIDIA GPUs | Run **`/nim-setup`** first |
+| **Caikit+TGIS** | Caikit-format models, gRPC | Model conversion as required |
+
+Full comparison: **[docs/references/supported-runtimes.md](docs/references/supported-runtimes.md)**.
+
+### Example model / GPU profiles
+
+| Model | Params | Min GPUs (typical) | Default runtime |
+|-------|--------|--------------------|-----------------|
+| Llama 3.1 8B | 8B | 1× (16GB VRAM) | vLLM |
+| Llama 3.1 70B | 70B | 4× A100 80GB | vLLM / NIM |
+| Granite 3.1 8B | 8B | 1× (16GB VRAM) | vLLM |
+| Mixtral 8x7B | 46.7B MoE | 2× A100 80GB | vLLM |
+| Mistral 7B | 7B | 1× (16GB VRAM) | vLLM |
+
+Extended tables and guidance: **[docs/references/known-model-profiles.md](docs/references/known-model-profiles.md)**. Models not listed are still supported via product docs and live cluster checks.
+
+### In-repo examples
+
+- NIM walkthrough: [docs/examples/nim-setup.md](docs/examples/nim-setup.md) (also linked from **References** below).
+
+
+
+## MCP Server Integrations
+
+| Server | Type | Requirement | Role |
+|--------|------|-------------|------|
+| **`openshift`** | Container (e.g. podman) | **Required** | Kubernetes CRUD, pods, logs, events — foundation for all skills. |
+| **`rhoai`** | Local process (e.g. `uvx`) | **Preferred** | RHOAI-focused helpers (deployments, runtimes, projects); skills **fall back to openshift** on auth/API errors. See [opendatahub-io/rhoai-mcp](https://github.com/opendatahub-io/rhoai-mcp). |
+| **`ai-observability`** | Remote HTTP | **Optional** | Metrics, GPU checks, tracing; skipped if unset. See [ai-observability-summarizer MCP](https://github.com/rh-ai-quickstart/ai-observability-summarizer/tree/main/src/mcp_server). |
+
+The **`openshift`** server is the reliable baseline. **`rhoai`** speeds YAML-light flows; when it fails, skills transparently use equivalent OpenShift operations (refresh `oc login` if tokens expire).
+
 
 ## Sample Workflows
 
@@ -269,6 +277,61 @@ User: "Create a new data science project with a Jupyter workbench"
 
 
 
+## Security Model
+
+- Never print NGC keys, kubeconfig, or pull secrets — only confirm that required env vars exist.
+- Follow each skill’s confirmation gates before creating or deleting DataScienceProject, InferenceService, or storage resources.
+- Optional **`ai-observability`** must not receive production secrets in URLs; use network policies and TLS as appropriate.
+
+### Installation (Claude Code)
+
+Install the collection as a Claude Code plugin:
+
+```bash
+claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+claude plugin install rh-ai-engineer
+```
+
+Or for local development:
+
+```bash
+claude plugin marketplace add /path/to/agentic-collections
+claude plugin install rh-ai-engineer
+```
+
+### Installation (Cursor)
+
+Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+```
+
+Or download and extract:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+```
+
+### Installation (Open Code)
+
+Open Code does not support direct marketplace install via CLI. Clone or download the repository:
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+```
+
+Or with wget:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
+```
+
+
 ## License
 
 
@@ -279,6 +342,9 @@ User: "Create a new data science project with a Jupyter workbench"
 
 
 - [Red Hat OpenShift AI Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed) - RHOAI product documentation for model serving, pipelines, and workbenches.
+
+
+- [Known model hardware profiles (in-repo)](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed/latest/html-single/red_hat_openshift_ai_self_managed) - Parameter counts, GPU sizing, and runtime notes collated for common models.
 
 
 - [OpenShift AI Model Serving](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed/latest/html-single/red_hat_openshift_ai_self_managed) - InferenceService, runtimes, and model deployment.

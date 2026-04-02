@@ -1,0 +1,172 @@
+{
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "rh-automation/collection.yaml",
+    "regenerate": "make generate-catalog"
+  },
+  "id": "rh-automation",
+  "name": "Red Hat Automation Agentic Collection",
+  "provider": "Red Hat",
+  "version": "1.0.0",
+  "categories": [
+    "Automation",
+    "Governance"
+  ],
+  "personas": [
+    "Red Hat Automation Governance Architect"
+  ],
+  "marketplaces": [
+    "Claude Code",
+    "Cursor"
+  ],
+  "support_level": "Unknown",
+  "keywords": [
+    "ansible",
+    "aap",
+    "automation",
+    "red-hat",
+    "governance",
+    "troubleshooting",
+    "execution"
+  ],
+  "description": "Ansible Automation Platform governance, execution safety, and forensic troubleshooting tools for Red Hat automation engineers.",
+  "summary": "The rh-automation collection provides 11 skills for AAP governance assessment, governed execution, and forensic troubleshooting.",
+  "contents": {
+    "description": "The pack provides 11 skills for AAP governance, execution safety, and forensic troubleshooting, including 3 orchestration skills.",
+    "skills": [
+      {
+        "name": "aap-mcp-validator",
+        "description": "Validate AAP MCP Server Connectivity",
+        "summary_markdown": "Validate that required AAP MCP servers are accessible before executing automation skills.\n\n**Use when:**\n- Before any skill that requires AAP MCP access\n- \"Validate AAP MCP\", \"Check if AAP is configured\"\n- \"Verify AAP connection\", \"Test AAP MCP servers\"\n\n**What it does:**\n- Validates one or more of the 6 AAP MCP servers\n- Verifies environment variables (AAP_MCP_SERVER, AAP_API_TOKEN)\n- Reports connectivity status (PASSED/PARTIAL/FAILED)\n"
+      },
+      {
+        "name": "governance-readiness-assessor",
+        "description": "7-Domain Platform Governance Audit",
+        "summary_markdown": "Audit AAP platform across 7 governance domains with Red Hat citations.\n\n**Use when:**\n- \"Assess my AAP governance\", \"Is my AAP ready for production?\"\n- \"Check credentials setup\", \"Audit RBAC\", \"How are my notifications?\"\n\n**What it does:**\n- Assesses Workflow Governance, Notification Coverage, RBAC, Credential Security,\n  Execution Environments, Workload Isolation, Audit Trail\n- Produces PASS/GAP/WARN report with Red Hat documentation citations\n"
+      },
+      {
+        "name": "execution-risk-analyzer",
+        "description": "Inventory Risk Classification and Secret Scanning",
+        "summary_markdown": "Classify inventory risk and scan extra_vars for secrets before execution.\n\n**Use when:**\n- Before executing jobs on production\n- \"What's the risk of running this on prod?\"\n- Validate extra_vars for sensitive data\n\n**What it does:**\n- Classifies inventory risk (dev/staging/prod)\n- Scans extra_vars for potential secrets\n- Supports governed execution flow\n"
+      },
+      {
+        "name": "governed-job-launcher",
+        "description": "Check Mode, Approval, and Phased Rollout",
+        "summary_markdown": "Launch jobs with check mode, approval gates, phased rollout, and rollback.\n\n**Use when:**\n- \"Execute the security patch on production urgently\"\n- Run jobs with dry-run before real execution\n- Phased rollout across environments\n\n**What it does:**\n- Runs check mode before execution\n- Requires approval for production targets\n- Supports phased rollout and rollback\n"
+      },
+      {
+        "name": "job-failure-analyzer",
+        "description": "Event Extraction and Error Classification",
+        "summary_markdown": "Extract failure events and classify errors (Platform/Code/Configuration).\n\n**Use when:**\n- \"Job #4451 failed. What happened?\"\n- Analyze job failure events\n- Classify error type for resolution\n\n**What it does:**\n- Extracts failure events from job execution\n- Classifies errors using Red Hat taxonomy\n- Correlates with host facts for root cause\n"
+      },
+      {
+        "name": "host-fact-inspector",
+        "description": "Host Fact Correlation with Failures",
+        "summary_markdown": "Correlate host ansible_facts with job failures for root cause analysis.\n\n**Use when:**\n- Job failed on specific hosts\n- Need host configuration context for failure\n- Correlate failures with host facts\n\n**What it does:**\n- Retrieves host facts from inventory\n- Correlates with failure events\n- Supports forensic troubleshooting\n"
+      },
+      {
+        "name": "resolution-advisor",
+        "description": "Red Hat Doc-Backed Resolution Recommendations",
+        "summary_markdown": "Provide resolution recommendations backed by Red Hat documentation.\n\n**Use when:**\n- After error classification in troubleshooting\n- Need resolution steps for identified error type\n- Advisory guidance (no MCP tools)\n\n**What it does:**\n- Maps error types to resolution paths\n- Cites Red Hat documentation\n- Provides actionable recommendations\n"
+      },
+      {
+        "name": "execution-summary",
+        "description": "Audit Trail with Doc Consultation Tracking",
+        "summary_markdown": "Generate execution reports for audit and learning purposes.\n\n**Use when:**\n- Generate execution summary\n- Create audit trail for workflow\n- Summarize skills and docs used\n\n**What it does:**\n- Analyzes conversation history\n- Extracts agents, skills, tools, and docs used\n- Provides audit trail for workflows\n"
+      }
+    ],
+    "skills_decision_guide": [
+      {
+        "user_request": "\"Assess my AAP governance\" or \"Is my AAP ready for production?\"",
+        "skill_to_use": "governance-assessor",
+        "reason": "Orchestrates full platform governance audit across 7 domains."
+      },
+      {
+        "user_request": "\"Execute the security patch on production\" or \"Run this job with check mode\"",
+        "skill_to_use": "governance-executor",
+        "reason": "Orchestrates governed execution with risk analysis and approval."
+      },
+      {
+        "user_request": "\"Job #4451 failed. What happened?\" or \"Troubleshoot this job failure\"",
+        "skill_to_use": "forensic-troubleshooter",
+        "reason": "Orchestrates failure root cause analysis with error classification."
+      },
+      {
+        "user_request": "\"Validate AAP MCP\" or \"Check AAP connectivity\"",
+        "skill_to_use": "aap-mcp-validator",
+        "reason": "Direct MCP connectivity validation without full assessment."
+      }
+    ],
+    "orchestration_skills": [
+      {
+        "name": "governance-assessor",
+        "description": "Orchestrates Platform Governance Audit",
+        "summary_markdown": "Orchestrates AAP governance readiness assessments across 7 domains.\n\n**Use when:**\n- \"Assess my AAP platform's governance readiness\"\n- \"Audit my platform governance\"\n- \"What should I fix before executing jobs?\"\n\n**Workflow:**\n- Validates MCP connectivity (aap-mcp-validator)\n- Runs governance-readiness-assessor (full or scoped)\n- Produces execution-summary\n"
+      },
+      {
+        "name": "governance-executor",
+        "description": "Orchestrates Governed Execution",
+        "summary_markdown": "Orchestrates governed job execution with risk analysis and approval.\n\n**Use when:**\n- \"Execute the security patch on production urgently\"\n- Run jobs with check mode and approval\n\n**Workflow:**\n- execution-risk-analyzer (inventory risk, secret scanning)\n- governed-job-launcher (check mode, approval, phased rollout)\n"
+      },
+      {
+        "name": "forensic-troubleshooter",
+        "description": "Orchestrates Failure Root Cause Analysis",
+        "summary_markdown": "Orchestrates forensic failure analysis with error classification.\n\n**Use when:**\n- \"Job #4451 failed. What happened?\"\n- Troubleshoot job failures\n\n**Workflow:**\n- job-failure-analyzer (event extraction, error classification)\n- host-fact-inspector (host correlation)\n- resolution-advisor (Red Hat doc-backed recommendations)\n"
+      }
+    ]
+  },
+  "deploy_and_use": "### Prerequisites\n\n- Claude Code CLI or IDE extension (or Cursor)\n- Red Hat Ansible Automation Platform 2.5+\n- AAP API token (Personal Access Token)\n\n### Environment Setup\n\nConfigure AAP MCP server and API token:\n\n```bash\nexport AAP_MCP_SERVER=\"your-aap-mcp-server.example.com\"\nexport AAP_API_TOKEN=\"your-personal-access-token\"\n```\n\n### Installation (Claude Code)\n\nInstall the collection as a Claude Code plugin:\n\n```bash\nclaude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections\nclaude plugin install rh-automation\n```\n\nOr for local development:\n\n```bash\nclaude plugin marketplace add /path/to/agentic-collections\nclaude plugin install rh-automation\n```\n\n### Installation (Cursor)\n\nCursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:\n\n```bash\ngit clone https://github.com/RHEcosystemAppEng/agentic-collections.git\ncp -r agentic-collections/rh-automation ~/.cursor/plugins/rh-automation\n```\n\nOr download and extract:\n\n```bash\nwget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz\ncp -r agentic-collections-main/rh-automation ~/.cursor/plugins/rh-automation\n```\n\n### Installation (Open Code)\n\nOpen Code does not support direct marketplace install via CLI. Clone or download the repository:\n\n```bash\ngit clone https://github.com/RHEcosystemAppEng/agentic-collections.git\ncp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation\n```\n",
+  "documentation_section": "### What this collection adds over raw MCP access\n\nRaw MCP access can list templates, launch jobs, and read events. This pack adds:\n\n1. **Knowledge** — In-repo docs distilled from Red Hat sources (cited at runtime). Start with embedded references: [docs/aap/governance-readiness.md](docs/aap/governance-readiness.md), [docs/aap/execution-governance.md](docs/aap/execution-governance.md), [docs/aap/job-troubleshooting.md](docs/aap/job-troubleshooting.md), [docs/references/error-classification.md](docs/references/error-classification.md).\n2. **Judgment** — Skills interpret MCP data through governance and risk patterns (secret scans, inventory classification, error taxonomy).\n3. **Workflow** — Orchestration skills (**`governance-assessor`**, **`governance-executor`**, **`forensic-troubleshooter`**) chain sub-skills with human-in-the-loop gates.\n\n### Three primary use cases\n\n**1. Governance assessment** — *\"Assess my AAP platform's governance readiness.\"*  \nEntry: **`governance-assessor`** → audits seven domains across all MCP endpoints; see **governance-readiness** doc above.\n\n**2. Governed execution** — *\"Execute the security patch on production urgently.\"*  \nEntry: **`governance-executor`** → risk analysis, check mode, approval before production.\n\n**3. Forensic troubleshooting** — *\"Job #4451 failed. What happened?\"*  \nEntry: **`forensic-troubleshooter`** → events, host facts, doc-backed resolutions (**job-troubleshooting**, **error-classification**).\n\n### Skills × MCP coverage (summary)\n\n| Skill | Typical MCP scope |\n|-------|-------------------|\n| `governance-assessor` | All 6 servers (orchestrated audit) |\n| `governance-executor` | job-management, inventory-management |\n| `forensic-troubleshooter` | job-management, inventory-management |\n| `aap-mcp-validator` | All 6 (connectivity) |\n| `governance-readiness-assessor` | All 6 |\n| `execution-risk-analyzer`, `governed-job-launcher` | job-management (+ inventory as needed) |\n| `job-failure-analyzer` | job-management |\n| `host-fact-inspector` | inventory-management |\n| `resolution-advisor`, `execution-summary` | Advisory / reporting (consult docs) |\n",
+  "mcp_section": "Six HTTP MCP servers (see **`rh-automation/.mcp.json`** and [AAP MCP Server](https://github.com/ansible/aap-mcp-server)):\n\n| Server | Purpose |\n|--------|---------|\n| **aap-mcp-job-management** | Job templates, launches, events, workflows |\n| **aap-mcp-inventory-management** | Inventories, hosts, groups, facts |\n| **aap-mcp-configuration** | Notifications, execution environments, platform settings |\n| **aap-mcp-security-compliance** | Credentials, credential types, testing |\n| **aap-mcp-system-monitoring** | Instance groups, activity stream, mesh, status |\n| **aap-mcp-user-management** | Users, teams, organizations, RBAC |\n\nFull governance audits require reachability across **all six**; execution paths may use a subset. Set **`AAP_MCP_SERVER`** and **`AAP_API_TOKEN`** as documented under Quick Start.\n",
+  "security_model": "- Never print **`AAP_API_TOKEN`** or raw Bearer material.\n- Production job launches require explicit approval paths in **`governed-job-launcher`** / **`governance-executor`**.\n- Treat extra_vars and inventory names as sensitive; skills scan for secrets before execution.\n",
+  "sample_workflows": [
+    {
+      "name": "Governance Assessment",
+      "workflow": "User: \"Assess my AAP governance - is it ready for production?\"\n- governance-assessor skill:\n  1. Audits AAP platform across 7 governance domains\n  2. Produces PASS/GAP/WARN report with Red Hat citations\n"
+    },
+    {
+      "name": "Governed Execution",
+      "workflow": "User: \"Run this job template with full governance check\"\n- governance-executor skill:\n  1. Performs risk analysis\n  2. Runs check mode (dry run) first\n  3. Requires approval before production execution\n  4. Catches failures in dry run before production\n"
+    },
+    {
+      "name": "Forensic Troubleshooting",
+      "workflow": "User: \"Job 12345 failed - help me troubleshoot\"\n- forensic-troubleshooter skill:\n  1. Extracts job events and host facts\n  2. Classifies errors per taxonomy\n  3. Correlates host facts and failures\n  4. Provides resolution recommendations\n"
+    }
+  ],
+  "resources": [
+    {
+      "title": "Red Hat Ansible Automation Platform",
+      "url": "https://www.redhat.com/en/technologies/management/ansible",
+      "description": "Product overview and capabilities for AAP."
+    },
+    {
+      "title": "AAP 2.5 Security Best Practices",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/configuring_automation_execution/controller-security-best-practices",
+      "description": "Credential security, RBAC, separation of duties.",
+      "embedded_doc": "docs/aap/governance-readiness.md"
+    },
+    {
+      "title": "AAP 2.6 Troubleshooting Guide (Jobs)",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs",
+      "description": "Job failure analysis, common errors, event interpretation.",
+      "embedded_doc": "docs/aap/job-troubleshooting.md"
+    },
+    {
+      "title": "AAP 2.5 Job Templates and Configuration",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html/automation_controller_user_guide/controller-job-templates",
+      "description": "Job execution, check mode, extra_vars, job slicing.",
+      "embedded_doc": "docs/aap/execution-governance.md"
+    },
+    {
+      "title": "AAP 2.6 Troubleshooting Guide",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/troubleshooting_ansible_automation_platform/troubleshoot-jobs",
+      "description": "Error classification taxonomy and resolution paths.",
+      "embedded_doc": "docs/references/error-classification.md"
+    },
+    {
+      "title": "AAP MCP Server",
+      "url": "https://github.com/ansible/aap-mcp-server",
+      "description": "MCP server for AAP API integration used by this collection."
+    }
+  ]
+}

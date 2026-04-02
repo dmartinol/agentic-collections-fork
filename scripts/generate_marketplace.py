@@ -5,16 +5,24 @@ Generate Claude Code and Cursor marketplace.json from collection.yaml definition
 Discovers all */collection.yaml files and produces:
 - .claude-plugin/marketplace.json
 - .cursor-plugin/marketplace.json
+
+Each file includes `_generated` metadata ($schema remains first in the Claude file).
 """
 
-import json
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
 import yaml
 
+from generation_notice import attach_json_generation_metadata, write_json
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+MARKETPLACE_JSON_SOURCE = (
+    "Each plugin entry is generated from the pack's collection.yaml "
+    "(see each item's `source` path under the repository root)."
+)
 MARKETPLACE_OWNER = {
     "name": "Red Hat Ecosystem Engineering",
     "email": "eco-engineering@redhat.com",
@@ -102,19 +110,23 @@ def main() -> int:
         print("No collection.yaml files found.")
         return 1
 
-    claude_data = build_claude_marketplace(collections)
-    cursor_data = build_cursor_marketplace(collections)
+    claude_data = attach_json_generation_metadata(
+        build_claude_marketplace(collections),
+        source_of_truth=MARKETPLACE_JSON_SOURCE,
+        schema_key_first="$schema",
+    )
+    cursor_data = attach_json_generation_metadata(
+        build_cursor_marketplace(collections),
+        source_of_truth=MARKETPLACE_JSON_SOURCE,
+    )
 
     claude_dir = REPO_ROOT / ".claude-plugin"
     cursor_dir = REPO_ROOT / ".cursor-plugin"
     claude_dir.mkdir(exist_ok=True)
     cursor_dir.mkdir(exist_ok=True)
 
-    with open(claude_dir / "marketplace.json", "w", encoding="utf-8") as f:
-        json.dump(claude_data, f, indent=2)
-
-    with open(cursor_dir / "marketplace.json", "w", encoding="utf-8") as f:
-        json.dump(cursor_data, f, indent=2)
+    write_json(claude_dir / "marketplace.json", claude_data)
+    write_json(cursor_dir / "marketplace.json", cursor_data)
 
     print(f"Generated .claude-plugin/marketplace.json ({len(collections)} plugins)")
     print(f"Generated .cursor-plugin/marketplace.json ({len(collections)} plugins)")

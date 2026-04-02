@@ -1,3 +1,9 @@
+<!--
+  GENERATED FILE — do not edit manually.
+  Source of truth: rh-developer/collection.yaml
+  Regenerate with: make generate-catalog
+-->
+
 # Red Hat Developer Agentic Collection
 
 Plugins for building and deploying applications on Red Hat platforms.
@@ -14,8 +20,14 @@ The rh-developer collection provides skills for development tasks.
 ### Prerequisites
 
 - Claude Code CLI or IDE extension
-- OpenShift cluster with build and deployment capabilities
-- `oc` CLI and `KUBECONFIG` configured for cluster access
+- **OpenShift** cluster with build/deploy capabilities (for OpenShift skills)
+- **`oc`** CLI and **`KUBECONFIG`** for cluster-scoped skills
+- **Podman** installed locally (S2I builds, **podman** MCP, local image workflows)
+- **Git**; **GitHub personal access token** when analyzing private GitHub repos via **`github`** MCP
+- **Helm** CLI (for **`/helm-deploy`**)
+- **Optional — Red Hat Insights / Lightspeed** (`LIGHTSPEED_CLIENT_ID`, `LIGHTSPEED_CLIENT_SECRET`) for **`/debug-rhel`** and **`/rhel-deploy`** advisor data
+
+**Supported languages** (detection / S2I): Node.js, Python, Java, Go, Ruby, .NET, PHP, Perl — see also [docs/builder-images.md](docs/builder-images.md).
 
 ### Environment Setup
 
@@ -31,53 +43,7 @@ Verify access:
 oc get projects
 ```
 
-### Installation (Claude Code)
-
-Install the collection as a Claude Code plugin:
-
-```bash
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install rh-developer
-```
-
-Or for local development:
-
-```bash
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install rh-developer
-```
-
-### Installation (Cursor)
-
-Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
-
-```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-developer ~/.cursor/plugins/rh-developer
-```
-
-Or download and extract:
-
-```bash
-wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-cp -r agentic-collections-main/rh-developer ~/.cursor/plugins/rh-developer
-```
-
-### Installation (Open Code)
-
-Open Code does not support direct marketplace install via CLI. Clone or download the repository:
-
-```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-developer ~/.opencode/plugins/rh-developer
-```
-
-Or with wget:
-
-```bash
-wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
-```
+Copy MCP server definitions from **`rh-developer/.mcp.json`** into your assistant MCP settings. **macOS Podman note:** the **openshift** MCP stanza may use `--userns=keep-id`; Podman on macOS runs in a VM and this can prevent startup. If the server fails to start, remove or adjust the `--userns` arguments in `.mcp.json` per your platform (see upstream README guidance; Linux typically keeps the mapping for `chmod 600` kubeconfigs).
 
 
 ## Skills
@@ -332,6 +298,35 @@ Diagnose RHEL system issues including systemd failures, SELinux denials, firewal
 
 
 
+## Documentation
+
+### Skill index (quick reference)
+
+| Area | Skills |
+|------|--------|
+| **Build & deploy** | `/detect-project`, `/recommend-image`, `/s2i-build`, `/deploy`, `/helm-deploy`, `/rhel-deploy`, `/containerize-deploy` |
+| **Diagnostics** | `/debug-pod`, `/debug-build`, `/debug-pipeline`, `/debug-network`, `/debug-container`, `/debug-rhel` |
+| **Preflight** | `/validate-environment` |
+
+Deep workflows remain in each **`skills/<name>/SKILL.md`**.
+
+### Documentation in this pack
+
+- Builder and image notes: [docs/builder-images.md](docs/builder-images.md)
+
+
+
+## MCP Server Integrations
+
+| Server | Role |
+|--------|------|
+| **openshift** | Cluster CRUD, builds, deployments, Helm on OpenShift. |
+| **podman** | Local images and container tooling. |
+| **github** | Repository browse/analysis (e.g. **`/detect-project`** from GitHub URLs). |
+| **lightspeed-mcp** | Optional Insights vulnerability/advisor context for RHEL paths. |
+
+Configure all via **`rh-developer/.mcp.json`**; skills must not call MCP tools directly.
+
 
 ## Sample Workflows
 
@@ -364,6 +359,61 @@ User: "Deploy this Helm chart to OpenShift"
 - helm-deploy skill deploys with release name and namespace
 
 
+
+
+## Security Model
+
+- Never print kubeconfig, GitHub tokens, or Lightspeed client secrets.
+- **openshift** MCP user-namespace mapping can affect kubeconfig readability on some hosts; fix MCP config rather than loosening secret file permissions.
+- Destructive changes require explicit user approval per skill workflows.
+
+### Installation (Claude Code)
+
+Install the collection as a Claude Code plugin:
+
+```bash
+claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
+claude plugin install rh-developer
+```
+
+Or for local development:
+
+```bash
+claude plugin marketplace add /path/to/agentic-collections
+claude plugin install rh-developer
+```
+
+### Installation (Cursor)
+
+Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-developer ~/.cursor/plugins/rh-developer
+```
+
+Or download and extract:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-developer ~/.cursor/plugins/rh-developer
+```
+
+### Installation (Open Code)
+
+Open Code does not support direct marketplace install via CLI. Clone or download the repository:
+
+```bash
+git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
+cp -r agentic-collections/rh-developer ~/.opencode/plugins/rh-developer
+```
+
+Or with wget:
+
+```bash
+wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
+cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
+```
 
 
 ## License

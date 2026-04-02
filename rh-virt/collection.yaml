@@ -276,6 +276,17 @@ deploy_and_use: |
   cp -r agentic-collections-main/rh-virt ~/.opencode/plugins/openshift-virtualization
   ```
 sample_workflows:
+- name: Create and Start a VM
+  workflow: |
+    User: "Create a RHEL VM named web-app in namespace vms and start it"
+    - vm-create skill provisions the VM (instance type, storage, network)
+    - vm-lifecycle-manager starts the VM after creation if it is not running
+    - vm-inventory verifies status and node placement
+- name: VM Inventory Check
+  workflow: |
+    User: "List all VMs in namespace prod and show which are running"
+    - vm-inventory skill lists VMs, status, and resource usage for the namespace
+    - Filter or expand to other namespaces as needed
 - name: VM Lifecycle Management
   workflow: |
     User: "Start VM web-server in namespace vms"
@@ -283,6 +294,11 @@ sample_workflows:
       1. Gathers VM name, namespace, and action
       2. Confirms before executing
       3. Executes start/stop/restart via MCP
+- name: VM Cloning for Test Environment
+  workflow: |
+    User: "Clone VM database-01 to database-01-test in namespace test-vms"
+    - vm-clone skill duplicates the VM and disks
+    - vm-inventory confirms the new VM exists before cutover or testing
 - name: VM Snapshot Before Upgrade
   workflow: |
     User: "Create a snapshot of database-vm before I upgrade"
@@ -296,6 +312,38 @@ sample_workflows:
       1. Analyzes node utilization
       2. Proposes live migration plan
       3. Executes migrations with user approval
+- name: VM Deletion and Cleanup
+  workflow: |
+    User: "Delete VM obsolete-lab in namespace test-vms and free storage"
+    - vm-delete skill removes the VM and associated PVCs/DataVolumes
+    - Confirm destructive action when prompted
+    - vm-inventory verifies the VM no longer appears
+- name: Diagnose MCP or cluster issues
+  workflow: |
+    User: "Skills fail with API errors when I manage VMs"
+    - Verify `KUBECONFIG` and `oc get virtualmachines -A` outside the agent
+    - Confirm the openshift-mcp-server image was built and referenced in `.mcp.json`
+    - Consult [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) and **CLAUDE.md** safety rules
+documentation_section: |
+  ### Troubleshooting and operations
+
+  - **MCP server** — Build and run the OpenShift MCP server image as described in **Quick Start** (this collection’s `deploy_and_use`). Confirm the local image tag matches `.mcp.json`.
+  - **VM failures** — See [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) for conditions, storage, and migration issues.
+  - **Skills not matching** — Use the **Skills Decision Guide** above or **CLAUDE.md** intent routing.
+
+  ### Architecture
+
+  - Skills under **`skills/`** wrap the **openshift-virtualization** MCP server; they enforce confirmations for destructive actions.
+  - Namespace-scoped resources: always confirm namespace and VM name before delete, restore, or rebalance.
+mcp_section: |
+  The pack uses **openshift-virtualization** (OpenShift MCP server) as defined in **`.mcp.json`**. The server talks to the cluster Kubernetes API using your kubeconfig.
+
+  - Requires OpenShift **4.19+** with OpenShift Virtualization installed.
+  - Build the MCP image from [openshift/openshift-mcp-server](https://github.com/openshift/openshift-mcp-server) if you do not use a pre-built image (see Quick Start).
+security_model: |
+  - Never share kubeconfig contents, cloud-init passwords, or SSH keys in chat.
+  - Destructive operations (**vm-delete**, **vm-snapshot-delete**, **vm-snapshot-restore**) require explicit user confirmation.
+  - **vm-snapshot-restore** typically requires the VM to be stopped first; the skill workflow enforces checks—do not bypass them.
 resources:
   - title: OpenShift Virtualization Documentation
     url: https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html

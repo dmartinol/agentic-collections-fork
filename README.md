@@ -27,7 +27,7 @@
 /plugin install rh-developer@redhat-agentic-collections
 
 # For OpenShift Administrators
-/plugin install ocp-admin@redhat-agentic-collections
+/plugin install openshift-administration@redhat-agentic-collections
 
 # For Virtualization Administrators
 /plugin install openshift-virtualization@redhat-agentic-collections

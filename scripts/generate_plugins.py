@@ -5,14 +5,17 @@ Generate Claude Code and Cursor plugin.json from collection.yaml definitions.
 For each pack with collection.yaml, produces:
 - {pack}/.claude-plugin/plugin.json
 - {pack}/.cursor-plugin/plugin.json
+
+Each JSON file includes a `_generated` object (source path, do not edit).
 """
 
-import json
 import sys
 from pathlib import Path
 from typing import Any, Dict
 
 import yaml
+
+from generation_notice import attach_json_generation_metadata, collection_yaml_source, write_json
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -60,15 +63,17 @@ def main() -> int:
         return 1
 
     for pack_dir, data in collections:
-        plugin_data = build_plugin_json(data, pack_dir)
+        plugin_data = attach_json_generation_metadata(
+            build_plugin_json(data, pack_dir),
+            source_of_truth=collection_yaml_source(pack_dir),
+        )
         pack_path = REPO_ROOT / pack_dir
 
         for vendor, subdir in [("claude", ".claude-plugin"), ("cursor", ".cursor-plugin")]:
             vendor_dir = pack_path / subdir
             vendor_dir.mkdir(exist_ok=True)
             out_path = vendor_dir / "plugin.json"
-            with open(out_path, "w", encoding="utf-8") as f:
-                json.dump(plugin_data, f, indent=2)
+            write_json(out_path, plugin_data)
             print(f"Generated {pack_dir}/{subdir}/plugin.json")
 
     print(f"Generated plugin.json for {len(collections)} packs")

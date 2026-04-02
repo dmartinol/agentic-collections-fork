@@ -1,4 +1,9 @@
 {
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "rh-virt/collection.yaml",
+    "regenerate": "make generate-catalog"
+  },
   "name": "openshift-virtualization",
   "version": "1.0.0",
   "description": "Virtual machine management and automation for OpenShift Virtualization and KubeVirt workloads.",

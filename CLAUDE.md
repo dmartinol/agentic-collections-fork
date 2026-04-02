@@ -26,6 +26,7 @@ Each pack follows this structure:
 ```
 <pack-name>/
 ├── collection.yaml      # Source of truth: vendor-agnostic catalog definition
+├── collection.json      # Generated JSON mirror of collection.yaml (do not edit manually)
 ├── README.md            # Generated from collection.yaml (do not edit manually)
 ├── CLAUDE.md            # Claude Code instruction routing (persona, skills, rules)
 ├── .claude-plugin/      # Claude Code plugin metadata (generated)
@@ -170,7 +171,7 @@ last_updated: YYYY-MM-DD
 1. Create pack folder: `<pack-name>/`
 2. Create `collection.yaml` (vendor-agnostic definition; see `catalog/schema.yaml`). Include `contents.skills` and `contents.orchestration_skills` with user-oriented `summary_markdown` per skill. Optionally add `contents.skills_decision_guide` (array of `user_request`, `skill_to_use`, `reason`) to help users choose the right skill.
 3. Add `CLAUDE.md` with persona, skill-first rule, intent routing table, MCP servers, and global rules (see [rh-ai-engineer/CLAUDE.md](rh-ai-engineer/CLAUDE.md) for reference).
-4. Run `make generate-catalog` to generate `plugin.json`, `README.md`, and marketplace entries
+4. Run `make generate-catalog` to generate `plugin.json`, `collection.json`, `README.md`, and marketplace entries
 5. Create `skills/` directory
 6. Optional: Add `.mcp.json` for MCP server integrations
 7. Update main `README.md` table with link
@@ -190,7 +191,7 @@ last_updated: YYYY-MM-DD
 4. Include concrete examples and complete error handling
 5. Update `collection.yaml` `contents.skills` (or `contents.orchestration_skills`) with user-oriented entry (`name`, `description`, `summary_markdown`) so the generated README lists the skill correctly. Consider adding a `skills_decision_guide` entry for common user intents.
 6. Update the pack's `CLAUDE.md` intent routing table to include the new skill
-7. Run `make generate-catalog` so the README and plugin metadata stay in sync
+7. Run `make generate-catalog` so the README, `collection.json`, and plugin metadata stay in sync
 8. Test with `Skill` tool invocation
 9. Validate with `./scripts/run-skill-linter.sh skills/<skill-name>/`
 

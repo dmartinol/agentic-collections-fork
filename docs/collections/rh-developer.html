@@ -68,9 +68,14 @@
 <h3>Prerequisites</h3>
 <ul>
 <li>Claude Code CLI or IDE extension</li>
-<li>OpenShift cluster with build and deployment capabilities</li>
-<li><code>oc</code> CLI and <code>KUBECONFIG</code> configured for cluster access</li>
+<li><strong>OpenShift</strong> cluster with build/deploy capabilities (for OpenShift skills)</li>
+<li><strong><code>oc</code></strong> CLI and <strong><code>KUBECONFIG</code></strong> for cluster-scoped skills</li>
+<li><strong>Podman</strong> installed locally (S2I builds, <strong>podman</strong> MCP, local image workflows)</li>
+<li><strong>Git</strong>; <strong>GitHub personal access token</strong> when analyzing private GitHub repos via <strong><code>github</code></strong> MCP</li>
+<li><strong>Helm</strong> CLI (for <strong><code>/helm-deploy</code></strong>)</li>
+<li><strong>Optional — Red Hat Insights / Lightspeed</strong> (<code>LIGHTSPEED_CLIENT_ID</code>, <code>LIGHTSPEED_CLIENT_SECRET</code>) for <strong><code>/debug-rhel</code></strong> and <strong><code>/rhel-deploy</code></strong> advisor data</li>
 </ul>
+<p><strong>Supported languages</strong> (detection / S2I): Node.js, Python, Java, Go, Ruby, .NET, PHP, Perl — see also <a href="docs/builder-images.md">docs/builder-images.md</a>.</p>
 <h3>Environment Setup</h3>
 <p>Configure OpenShift cluster access:</p>
 <pre><code class="language-bash">export KUBECONFIG=&quot;/path/to/your/kubeconfig&quot;
@@ -78,41 +83,40 @@
 <p>Verify access:</p>
 <pre><code class="language-bash">oc get projects
 </code></pre>
-<div class="install-accordion">
-<details class="install-accordion-item" open>
-<summary class="install-accordion-header">Installation (Claude Code)</summary>
-<div class="install-accordion-body"><p>Install the collection as a Claude Code plugin:</p>
+<p>Copy MCP server definitions from <strong><code>rh-developer/.mcp.json</code></strong> into your assistant MCP settings. <strong>macOS Podman note:</strong> the <strong>openshift</strong> MCP stanza may use <code>--userns=keep-id</code>; Podman on macOS runs in a VM and this can prevent startup. If the server fails to start, remove or adjust the <code>--userns</code> arguments in <code>.mcp.json</code> per your platform (see upstream README guidance; Linux typically keeps the mapping for <code>chmod 600</code> kubeconfigs).</p>
+<h2>Security Model</h2>
+<ul>
+<li>Never print kubeconfig, GitHub tokens, or Lightspeed client secrets.</li>
+<li><strong>openshift</strong> MCP user-namespace mapping can affect kubeconfig readability on some hosts; fix MCP config rather than loosening secret file permissions.</li>
+<li>Destructive changes require explicit user approval per skill workflows.</li>
+</ul>
+<h3>Installation (Claude Code)</h3>
+<p>Install the collection as a Claude Code plugin:</p>
 <pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
 claude plugin install rh-developer
 </code></pre>
 <p>Or for local development:</p>
 <pre><code class="language-bash">claude plugin marketplace add /path/to/agentic-collections
 claude plugin install rh-developer
-</code></pre></div>
-</details>
-<details class="install-accordion-item">
-<summary class="install-accordion-header">Installation (Cursor)</summary>
-<div class="install-accordion-body"><p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
+</code></pre>
+<h3>Installation (Cursor)</h3>
+<p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
 <pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-developer ~/.cursor/plugins/rh-developer
 </code></pre>
 <p>Or download and extract:</p>
 <pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
 cp -r agentic-collections-main/rh-developer ~/.cursor/plugins/rh-developer
-</code></pre></div>
-</details>
-<details class="install-accordion-item">
-<summary class="install-accordion-header">Installation (Open Code)</summary>
-<div class="install-accordion-body"><p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
+</code></pre>
+<h3>Installation (Open Code)</h3>
+<p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
 <pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-developer ~/.opencode/plugins/rh-developer
 </code></pre>
 <p>Or with wget:</p>
 <pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
 cp -r agentic-collections-main/rh-developer ~/.opencode/plugins/rh-developer
-</code></pre></div>
-</details>
-</div>
+</code></pre>
 <h2>License</h2>
 <p><a href="https://www.redhat.com/en/about/agreements">Apache-2.0</a></p>
             </div>

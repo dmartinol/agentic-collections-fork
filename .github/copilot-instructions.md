@@ -23,6 +23,7 @@ agentic-collections/
 ```
 <pack>/
 ├── collection.yaml              # Source of truth: vendor-agnostic catalog definition
+├── collection.json              # Generated JSON mirror (do not edit manually)
 ├── README.md                    # Generated from collection.yaml (do not edit manually)
 ├── .claude-plugin/plugin.json   # Generated from collection.yaml
 ├── .cursor-plugin/plugin.json   # Generated from collection.yaml
@@ -43,7 +44,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 |---|---|
 | `make install` | Install Python deps |
 | `make validate` | Validate pack/skill/agent structure (runs in CI) |
-| `make generate-catalog` | Generate marketplace, plugins, README from collection.yaml |
+| `make generate-catalog` | Generate marketplace, plugins, collection.json, README from collection.yaml |
 | `make generate` | Generate catalog + `docs/data.json` |
 | `make test` | validate + generate + verify checks |
 | `make serve` | Local site at http://localhost:8000 |
@@ -56,7 +57,7 @@ Packs known to the validator are listed in `scripts/validate_structure.py` (`PAC
 
 ### Collection — `collection.yaml`
 
-Vendor-agnostic catalog definition. See [COLLECTION_SPEC.md](COLLECTION_SPEC.md) for full structure and generation pipeline. Schema in `catalog/schema.yaml`. Run `make generate-catalog` to produce plugin.json, README, and marketplace entries.
+Vendor-agnostic catalog definition. See [COLLECTION_SPEC.md](COLLECTION_SPEC.md) for full structure and generation pipeline. Schema in `catalog/schema.yaml`. Run `make generate-catalog` to produce plugin.json, collection.json, README, and marketplace entries.
 
 ### Skills — `skills/<name>/SKILL.md`
 
@@ -110,7 +111,7 @@ Same YAML frontmatter requirement (`name` + `description`). Agents orchestrate s
 ## Adding a New Pack
 
 1. Create `<pack-name>/` directory with `collection.yaml` (see [COLLECTION_SPEC.md](COLLECTION_SPEC.md)).
-2. Run `make generate-catalog` to generate README, plugin.json, marketplace entries.
+2. Run `make generate-catalog` to generate README, collection.json, plugin.json, marketplace entries.
 3. Add `skills/` and optionally `agents/`, `.mcp.json`.
 4. Add the new pack name to `PACK_DIRS` in `scripts/validate_structure.py`.
 5. Run `make validate && make generate` to regenerate docs locally for testing.

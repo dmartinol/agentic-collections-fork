@@ -1,5 +1,10 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "Each plugin entry is generated from the pack's collection.yaml (see each item's `source` path under the repository root).",
+    "regenerate": "make generate-catalog"
+  },
   "name": "redhat-agentic-collections",
   "version": "1.0.0",
   "description": "Validated Agentic Collections from Red Hat Ecosystem Engineering",
@@ -9,7 +14,7 @@
   },
   "plugins": [
     {
-      "name": "ocp-admin",
+      "name": "openshift-administration",
       "description": "Automation capabilities for OpenShift Container Platform cluster management, workload orchestration, security policies, and operational tasks.",
       "version": "1.0.0",
       "author": {

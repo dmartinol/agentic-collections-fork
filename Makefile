@@ -51,9 +51,10 @@ validate-skill-design-changed: check-uv
 	@VALIDATE_INCLUDE_UNCOMMITTED=1 ./scripts/ci-validate-changed-skills.sh
 
 generate-catalog: check-uv
-	@echo "Generating catalog (marketplace, plugins, README)..."
+	@echo "Generating catalog (marketplace, plugins, README, collection.json)..."
 	@uv run python scripts/generate_marketplace.py
 	@uv run python scripts/generate_plugins.py
+	@uv run python scripts/generate_collection_json.py
 	@uv run python scripts/generate_readme.py
 	@echo "✓ Catalog generated!"
 
@@ -75,12 +76,13 @@ verify-generated: check-uv
 	@echo "Verifying generated files match committed..."
 	@make generate
 	@git diff --exit-code .claude-plugin/ .cursor-plugin/ docs/collections/ docs/data.json \
-	  rh-sre/.claude-plugin/plugin.json rh-sre/.cursor-plugin/plugin.json rh-sre/README.md \
-	  rh-developer/.claude-plugin/plugin.json rh-developer/.cursor-plugin/plugin.json rh-developer/README.md \
-	  ocp-admin/.claude-plugin/plugin.json ocp-admin/.cursor-plugin/plugin.json ocp-admin/README.md \
-	  rh-virt/.claude-plugin/plugin.json rh-virt/.cursor-plugin/plugin.json rh-virt/README.md \
-	  rh-ai-engineer/.claude-plugin/plugin.json rh-ai-engineer/.cursor-plugin/plugin.json rh-ai-engineer/README.md \
-	  rh-support-engineer/.claude-plugin/plugin.json rh-support-engineer/.cursor-plugin/plugin.json rh-support-engineer/README.md \
+	  rh-sre/.claude-plugin/plugin.json rh-sre/.cursor-plugin/plugin.json rh-sre/README.md rh-sre/collection.json \
+	  rh-developer/.claude-plugin/plugin.json rh-developer/.cursor-plugin/plugin.json rh-developer/README.md rh-developer/collection.json \
+	  ocp-admin/.claude-plugin/plugin.json ocp-admin/.cursor-plugin/plugin.json ocp-admin/README.md ocp-admin/collection.json \
+	  rh-virt/.claude-plugin/plugin.json rh-virt/.cursor-plugin/plugin.json rh-virt/README.md rh-virt/collection.json \
+	  rh-ai-engineer/.claude-plugin/plugin.json rh-ai-engineer/.cursor-plugin/plugin.json rh-ai-engineer/README.md rh-ai-engineer/collection.json \
+	  rh-automation/.claude-plugin/plugin.json rh-automation/.cursor-plugin/plugin.json rh-automation/README.md rh-automation/collection.json \
+	  rh-support-engineer/.claude-plugin/plugin.json rh-support-engineer/.cursor-plugin/plugin.json rh-support-engineer/README.md rh-support-engineer/collection.json \
 	  && echo "✓ Generated files match committed" \
 	  || (echo "Error: Generated files differ. Run 'make generate' and commit."; exit 1)
 

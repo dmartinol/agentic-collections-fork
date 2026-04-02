@@ -1,0 +1,180 @@
+{
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "rh-virt/collection.yaml",
+    "regenerate": "make generate-catalog"
+  },
+  "id": "openshift-virtualization",
+  "name": "Red Hat OpenShift Virtualization Agentic Collection",
+  "provider": "Red Hat",
+  "version": "1.0.0",
+  "categories": [
+    "Virtualization",
+    "OpenShift"
+  ],
+  "personas": [
+    "Virtualization Engineer"
+  ],
+  "marketplaces": [
+    "Claude Code",
+    "Cursor"
+  ],
+  "support_level": "Unknown",
+  "description": "Virtual machine management and automation for OpenShift Virtualization and KubeVirt workloads.",
+  "summary": "The rh-virt collection provides skills for virtualization tasks.",
+  "contents": {
+    "description": "The pack provides 10 skills for virtual machine management on OpenShift Virtualization.",
+    "skills": [
+      {
+        "name": "vm-clone",
+        "description": "VM Cloning",
+        "summary_markdown": "Clone existing virtual machines for testing, scaling, or creating templates.\n\n**Use when:**\n- \"Clone VM X to Y\"\n- \"Create a copy of VM database-01\"\n- \"Duplicate VM for testing\"\n\n**What it does:**\n- Clones VM and associated resources\n- Supports cross-namespace cloning\n- Preserves or customizes configuration\n"
+      },
+      {
+        "name": "vm-create",
+        "description": "VM Creation",
+        "summary_markdown": "Create new virtual machines in OpenShift Virtualization with automatic instance type resolution and OS selection.\n\n**Use when:**\n- \"Create a new VM\"\n- \"Deploy a virtual machine with RHEL\"\n- \"Set up a VM in namespace X\"\n\n**What it does:**\n- Creates VM with appropriate instance type\n- Configures OS and resources\n- Handles storage and networking\n"
+      },
+      {
+        "name": "vm-delete",
+        "description": "VM Deletion",
+        "summary_markdown": "Permanently delete virtual machines and their associated resources from OpenShift Virtualization.\n\n**Use when:**\n- \"Delete VM X\"\n- \"Remove virtual machine Y\"\n- \"Clean up VM and its disks\"\n\n**What it does:**\n- Deletes VM and associated resources\n- Handles DataVolumes and PVCs\n- Requires confirmation for destructive action\n"
+      },
+      {
+        "name": "vm-inventory",
+        "description": "VM Listing and Discovery",
+        "summary_markdown": "List and view virtual machines across namespaces with status, resource usage, and health information.\n\n**Use when:**\n- \"List all VMs\"\n- \"Show VMs in namespace X\"\n- \"What VMs are running?\"\n\n**What it does:**\n- Lists VMs across namespaces\n- Shows status and resource usage\n- Displays health information\n"
+      },
+      {
+        "name": "vm-lifecycle-manager",
+        "description": "Start, Stop, Restart",
+        "summary_markdown": "Manage virtual machine lifecycle operations including start, stop, and restart.\n\n**Use when:**\n- \"Start VM X\"\n- \"Stop the virtual machine Y\"\n- \"Restart VM database-01\"\n\n**What it does:**\n- Starts stopped VMs\n- Stops running VMs\n- Restarts VMs gracefully\n"
+      },
+      {
+        "name": "vm-rebalance",
+        "description": "VM Migration",
+        "summary_markdown": "Orchestrate VM migrations across cluster nodes for load balancing, maintenance, and resource optimization.\n\n**Use when:**\n- \"Move VM database-01 to worker-03\"\n- \"Rebalance VMs to optimize CPU load\"\n- \"Drain node for maintenance\"\n\n**What it does:**\n- Migrates VMs between nodes\n- Supports live migration\n- Handles node drain and cordon\n"
+      },
+      {
+        "name": "vm-snapshot-create",
+        "description": "Snapshot Creation",
+        "summary_markdown": "Create virtual machine snapshots for backup and recovery.\n\n**Use when:**\n- \"Create a snapshot of VM X\"\n- \"Backup VM before upgrade\"\n- \"Take a snapshot of database-01\"\n\n**What it does:**\n- Creates VM snapshots\n- Validates storage class support\n- Manages snapshot resources\n"
+      },
+      {
+        "name": "vm-snapshot-delete",
+        "description": "Snapshot Deletion",
+        "summary_markdown": "Permanently delete virtual machine snapshots to free storage space.\n\n**Use when:**\n- \"Delete snapshot X\"\n- \"Remove old VM snapshots\"\n- \"Free space from snapshots\"\n\n**What it does:**\n- Deletes snapshot resources\n- Frees associated storage\n- Requires confirmation\n"
+      },
+      {
+        "name": "vm-snapshot-list",
+        "description": "Snapshot Listing",
+        "summary_markdown": "List virtual machine snapshots with status and metadata.\n\n**Use when:**\n- \"List snapshots for VM X\"\n- \"Show available backups\"\n- \"What snapshots exist?\"\n\n**What it does:**\n- Lists snapshots per VM\n- Shows status and size\n- Displays creation time\n"
+      },
+      {
+        "name": "vm-snapshot-restore",
+        "description": "Snapshot Restore",
+        "summary_markdown": "Restore virtual machines from existing snapshots.\n\n**Use when:**\n- \"Restore VM from snapshot\"\n- \"Roll back to snapshot X\"\n- \"Recover VM from backup\"\n\n**What it does:**\n- Restores VM from snapshot\n- Handles disk and configuration\n- Preserves or creates new VM\n"
+      }
+    ],
+    "skills_decision_guide": [
+      {
+        "user_request": "\"List all VMs\" or \"Show VMs in namespace X\"",
+        "skill_to_use": "vm-inventory",
+        "reason": "Lists and inspects VM status across namespaces."
+      },
+      {
+        "user_request": "\"Create a new VM\" or \"Deploy a virtual machine with RHEL\"",
+        "skill_to_use": "vm-create",
+        "reason": "Provisions new VMs with instance type resolution and OS selection."
+      },
+      {
+        "user_request": "\"Start VM X\" or \"Stop the virtual machine Y\"",
+        "skill_to_use": "vm-lifecycle-manager",
+        "reason": "Manages VM power state (start, stop, restart)."
+      },
+      {
+        "user_request": "\"Clone VM X to Y\" or \"Create a copy of VM database-01\"",
+        "skill_to_use": "vm-clone",
+        "reason": "Clones existing VMs for testing, scaling, or templates."
+      },
+      {
+        "user_request": "\"Move VM database-01 to worker-03\" or \"Rebalance VMs\"",
+        "skill_to_use": "vm-rebalance",
+        "reason": "Orchestrates live migration across nodes for load balancing."
+      }
+    ]
+  },
+  "deploy_and_use": "### Prerequisites\n\n- Claude Code CLI or IDE extension\n- OpenShift cluster (>= 4.19) with Virtualization operator installed\n- ServiceAccount with appropriate RBAC permissions for VirtualMachine resources\n- KUBECONFIG environment variable configured with cluster access\n\n### Environment Setup\n\nConfigure OpenShift cluster access:\n\n```bash\nexport KUBECONFIG=\"/path/to/your/kubeconfig\"\n```\n\nVerify access to the cluster:\n\n```bash\noc get virtualmachines -A\n# or\nkubectl get vms -A\n```\n\n### Building the MCP Server Container Image\n\nThe OpenShift MCP server is not published to public registries, so you need to build it locally before using this collection.\n\n**Prerequisites**: Git, Podman (or Docker)\n\n**Build Steps**:\n\n1. Clone the openshift-mcp-server repository:\n   ```bash\n   git clone https://github.com/openshift/openshift-mcp-server.git\n   cd openshift-mcp-server\n   ```\n\n2. Build the container image using Podman:\n   ```bash\n   podman build -t localhost/openshift-mcp-server:latest -f Dockerfile .\n   ```\n   Or using Docker:\n   ```bash\n   docker build -t localhost/openshift-mcp-server:latest -f Dockerfile .\n   ```\n\n3. Verify the image was built successfully:\n   ```bash\n   podman images localhost/openshift-mcp-server:latest\n   podman tag localhost/openshift-mcp-server:latest quay.io/ecosystem-appeng/openshift-mcp-server:latest\n   ```\n\n**Note**: The build process takes several minutes. The final image size is approximately 192 MB.\n\n### Installation (Claude Code)\n\nInstall the collection as a Claude Code plugin:\n\n```bash\nclaude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections\nclaude plugin install openshift-virtualization\n```\n\nOr for local development:\n\n```bash\nclaude plugin marketplace add /path/to/agentic-collections\nclaude plugin install openshift-virtualization\n```\n\n### Installation (Cursor)\n\nCursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:\n\n```bash\ngit clone https://github.com/RHEcosystemAppEng/agentic-collections.git\ncp -r agentic-collections/rh-virt ~/.cursor/plugins/openshift-virtualization\n```\n\nOr download and extract:\n\n```bash\nwget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz\ncp -r agentic-collections-main/rh-virt ~/.cursor/plugins/openshift-virtualization\n```\n\n### Installation (Open Code)\n\nOpen Code does not support direct marketplace install via CLI. Clone or download the repository:\n\n```bash\ngit clone https://github.com/RHEcosystemAppEng/agentic-collections.git\ncp -r agentic-collections/rh-virt ~/.opencode/plugins/openshift-virtualization\n```\n\nOr with wget:\n\n```bash\nwget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz\ncp -r agentic-collections-main/rh-virt ~/.opencode/plugins/openshift-virtualization\n```\n",
+  "sample_workflows": [
+    {
+      "name": "Create and Start a VM",
+      "workflow": "User: \"Create a RHEL VM named web-app in namespace vms and start it\"\n- vm-create skill provisions the VM (instance type, storage, network)\n- vm-lifecycle-manager starts the VM after creation if it is not running\n- vm-inventory verifies status and node placement\n"
+    },
+    {
+      "name": "VM Inventory Check",
+      "workflow": "User: \"List all VMs in namespace prod and show which are running\"\n- vm-inventory skill lists VMs, status, and resource usage for the namespace\n- Filter or expand to other namespaces as needed\n"
+    },
+    {
+      "name": "VM Lifecycle Management",
+      "workflow": "User: \"Start VM web-server in namespace vms\"\n- vm-lifecycle-manager skill:\n  1. Gathers VM name, namespace, and action\n  2. Confirms before executing\n  3. Executes start/stop/restart via MCP\n"
+    },
+    {
+      "name": "VM Cloning for Test Environment",
+      "workflow": "User: \"Clone VM database-01 to database-01-test in namespace test-vms\"\n- vm-clone skill duplicates the VM and disks\n- vm-inventory confirms the new VM exists before cutover or testing\n"
+    },
+    {
+      "name": "VM Snapshot Before Upgrade",
+      "workflow": "User: \"Create a snapshot of database-vm before I upgrade\"\n- vm-snapshot-create skill creates snapshot\n- vm-snapshot-list to view existing snapshots\n- vm-snapshot-restore to roll back if needed\n"
+    },
+    {
+      "name": "Live Migration (VM Rebalance)",
+      "workflow": "User: \"Rebalance VMs across nodes to balance workload\"\n- vm-rebalance skill:\n  1. Analyzes node utilization\n  2. Proposes live migration plan\n  3. Executes migrations with user approval\n"
+    },
+    {
+      "name": "VM Deletion and Cleanup",
+      "workflow": "User: \"Delete VM obsolete-lab in namespace test-vms and free storage\"\n- vm-delete skill removes the VM and associated PVCs/DataVolumes\n- Confirm destructive action when prompted\n- vm-inventory verifies the VM no longer appears\n"
+    },
+    {
+      "name": "Diagnose MCP or cluster issues",
+      "workflow": "User: \"Skills fail with API errors when I manage VMs\"\n- Verify `KUBECONFIG` and `oc get virtualmachines -A` outside the agent\n- Confirm the openshift-mcp-server image was built and referenced in `.mcp.json`\n- Consult [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) and **CLAUDE.md** safety rules\n"
+    }
+  ],
+  "documentation_section": "### Troubleshooting and operations\n\n- **MCP server** — Build and run the OpenShift MCP server image as described in **Quick Start** (this collection’s `deploy_and_use`). Confirm the local image tag matches `.mcp.json`.\n- **VM failures** — See [docs/troubleshooting/INDEX.md](docs/troubleshooting/INDEX.md) for conditions, storage, and migration issues.\n- **Skills not matching** — Use the **Skills Decision Guide** above or **CLAUDE.md** intent routing.\n\n### Architecture\n\n- Skills under **`skills/`** wrap the **openshift-virtualization** MCP server; they enforce confirmations for destructive actions.\n- Namespace-scoped resources: always confirm namespace and VM name before delete, restore, or rebalance.\n",
+  "mcp_section": "The pack uses **openshift-virtualization** (OpenShift MCP server) as defined in **`.mcp.json`**. The server talks to the cluster Kubernetes API using your kubeconfig.\n\n- Requires OpenShift **4.19+** with OpenShift Virtualization installed.\n- Build the MCP image from [openshift/openshift-mcp-server](https://github.com/openshift/openshift-mcp-server) if you do not use a pre-built image (see Quick Start).\n",
+  "security_model": "- Never share kubeconfig contents, cloud-init passwords, or SSH keys in chat.\n- Destructive operations (**vm-delete**, **vm-snapshot-delete**, **vm-snapshot-restore**) require explicit user confirmation.\n- **vm-snapshot-restore** typically requires the VM to be stopped first; the skill workflow enforces checks—do not bypass them.\n",
+  "resources": [
+    {
+      "title": "OpenShift Virtualization Documentation",
+      "url": "https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html",
+      "description": "OpenShift Virtualization overview and VM management."
+    },
+    {
+      "title": "KubeVirt User Guide",
+      "url": "https://kubevirt.io/user-guide/",
+      "description": "KubeVirt VM lifecycle, status conditions, and node placement.",
+      "embedded_doc": "docs/troubleshooting/INDEX.md"
+    },
+    {
+      "title": "OpenShift MCP Server",
+      "url": "https://github.com/openshift/openshift-mcp-server",
+      "description": "MCP server for OpenShift/KubeVirt used by this collection."
+    }
+  ],
+  "legal_resources": {
+    "license_agreement_url": "https://www.redhat.com/en/about/agreements",
+    "privacy_policy_url": "https://www.redhat.com/en/about/privacy-policy"
+  },
+  "author": {
+    "name": "Red Hat Ecosystem Engineering",
+    "email": "eco-engineering@redhat.com"
+  },
+  "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
+  "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
+  "license": "Apache-2.0",
+  "keywords": [
+    "red-hat",
+    "kubevirt",
+    "openshift",
+    "virtualization"
+  ]
+}

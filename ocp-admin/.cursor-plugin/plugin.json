@@ -1,5 +1,10 @@
 {
-  "name": "ocp-admin",
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "ocp-admin/collection.yaml",
+    "regenerate": "make generate-catalog"
+  },
+  "name": "openshift-administration",
   "version": "1.0.0",
   "description": "Automation capabilities for OpenShift Container Platform cluster management, workload orchestration, security policies, and operational tasks.",
   "author": {

@@ -107,6 +107,12 @@ cp -r agentic-collections/rh-automation ~/.opencode/plugins/rh-automation
 </code></pre></div>
 </details>
 </div>
+<h2>Security Model</h2>
+<ul>
+<li>Never print <strong><code>AAP_API_TOKEN</code></strong> or raw Bearer material.</li>
+<li>Production job launches require explicit approval paths in <strong><code>governed-job-launcher</code></strong> / <strong><code>governance-executor</code></strong>.</li>
+<li>Treat extra_vars and inventory names as sensitive; skills scan for secrets before execution.</li>
+</ul>
 <h2>License</h2>
 <p>Apache 2.0</p>
             </div>

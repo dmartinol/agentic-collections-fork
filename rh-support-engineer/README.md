@@ -1,3 +1,9 @@
+<!--
+  GENERATED FILE — do not edit manually.
+  Source of truth: rh-support-engineer/collection.yaml
+  Regenerate with: make generate-catalog
+-->
+
 # Red Hat Support Engineer Agentic Collection
 
 Technical support and troubleshooting tools for Red Hat products and platforms.

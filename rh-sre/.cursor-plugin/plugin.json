@@ -1,4 +1,9 @@
 {
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "rh-sre/collection.yaml",
+    "regenerate": "make generate-catalog"
+  },
   "name": "rh-sre",
   "version": "1.0.0",
   "description": "Site reliability engineering tools and automation for managing Red Hat platforms and infrastructure.",

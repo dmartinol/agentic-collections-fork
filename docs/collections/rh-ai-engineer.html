@@ -70,52 +70,56 @@
 <h3>Prerequisites</h3>
 <ul>
 <li>Claude Code CLI or IDE extension</li>
-<li>Red Hat OpenShift AI (RHOAI) cluster with model serving capabilities</li>
-<li><code>oc</code> CLI and <code>KUBECONFIG</code> configured for cluster access</li>
+<li><strong><code>podman</code></strong> (or Docker) for containerized MCP servers where configured in <code>.mcp.json</code></li>
+<li><strong><code>oc</code></strong> CLI and <strong><code>KUBECONFIG</code></strong> for cluster access</li>
+<li>OpenShift cluster with <strong>Red Hat OpenShift AI</strong> operator installed and <strong>KServe</strong> model serving available</li>
+<li><strong>GPU nodes</strong> for GPU-accelerated inference (see <a href="docs/references/known-model-profiles.md">known-model-profiles.md</a> for sizing hints)</li>
 </ul>
+<p><strong>For NVIDIA NIM deployments:</strong> NVIDIA GPU Operator, Node Feature Discovery (NFD), and an <strong>NGC API key</strong> (see <strong><code>/nim-setup</code></strong> and <a href="https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed">NIM on OpenShift AI</a>).</p>
 <h3>Environment Setup</h3>
 <p>Configure OpenShift AI cluster access:</p>
 <pre><code class="language-bash">export KUBECONFIG=&quot;/path/to/your/kubeconfig&quot;
 </code></pre>
+<p>Optional observability MCP URL (when using the remote summarizer pattern):</p>
+<pre><code class="language-bash">export AI_OBSERVABILITY_MCP_URL=&quot;https://your-observability-mcp.example&quot;
+</code></pre>
 <p>Verify access to OpenShift AI:</p>
 <pre><code class="language-bash">oc get datascienceprojects -A
 </code></pre>
-<p>Skills rely on <strong><code>openshift</code></strong> (required), <strong><code>rhoai</code></strong> (preferred), and optional <strong><code>ai-observability</code></strong> MCP servers defined in <code>rh-ai-engineer/.mcp.json</code>. Copy entries into your Claude Code MCP settings; use <code>${...}</code> env placeholders only.</p>
-<div class="install-accordion">
-<details class="install-accordion-item" open>
-<summary class="install-accordion-header">Installation (Claude Code)</summary>
-<div class="install-accordion-body"><p>Install the collection as a Claude Code plugin:</p>
+<p>MCP definitions live in <strong><code>rh-ai-engineer/.mcp.json</code></strong> — copy entries into Claude Code <code>/mcp</code> or settings; use <strong><code>${...}</code></strong> placeholders only for secrets.</p>
+<h2>Security Model</h2>
+<ul>
+<li>Never print NGC keys, kubeconfig, or pull secrets — only confirm that required env vars exist.</li>
+<li>Follow each skill’s confirmation gates before creating or deleting DataScienceProject, InferenceService, or storage resources.</li>
+<li>Optional <strong><code>ai-observability</code></strong> must not receive production secrets in URLs; use network policies and TLS as appropriate.</li>
+</ul>
+<h3>Installation (Claude Code)</h3>
+<p>Install the collection as a Claude Code plugin:</p>
 <pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
 claude plugin install rh-ai-engineer
 </code></pre>
 <p>Or for local development:</p>
 <pre><code class="language-bash">claude plugin marketplace add /path/to/agentic-collections
 claude plugin install rh-ai-engineer
-</code></pre></div>
-</details>
-<details class="install-accordion-item">
-<summary class="install-accordion-header">Installation (Cursor)</summary>
-<div class="install-accordion-body"><p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
+</code></pre>
+<h3>Installation (Cursor)</h3>
+<p>Cursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:</p>
 <pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
 </code></pre>
 <p>Or download and extract:</p>
 <pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
 cp -r agentic-collections-main/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
-</code></pre></div>
-</details>
-<details class="install-accordion-item">
-<summary class="install-accordion-header">Installation (Open Code)</summary>
-<div class="install-accordion-body"><p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
+</code></pre>
+<h3>Installation (Open Code)</h3>
+<p>Open Code does not support direct marketplace install via CLI. Clone or download the repository:</p>
 <pre><code class="language-bash">git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
 cp -r agentic-collections/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
 </code></pre>
 <p>Or with wget:</p>
 <pre><code class="language-bash">wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
 cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
-</code></pre></div>
-</details>
-</div>
+</code></pre>
 <h2>License</h2>
 <p><a href="https://www.redhat.com/en/about/agreements">Apache-2.0</a></p>
             </div>
@@ -186,6 +190,7 @@ cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
                 <h2>References</h2>
 <ul>
 <li><a href="https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed" target="_blank" rel="noopener">Red Hat OpenShift AI Documentation</a> - RHOAI product documentation for model serving, pipelines, and workbenches.</li>
+<li><a href="https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed/latest/html-single/red_hat_openshift_ai_self_managed" target="_blank" rel="noopener">Known model hardware profiles (in-repo)</a> - Parameter counts, GPU sizing, and runtime notes collated for common models. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/references/known-model-profiles.md" target="_blank" rel="noopener">[embedded doc]</a></li>
 <li><a href="https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self_managed/latest/html-single/red_hat_openshift_ai_self_managed" target="_blank" rel="noopener">OpenShift AI Model Serving</a> - InferenceService, runtimes, and model deployment. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/references/supported-runtimes.md" target="_blank" rel="noopener">[embedded doc]</a></li>
 <li><a href="https://docs.nvidia.com/nim/" target="_blank" rel="noopener">NVIDIA NIM on OpenShift AI</a> - NVIDIA Inference Microservices for GPU-accelerated serving. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-ai-engineer/docs/examples/nim-setup.md" target="_blank" rel="noopener">[embedded doc]</a></li>
 </ul>

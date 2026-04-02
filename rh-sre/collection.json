@@ -1,0 +1,227 @@
+{
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "rh-sre/collection.yaml",
+    "regenerate": "make generate-catalog"
+  },
+  "id": "rh-sre",
+  "name": "Red Hat SRE Agentic Collection",
+  "provider": "Red Hat",
+  "version": "1.0.0",
+  "categories": [
+    "Site Reliability",
+    "Security"
+  ],
+  "personas": [
+    "Site Reliability Engineer"
+  ],
+  "marketplaces": [
+    "Claude Code",
+    "Cursor"
+  ],
+  "support_level": "Unknown",
+  "description": "Site reliability engineering tools and automation for managing Red Hat platforms and infrastructure.",
+  "summary": "The rh-sre collection provides skills for site reliability tasks.",
+  "contents": {
+    "description": "The pack provides 13 skills for common SRE operations, including one orchestration skill for end-to-end remediation.",
+    "skills": [
+      {
+        "name": "fleet-inventory",
+        "description": "System Discovery and Fleet Management",
+        "summary_markdown": "Query and display Red Hat Lightspeed managed system inventory.\n\n**Use when:**\n- Show the managed fleet\n- List all RHEL 8 systems\n- What systems are registered in Lightspeed?\n\n**What it does:**\n- Retrieves all registered systems\n- Groups by RHEL version and environment\n- Shows system health and check-in status\n- Identifies stale systems\n"
+      },
+      {
+        "name": "cve-impact",
+        "description": "CVE Discovery and Risk Assessment",
+        "summary_markdown": "Analyze CVE impact across the fleet without immediate remediation.\n\n**Use when:**\n- What are the most critical vulnerabilities?\n- Show CVEs affecting my systems\n- List high-severity CVEs\n\n**What it does:**\n- Lists CVEs by severity (Critical/Important)\n- Sorts by CVSS score\n- Shows affected system counts\n- Provides priority recommendations\n"
+      },
+      {
+        "name": "cve-validation",
+        "description": "CVE Verification",
+        "summary_markdown": "Validate CVE existence and remediation availability.\n\n**Use when:**\n- Is CVE-2024-1234 valid?\n- Does CVE-X have a remediation?\n- What's the CVSS score for CVE-Y?\n\n**What it does:**\n- Verifies CVE in Red Hat database\n- Checks remediation availability\n- Returns CVE metadata and severity\n"
+      },
+      {
+        "name": "system-context",
+        "description": "System Information Gathering",
+        "summary_markdown": "Collect detailed system information from Red Hat Lightspeed.\n\n**Use when:**\n- What systems are affected by CVE-X?\n- Show me details for server-01\n- Get system profile for these hosts\n\n**What it does:**\n- Retrieves system details\n- Shows installed packages\n- Displays configuration data\n- Maps CVE-to-system relationships\n"
+      },
+      {
+        "name": "playbook-generator",
+        "description": "Ansible Playbook Creation",
+        "summary_markdown": "Generate Ansible remediation playbooks following Red Hat best practices. **Only generates playbooks; does not execute them.** Use `/playbook-executor` to run playbooks.\n\n**Use when:**\n- Create a remediation playbook for CVE-X\n- Generate Ansible playbook to patch CVE-Y\n\n**What it does:**\n- Calls Red Hat Lightspeed remediation API\n- Generates production-ready Ansible playbooks\n- Includes error handling and rollback steps\n- Follows Red Hat standards\n"
+      },
+      {
+        "name": "playbook-executor",
+        "description": "AAP Playbook Execution",
+        "summary_markdown": "Execute Ansible playbooks via AAP with dry-run, real-time monitoring, and reporting.\n\n**Use when:**\n- Execute this remediation playbook\n- Run the playbook and monitor status\n\n**What it does:**\n- Launches jobs via AAP MCP (job_templates_launch_retrieve)\n- Performs Git Flow (commit, push, sync) when playbook path differs from template\n- Monitors job status (PENDING → RUNNING → COMPLETED)\n- Reports execution results\n\n**Note:** Requires AAP MCP servers configured and job templates created (use job-template-creator skill).\n"
+      },
+      {
+        "name": "remediation-verifier",
+        "description": "Remediation Verification",
+        "summary_markdown": "Verify that CVE remediations were successfully applied.\n\n**Use when:**\n- Check if CVE-X was patched on server-01\n- Verify remediation status\n\n**What it does:**\n- Queries current CVE status\n- Verifies package updates\n- Confirms remediation success\n"
+      },
+      {
+        "name": "mcp-lightspeed-validator",
+        "description": "Lightspeed MCP Server Validation",
+        "summary_markdown": "Validate Red Hat Lightspeed MCP server configuration and connectivity.\n\n**Use when:**\n- Validate Lightspeed MCP\n- Check if Lightspeed is configured\n- Verify Lightspeed connection\n- Other skills need to verify lightspeed-mcp availability\n\n**What it does:**\n- Checks MCP server configuration in .mcp.json\n- Verifies environment variables (CLIENT_ID, CLIENT_SECRET)\n- Tests server connectivity and tool availability\n- Reports validation status (PASSED/PARTIAL/FAILED)\n"
+      },
+      {
+        "name": "mcp-aap-validator",
+        "description": "AAP MCP Server Validation",
+        "summary_markdown": "Validate AAP MCP server configuration and connectivity.\n\n**Use when:**\n- Validate AAP MCP\n- Check if AAP is configured\n- Verify AAP connection\n- Other skills need to verify AAP MCP server availability\n\n**What it does:**\n- Checks both AAP MCP servers (job-management, inventory-management)\n- Verifies environment variables (AAP_MCP_SERVER, AAP_API_TOKEN)\n- Tests server connectivity and authentication\n- Reports validation status (PASSED/PARTIAL/FAILED)\n"
+      },
+      {
+        "name": "execution-summary",
+        "description": "Workflow Execution Report",
+        "summary_markdown": "Generate concise execution reports for audit and learning purposes.\n\n**Use when:**\n- Generate execution summary\n- Create execution report\n- Summarize what was used\n- Show execution summary\n\n**What it does:**\n- Analyzes conversation history\n- Extracts agents, skills, tools, and docs used\n- Formats in machine-readable format\n- Provides audit trail for workflows\n"
+      },
+      {
+        "name": "job-template-creator",
+        "description": "AAP Job Template Creation",
+        "summary_markdown": "Create AAP job templates for executing Ansible playbooks through Ansible Automation Platform.\n\n**Use when:**\n- Create a job template for this playbook\n- Set up a template to run remediation playbooks\n- Configure AAP to execute this playbook\n\n**What it does:**\n- Lists available projects and inventories\n- Provides instructions for template creation (Web UI or API)\n- Verifies template creation\n- Prepares for AAP-based playbook execution\n"
+      },
+      {
+        "name": "job-template-remediation-validator",
+        "description": "AAP Job Template Remediation Validation",
+        "summary_markdown": "Verify an AAP job template meets requirements for executing CVE remediation playbooks.\n\n**Use when:**\n- Does this job template support remediation playbooks?\n- Validate job template X for CVE remediation\n- Check if template is ready for playbook-executor\n\n**What it does:**\n- Validates required fields (inventory, project, playbook, credentials, privilege escalation)\n- Checks recommended options (ask variables/limit on launch)\n- Verifies project and inventory exist\n- Reports PASSED / PASSED WITH WARNINGS / FAILED\n"
+      }
+    ],
+    "skills_decision_guide": [
+      {
+        "user_request": "\"Show the managed fleet\" or \"List RHEL systems\"",
+        "skill_to_use": "fleet-inventory",
+        "reason": "Discovers and displays Lightspeed-managed system inventory."
+      },
+      {
+        "user_request": "\"What are the most critical CVEs?\" or \"Show CVEs affecting my systems\"",
+        "skill_to_use": "cve-impact",
+        "reason": "Analyzes CVE impact across the fleet without immediate remediation."
+      },
+      {
+        "user_request": "\"Remediate CVE-2024-1234 on system abc-123\" or \"Patch these CVEs on production\"",
+        "skill_to_use": "remediation",
+        "reason": "Orchestrates full workflow (validate → context → playbook → execute → verify)."
+      },
+      {
+        "user_request": "\"Create a remediation playbook for CVE-X\" (no execution yet)",
+        "skill_to_use": "playbook-generator",
+        "reason": "Generates Ansible playbook only; use playbook-executor to run it."
+      },
+      {
+        "user_request": "\"Does this job template support remediation playbooks?\"",
+        "skill_to_use": "job-template-remediation-validator",
+        "reason": "Validates AAP job template for CVE remediation requirements."
+      }
+    ],
+    "orchestration_skills": [
+      {
+        "name": "remediation",
+        "description": "End-to-End CVE Remediation",
+        "summary_markdown": "The remediation skill orchestrates 6 specialized skills to provide complete CVE remediation workflows.\n\n**Use when:**\n- Remediate CVE-2024-1234 on system abc-123\n- Create and execute a remediation playbook for CVE-X\n- Patch these 5 CVEs on all production servers\n\n**Workflow:**\n0. Validate MCP (mcp-lightspeed-validator, mcp-aap-validator)\n1. Impact (cve-impact skill, if needed)\n2. Validate CVE (cve-validation skill)\n3. Gather Context (system-context skill)\n4. Generate Playbook (playbook-generator skill)\n5. Execute (playbook-executor skill, with user confirmation)\n6. Verify (remediation-verifier skill)\n\n**Capabilities:**\n- Single CVE on single system\n- Batch remediation (multiple CVEs, multiple systems)\n- Cross-environment patching (dev → staging → prod)\n- Automated job tracking and reporting\n- Partial failure handling\n"
+      }
+    ]
+  },
+  "deploy_and_use": "### Prerequisites\n\n- Claude Code CLI or IDE extension\n- Podman or Docker installed\n- Red Hat Lightspeed service account ([setup guide](https://console.redhat.com/))\n\n### Environment Setup\n\nConfigure Red Hat Lightspeed credentials:\n\n```bash\nexport LIGHTSPEED_CLIENT_ID=\"your-service-account-client-id\"\nexport LIGHTSPEED_CLIENT_SECRET=\"your-service-account-client-secret\"\n```\n\n### Installation (Claude Code)\n\nInstall the collection as a Claude Code plugin:\n\n```bash\nclaude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections\nclaude plugin install rh-sre\n```\n\nOr for local development:\n\n```bash\nclaude plugin marketplace add /path/to/agentic-collections\nclaude plugin install rh-sre\n```\n\n### Installation (Cursor)\n\nCursor does not support direct marketplace install via CLI. Clone the repository and copy the collection:\n\n```bash\ngit clone https://github.com/RHEcosystemAppEng/agentic-collections.git\ncp -r agentic-collections/rh-sre ~/.cursor/plugins/rh-sre\n```\n\nOr download and extract:\n\n```bash\nwget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz\ncp -r agentic-collections-main/rh-sre ~/.cursor/plugins/rh-sre\n```\n\n### Installation (Open Code)\n\nOpen Code does not support direct marketplace install via CLI. Clone or download the repository:\n\n```bash\ngit clone https://github.com/RHEcosystemAppEng/agentic-collections.git\ncp -r agentic-collections/rh-sre ~/.opencode/plugins/rh-sre\n```\n\nOr with wget:\n\n```bash\nwget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz\ncp -r agentic-collections-main/rh-sre ~/.opencode/plugins/rh-sre\n```\n",
+  "sample_workflows": [
+    {
+      "name": "Fleet Discovery → CVE Analysis → Remediation",
+      "workflow": "User: \"Show the managed fleet\"\n- fleet-inventory skill lists all systems\n\nUser: \"What are the critical CVEs affecting these systems?\"\n- cve-impact skill analyzes vulnerabilities\n\nUser: \"Remediate CVE-2024-1234 on all RHEL 8 production systems\"\n- remediation skill orchestrates end-to-end remediation\n"
+    },
+    {
+      "name": "Emergency CVE Patching",
+      "workflow": "User: \"URGENT: CVE-2024-CRITICAL has CVSS 9.8 - create emergency remediation playbooks for all production systems\"\n- remediation skill:\n  1. Validates CVE (cve-validation skill)\n  2. Lists production systems (system-context skill)\n  3. Generates playbook (playbook-generator skill)\n  4. Provides execution instructions\n  5. Offers automated execution option\n"
+    },
+    {
+      "name": "Batch Remediation with Verification",
+      "workflow": "User: \"Create and execute remediation playbooks for CVE-X, CVE-Y, CVE-Z on systems server-01, server-02, server-03\"\n- remediation skill:\n  1. Validates all CVEs\n  2. Gathers system context\n  3. Generates consolidated playbook\n  4. Asks for execution approval\n  5. Executes and monitors job status\n  6. Verifies remediation success (remediation-verifier skill)\n"
+    },
+    {
+      "name": "Account-Level CVE Discovery",
+      "workflow": "User: \"What are the critical vulnerabilities on my account?\"\n- cve-impact skill with account-level parameters\n- Lists critical CVEs across the fleet, filters by severity and remediation availability\n"
+    },
+    {
+      "name": "Playbook Execution with Dry-Run",
+      "workflow": "User: \"Execute the CVE remediation playbook\"\n- playbook-executor skill:\n  1. Validates AAP prerequisites\n  2. Lists and selects job template\n  3. Offers dry-run first (check mode)\n  4. Proceeds to actual execution after approval\n  5. Monitors job status and reports results\n"
+    }
+  ],
+  "documentation_section": "### Why use this collection instead of calling MCP tools directly?\n\n- **Reliability** — Skills apply validation gates (CVE IDs, inventory, AAP connectivity) before expensive operations.\n- **Safety** — Human-in-the-loop for remediation plans, playbook execution, and broad job launches.\n- **Consistency** — Documented workflows, error handling, and follow-up skills (for example `/remediation` vs ad hoc tool calls).\n- **Troubleshooting** — Skills bundle recovery paths; use `/mcp-lightspeed-validator` and `/mcp-aap-validator` when prerequisites fail.\n\n### In-repository documentation\n\nThis pack ships an AI-oriented knowledge base under **`docs/`**. Start at **[docs/INDEX.md](docs/INDEX.md)** and use **`docs/.ai-index/`** (semantic index, task mapping) for token-efficient discovery.\n\n### Configuration and architecture\n\n- Environment variables for Lightspeed and AAP are declared only as `${VAR}` placeholders in **`.mcp.json`**.\n- Orchestration (**`/remediation`**) chains impact, validation, context, playbook generation, execution, and verification; see pack **CLAUDE.md** for routing when you need a single step only.\n",
+  "mcp_section": "| Server | Role |\n|--------|------|\n| **lightspeed-mcp** | CVEs, inventory, remediation inputs, playbook-related Lightspeed workflows. |\n| **aap-mcp-job-management** | Job templates, projects, launches, execution status. |\n| **aap-mcp-inventory-management** | Inventories and hosts for execution planning. |\n\nConfigure servers through **`.mcp.json`**; skills must be invoked instead of calling MCP tools directly from the agent.\n",
+  "security_model": "- Do **not** expose `LIGHTSPEED_CLIENT_ID`, `LIGHTSPEED_CLIENT_SECRET`, AAP tokens, or any API credentials in chat—only whether they appear configured.\n- Require explicit user approval before running remediation playbooks or destructive changes at scale.\n- Prefer **`/remediation`** for end-to-end CVE response so validation and verification steps are not skipped accidentally.\n",
+  "resources": [
+    {
+      "title": "Red Hat Lightspeed",
+      "url": "https://console.redhat.com/insights",
+      "description": "Red Hat Insights and Lightspeed console for fleet and vulnerability management."
+    },
+    {
+      "title": "Red Hat Lightspeed Remediations Guide",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html-single/red_hat_lightspeed_remediations_guide/index",
+      "description": "Creating remediation plans, playbook generation.",
+      "embedded_doc": "docs/ansible/cve-remediation-templates.md"
+    },
+    {
+      "title": "Red Hat Lightspeed MCP",
+      "url": "https://github.com/RedHatInsights/insights-mcp",
+      "description": "MCP server used by this collection; parameter reference.",
+      "embedded_doc": "docs/references/lightspeed-mcp-parameters.md"
+    },
+    {
+      "title": "Assessing and Monitoring Security Vulnerabilities on RHEL Systems",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/assessing_and_monitoring_security_vulnerabilities_on_rhel_systems/vuln-cves_vuln-overview",
+      "description": "CVE identification, classification, threat intelligence.",
+      "embedded_doc": "docs/insights/vulnerability-logic.md"
+    },
+    {
+      "title": "Managing Software with the DNF Tool (RHEL 9)",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/managing_software_with_the_dnf_tool/index",
+      "description": "DNF commands, updating packages, repository management.",
+      "embedded_doc": "docs/rhel/package-management.md"
+    },
+    {
+      "title": "Severity Ratings (Red Hat Customer Portal)",
+      "url": "https://access.redhat.com/security/updates/classification",
+      "description": "Red Hat severity ratings, CVSS usage.",
+      "embedded_doc": "docs/references/cvss-scoring.md"
+    },
+    {
+      "title": "Red Hat Ansible Automation Platform Documentation",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6",
+      "description": "AAP 2.6 docs; projects, job templates, playbook integration.",
+      "embedded_doc": "docs/ansible/playbook-integration-aap.md"
+    },
+    {
+      "title": "AAP Job Execution",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.6/html/using_automation_execution/controller-job-templates",
+      "description": "Job templates, check mode, dry-run execution.",
+      "embedded_doc": "docs/ansible/aap-job-execution.md"
+    },
+    {
+      "title": "Ansible Automation Platform",
+      "url": "https://www.redhat.com/en/technologies/management/ansible",
+      "description": "AAP product overview for playbook execution."
+    },
+    {
+      "title": "AAP REST API Documentation",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/",
+      "description": "AAP API reference for job and inventory management."
+    }
+  ],
+  "legal_resources": {
+    "license_agreement_url": "https://www.redhat.com/en/about/agreements",
+    "privacy_policy_url": "https://www.redhat.com/en/about/privacy-policy"
+  },
+  "author": {
+    "name": "Red Hat Ecosystem Engineering",
+    "email": "eco-engineering@redhat.com"
+  },
+  "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
+  "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
+  "license": "Apache-2.0",
+  "keywords": [
+    "sre",
+    "red-hat",
+    "platforms",
+    "products",
+    "automation"
+  ]
+}

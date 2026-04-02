@@ -1,3 +1,9 @@
+<!--
+  GENERATED FILE — do not edit manually.
+  Source of truth: rh-sre/collection.yaml
+  Regenerate with: make generate-catalog
+-->
+
 # Red Hat SRE Agentic Collection
 
 Site reliability engineering tools and automation for managing Red Hat platforms and infrastructure.
@@ -329,6 +335,36 @@ Verify an AAP job template meets requirements for executing CVE remediation play
 
 
 
+## Documentation
+
+### Why use this collection instead of calling MCP tools directly?
+
+- **Reliability** — Skills apply validation gates (CVE IDs, inventory, AAP connectivity) before expensive operations.
+- **Safety** — Human-in-the-loop for remediation plans, playbook execution, and broad job launches.
+- **Consistency** — Documented workflows, error handling, and follow-up skills (for example `/remediation` vs ad hoc tool calls).
+- **Troubleshooting** — Skills bundle recovery paths; use `/mcp-lightspeed-validator` and `/mcp-aap-validator` when prerequisites fail.
+
+### In-repository documentation
+
+This pack ships an AI-oriented knowledge base under **`docs/`**. Start at **[docs/INDEX.md](docs/INDEX.md)** and use **`docs/.ai-index/`** (semantic index, task mapping) for token-efficient discovery.
+
+### Configuration and architecture
+
+- Environment variables for Lightspeed and AAP are declared only as `${VAR}` placeholders in **`.mcp.json`**.
+- Orchestration (**`/remediation`**) chains impact, validation, context, playbook generation, execution, and verification; see pack **CLAUDE.md** for routing when you need a single step only.
+
+
+
+## MCP Server Integrations
+
+| Server | Role |
+|--------|------|
+| **lightspeed-mcp** | CVEs, inventory, remediation inputs, playbook-related Lightspeed workflows. |
+| **aap-mcp-job-management** | Job templates, projects, launches, execution status. |
+| **aap-mcp-inventory-management** | Inventories and hosts for execution planning. |
+
+Configure servers through **`.mcp.json`**; skills must be invoked instead of calling MCP tools directly from the agent.
+
 
 ## Sample Workflows
 
@@ -390,6 +426,13 @@ User: "Execute the CVE remediation playbook"
   5. Monitors job status and reports results
 
 
+
+
+## Security Model
+
+- Do **not** expose `LIGHTSPEED_CLIENT_ID`, `LIGHTSPEED_CLIENT_SECRET`, AAP tokens, or any API credentials in chat—only whether they appear configured.
+- Require explicit user approval before running remediation playbooks or destructive changes at scale.
+- Prefer **`/remediation`** for end-to-end CVE response so validation and verification steps are not skipped accidentally.
 
 
 ## License

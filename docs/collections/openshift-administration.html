@@ -89,11 +89,11 @@ oc get nodes
 <summary class="install-accordion-header">Installation (Claude Code)</summary>
 <div class="install-accordion-body"><p>Install the collection as a Claude Code plugin:</p>
 <pre><code class="language-bash">claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install ocp-admin
+claude plugin install openshift-administration
 </code></pre>
 <p>Or for local development:</p>
 <pre><code class="language-bash">claude plugin marketplace add /path/to/agentic-collections
-claude plugin install ocp-admin
+claude plugin install openshift-administration
 </code></pre></div>
 </details>
 <details class="install-accordion-item">
@@ -119,6 +119,12 @@ cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
 </code></pre></div>
 </details>
 </div>
+<h2>Security Model</h2>
+<ul>
+<li><strong>Secrets:</strong> Never print <code>OFFLINE_TOKEN</code>, kubeconfig contents, pull secrets, or install keys. Confirm only that required environment variables are set.</li>
+<li><strong>Human approval:</strong> <strong>cluster-creator</strong> waits for explicit confirmation before VIP assignment, host roles, static networking, and install triggers.</li>
+<li><strong>Read vs write:</strong> <strong>cluster-inventory</strong> is discovery-focused; <strong>cluster-report</strong> should use least-privilege kubeconfig where possible.</li>
+</ul>
 <h2>License</h2>
 <p><a href="https://www.redhat.com/en/about/agreements">Apache-2.0</a></p>
             </div>

@@ -11,9 +11,10 @@ Each pack has a `collection.yaml` at its root (e.g. `rh-sre/collection.yaml`). I
 - Deploy and use instructions
 - Sample workflows and resources
 
-**Generated artifacts** (do not edit manually):
+**Generated artifacts** (do not edit manually; each file states its source of truth and `make generate-catalog` in a header or `_generated` block):
 
-- `README.md` — Pack README
+- `README.md` — Pack README (HTML comment banner)
+- `collection.json` — JSON mirror of `collection.yaml` for tools that prefer JSON
 - `.claude-plugin/plugin.json` — Claude Code plugin metadata
 - `.cursor-plugin/plugin.json` — Cursor plugin metadata
 - `.claude-plugin/marketplace.json` / `.cursor-plugin/marketplace.json` — Marketplace listings
@@ -27,7 +28,7 @@ Full schema: [catalog/schema.yaml](catalog/schema.yaml)
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | string | Plugin identifier for install commands (e.g. `claude plugin install <id>`). Defaults to pack folder name. Override for rh-virt: `openshift-virtualization` |
+| `id` | string | Plugin identifier for install commands (e.g. `claude plugin install <id>`). Defaults to pack folder name. Overrides: **rh-virt** → `openshift-virtualization`; **ocp-admin** → `openshift-administration` |
 | `name` | string | Display name |
 | `provider` | string | Organization (e.g. "Red Hat") |
 | `version` | string | Semantic version (e.g. "1.0.0") |
@@ -138,7 +139,7 @@ For multi-turn workflows, repeat `User: "..."` followed by bullets for each turn
 ## Generation Pipeline
 
 ```bash
-make generate-catalog   # Generates marketplace, plugins, README
+make generate-catalog   # Generates marketplace, plugins, collection.json, README
 make generate          # generate-catalog + docs (data.json, collection pages)
 ```
 
@@ -146,6 +147,7 @@ make generate          # generate-catalog + docs (data.json, collection pages)
 |--------|----------|
 | `scripts/generate_marketplace.py` | `.claude-plugin/marketplace.json`, `.cursor-plugin/marketplace.json` |
 | `scripts/generate_plugins.py` | `{pack}/.claude-plugin/plugin.json`, `{pack}/.cursor-plugin/plugin.json` |
+| `scripts/generate_collection_json.py` | `{pack}/collection.json` |
 | `scripts/generate_readme.py` | `{pack}/README.md` (from `catalog/README_TEMPLATE.md.j2`) |
 | `scripts/build_website.py` | `docs/data.json`, `docs/collections/{id}.html` |
 

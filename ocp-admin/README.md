@@ -1,3 +1,9 @@
+<!--
+  GENERATED FILE — do not edit manually.
+  Source of truth: ocp-admin/collection.yaml
+  Regenerate with: make generate-catalog
+-->
+
 # Red Hat OpenShift Administration Agentic Collection
 
 Automation capabilities for OpenShift Container Platform cluster management, workload orchestration, security policies, and operational tasks.
@@ -42,14 +48,14 @@ Install the collection as a Claude Code plugin:
 
 ```bash
 claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install ocp-admin
+claude plugin install openshift-administration
 ```
 
 Or for local development:
 
 ```bash
 claude plugin marketplace add /path/to/agentic-collections
-claude plugin install ocp-admin
+claude plugin install openshift-administration
 ```
 
 ### Installation (Cursor)
@@ -157,6 +163,34 @@ uses **openshift-administration** MCP (see `.mcp.json`).
 
 
 
+## Documentation
+
+### Multi-cluster authentication
+
+For consolidated **cluster-report** across many contexts, set up kubeconfig and RBAC using the pack guide: [docs/multi-cluster-auth.md](docs/multi-cluster-auth.md).
+
+### Further documentation
+
+- **[Documentation index](docs/INDEX.md)** — navigation for networking, host requirements, troubleshooting, and static networking.
+- **Troubleshooting** — see [docs/troubleshooting.md](docs/troubleshooting.md) for Assisted Installer and cluster-specific issues.
+
+### Configuration notes
+
+- Ensure `OFFLINE_TOKEN` is exported before Assisted Installer or OCM MCP calls.
+- Point `KUBECONFIG` at a merged kubeconfig when reporting across fleets; verify with `oc config get-contexts`.
+
+
+
+## MCP Server Integrations
+
+Skills wrap MCP servers defined in **`.mcp.json`** (copy entries into Claude Code `/mcp` or your settings file). Typical layout:
+
+- **openshift-self-managed** — Assisted Installer API for **cluster-creator** / parts of **cluster-inventory** (self-managed OCP, SNO). Requires `OFFLINE_TOKEN`.
+- **openshift-ocm-managed** — OpenShift Cluster Manager API for ROSA, ARO, OSD in **cluster-inventory**. Requires `OFFLINE_TOKEN`.
+- **openshift-administration** — Kubernetes/OpenShift access for **cluster-report** (node and workload metrics). Requires `KUBECONFIG`.
+
+Images and commands reference `ocp-admin/.mcp.json`; use Podman or Docker as documented there.
+
 
 ## Sample Workflows
 
@@ -187,6 +221,13 @@ User: "Show me a report across all clusters"
 - **cluster-report** produces a comparison view
 
 
+
+
+## Security Model
+
+- **Secrets:** Never print `OFFLINE_TOKEN`, kubeconfig contents, pull secrets, or install keys. Confirm only that required environment variables are set.
+- **Human approval:** **cluster-creator** waits for explicit confirmation before VIP assignment, host roles, static networking, and install triggers.
+- **Read vs write:** **cluster-inventory** is discovery-focused; **cluster-report** should use least-privilege kubeconfig where possible.
 
 
 ## License

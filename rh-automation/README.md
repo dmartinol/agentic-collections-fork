@@ -1,3 +1,9 @@
+<!--
+  GENERATED FILE — do not edit manually.
+  Source of truth: rh-automation/collection.yaml
+  Regenerate with: make generate-catalog
+-->
+
 # Red Hat Automation Agentic Collection
 
 Ansible Automation Platform governance, execution safety, and forensic troubleshooting tools for Red Hat automation engineers.
@@ -262,6 +268,58 @@ Generate execution reports for audit and learning purposes.
 
 
 
+## Documentation
+
+### What this collection adds over raw MCP access
+
+Raw MCP access can list templates, launch jobs, and read events. This pack adds:
+
+1. **Knowledge** — In-repo docs distilled from Red Hat sources (cited at runtime). Start with embedded references: [docs/aap/governance-readiness.md](docs/aap/governance-readiness.md), [docs/aap/execution-governance.md](docs/aap/execution-governance.md), [docs/aap/job-troubleshooting.md](docs/aap/job-troubleshooting.md), [docs/references/error-classification.md](docs/references/error-classification.md).
+2. **Judgment** — Skills interpret MCP data through governance and risk patterns (secret scans, inventory classification, error taxonomy).
+3. **Workflow** — Orchestration skills (**`governance-assessor`**, **`governance-executor`**, **`forensic-troubleshooter`**) chain sub-skills with human-in-the-loop gates.
+
+### Three primary use cases
+
+**1. Governance assessment** — *"Assess my AAP platform's governance readiness."*  
+Entry: **`governance-assessor`** → audits seven domains across all MCP endpoints; see **governance-readiness** doc above.
+
+**2. Governed execution** — *"Execute the security patch on production urgently."*  
+Entry: **`governance-executor`** → risk analysis, check mode, approval before production.
+
+**3. Forensic troubleshooting** — *"Job #4451 failed. What happened?"*  
+Entry: **`forensic-troubleshooter`** → events, host facts, doc-backed resolutions (**job-troubleshooting**, **error-classification**).
+
+### Skills × MCP coverage (summary)
+
+| Skill | Typical MCP scope |
+|-------|-------------------|
+| `governance-assessor` | All 6 servers (orchestrated audit) |
+| `governance-executor` | job-management, inventory-management |
+| `forensic-troubleshooter` | job-management, inventory-management |
+| `aap-mcp-validator` | All 6 (connectivity) |
+| `governance-readiness-assessor` | All 6 |
+| `execution-risk-analyzer`, `governed-job-launcher` | job-management (+ inventory as needed) |
+| `job-failure-analyzer` | job-management |
+| `host-fact-inspector` | inventory-management |
+| `resolution-advisor`, `execution-summary` | Advisory / reporting (consult docs) |
+
+
+
+## MCP Server Integrations
+
+Six HTTP MCP servers (see **`rh-automation/.mcp.json`** and [AAP MCP Server](https://github.com/ansible/aap-mcp-server)):
+
+| Server | Purpose |
+|--------|---------|
+| **aap-mcp-job-management** | Job templates, launches, events, workflows |
+| **aap-mcp-inventory-management** | Inventories, hosts, groups, facts |
+| **aap-mcp-configuration** | Notifications, execution environments, platform settings |
+| **aap-mcp-security-compliance** | Credentials, credential types, testing |
+| **aap-mcp-system-monitoring** | Instance groups, activity stream, mesh, status |
+| **aap-mcp-user-management** | Users, teams, organizations, RBAC |
+
+Full governance audits require reachability across **all six**; execution paths may use a subset. Set **`AAP_MCP_SERVER`** and **`AAP_API_TOKEN`** as documented under Quick Start.
+
 
 ## Sample Workflows
 
@@ -296,6 +354,13 @@ User: "Job 12345 failed - help me troubleshoot"
   4. Provides resolution recommendations
 
 
+
+
+## Security Model
+
+- Never print **`AAP_API_TOKEN`** or raw Bearer material.
+- Production job launches require explicit approval paths in **`governed-job-launcher`** / **`governance-executor`**.
+- Treat extra_vars and inventory names as sensitive; skills scan for secrets before execution.
 
 
 ## License

@@ -1,4 +1,9 @@
 {
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "rh-automation/collection.yaml",
+    "regenerate": "make generate-catalog"
+  },
   "name": "rh-automation",
   "version": "1.0.0",
   "description": "Ansible Automation Platform governance, execution safety, and forensic troubleshooting tools for Red Hat automation engineers.",

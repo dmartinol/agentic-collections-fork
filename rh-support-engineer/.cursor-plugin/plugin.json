@@ -1,4 +1,9 @@
 {
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "rh-support-engineer/collection.yaml",
+    "regenerate": "make generate-catalog"
+  },
   "name": "rh-support-engineer",
   "version": "1.0.0",
   "description": "Technical support and troubleshooting tools for Red Hat products and platforms.",

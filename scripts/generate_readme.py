@@ -3,7 +3,7 @@
 Generate README.md from collection.yaml using Jinja2 template.
 
 For each pack with collection.yaml, produces:
-- {pack}/README.md
+- {pack}/README.md (leading HTML comment: source of truth + do not edit)
 """
 
 import sys
@@ -12,6 +12,8 @@ from typing import Any, Dict
 
 import yaml
 from jinja2 import Environment, FileSystemLoader
+
+from generation_notice import markdown_generation_banner
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = REPO_ROOT / "catalog"
@@ -64,7 +66,10 @@ def main() -> int:
         ctx = prepare_template_context(data, pack_dir)
         out_path = REPO_ROOT / pack_dir / "README.md"
         rendered = template.render(**ctx)
-        out_path.write_text(rendered, encoding="utf-8")
+        out_path.write_text(
+            markdown_generation_banner(pack_dir) + rendered,
+            encoding="utf-8",
+        )
         print(f"Generated {pack_dir}/README.md")
 
     print(f"Generated README for {len(collections)} packs")

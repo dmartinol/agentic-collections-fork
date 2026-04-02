@@ -1,4 +1,9 @@
 {
+  "_generated": {
+    "notice": "This file is generated. Do not edit manually.",
+    "source_of_truth": "rh-ai-engineer/collection.yaml",
+    "regenerate": "make generate-catalog"
+  },
   "name": "rh-ai-engineer",
   "version": "1.0.0",
   "description": "Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, registries, workbenches, and serving runtimes on OpenShift AI.",
