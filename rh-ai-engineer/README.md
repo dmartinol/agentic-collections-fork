@@ -226,44 +226,45 @@ Deploy guardrails orchestrators with PII, toxicity, and prompt-injection detecto
 
 ### Bootstrap then deploy a model
 
-1. **ds-project-setup** — create the project, connections, and serving prerequisites.
-2. **workbench-manage** (optional) — attach a notebook for experimentation.
-3. **model-deploy** — roll out the InferenceService; use **nim-setup** first if using NVIDIA NIM.
+User: "I need a new OpenShift AI project and a deployed model"
+- **ds-project-setup** creates the project, connections, and serving prerequisites
+- **workbench-manage** (optional) attaches a notebook for experimentation
+- **model-deploy** rolls out the InferenceService; use **nim-setup** first if using NVIDIA NIM
 
 
 
 ### Harden and monitor production inference
 
-1. **model-deploy** — ensure the model is ready.
-2. **ai-observability** — validate latency, GPU, and trace signals.
-3. **model-monitor** or **guardrails-config** — layer TrustyAI monitoring or guardrails as required.
+User: "Harden monitoring and guardrails on my production model"
+- **model-deploy** ensures the model is ready
+- **ai-observability** validates latency, GPU, and trace signals
+- **model-monitor** or **guardrails-config** layers TrustyAI monitoring or guardrails as required
 
 
 
 ### Debug a failed rollout
 
-1. **debug-inference** — isolate failing pods, events, or resources.
-2. Re-run **model-deploy** or adjust **serving-runtime-config** based on findings.
+User: "My InferenceService rollout failed—help me debug"
+- **debug-inference** isolates failing pods, events, or resources
+- Re-run **model-deploy** or adjust **serving-runtime-config** based on findings
 
 
 
 ### Deploy a model from registry
 
 User: "Deploy model v1.2 from the registry to production"
-
-1. Use **model-registry** to list and select a model version.
-2. Use **model-deploy** to deploy the selected model to a serving runtime.
-3. Use **ai-observability** to monitor inference performance.
+- **model-registry** lists and selects a model version
+- **model-deploy** deploys the selected model to a serving runtime
+- **ai-observability** monitors inference performance
 
 
 
 ### Set up a new data science project
 
 User: "Create a new data science project with a Jupyter workbench"
-
-1. Use **ds-project-setup** to create the project with data connections and pipeline server.
-2. Use **workbench-manage** to create a Jupyter workbench for development.
-3. Use **pipeline-manage** to run and monitor pipelines.
+- **ds-project-setup** creates the project with data connections and pipeline server
+- **workbench-manage** creates a Jupyter workbench for development
+- **pipeline-manage** runs and monitors pipelines
 
 
 

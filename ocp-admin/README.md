@@ -90,6 +90,7 @@ cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
 The pack provides 3 skills for OpenShift cluster lifecycle, inventory, and fleet health.
 
 
+
 ### cluster-creator - End-to-End Cluster Deployment
 
 Create OpenShift clusters with Red Hat Assisted Installer (SNO or HA) including ISOs, host discovery, networking, and install monitoring.
@@ -125,7 +126,6 @@ List and inspect clusters across self-managed (OCP, SNO) and managed (ROSA, ARO,
 
 
 
-
 ### cluster-report - Multi-Cluster Health Report
 
 Generate a consolidated health and resource report across kubeconfig contexts.
@@ -136,8 +136,10 @@ Generate a consolidated health and resource report across kubeconfig contexts.
 - "Multi-cluster status overview"
 
 **What it does:**
-- Verifies each context targets OpenShift before reporting
-- Aggregates nodes, GPUs, namespaces, and pod health
+- Verifies each kubeconfig context targets OpenShift before reporting
+- Collects node resources (CPU, memory, GPUs)
+- Reports namespace counts and pod health
+- Provides a single comparison view across clusters
 
 **Requires:** `KUBECONFIG` with appropriate cluster access;
 uses **openshift-administration** MCP (see `.mcp.json`).
@@ -161,27 +163,28 @@ uses **openshift-administration** MCP (see `.mcp.json`).
 
 ### Deploy and verify a new cluster
 
-1. Run **cluster-creator** to provision the cluster via Assisted Installer.
-2. Run **cluster-inventory** to confirm status and watch events until the cluster is ready.
-3. Configure `KUBECONFIG`, then run **cluster-report** for a first health snapshot.
+User: "Provision a new OpenShift cluster and verify it is healthy"
+- **cluster-creator** provisions the cluster via Assisted Installer
+- **cluster-inventory** confirms status and watches events until the cluster is ready
+- Configure `KUBECONFIG`, then **cluster-report** captures a first health snapshot
 
 
 
 ### Fleet health review
 
-1. Run **cluster-inventory** to list managed and self-managed clusters.
-2. Align kubeconfig contexts, then run **cluster-report** for resource and pod health across the fleet.
+User: "How is my fleet doing across kubeconfig contexts?"
+- **cluster-inventory** lists managed and self-managed clusters
+- Align kubeconfig contexts, then **cluster-report** reports resource and pod health across the fleet
 
 
 
 ### Multi-Cluster Health Report
 
 User: "Show me a report across all clusters"
-- cluster-report skill:
-  1. Verifies each kubeconfig context is OpenShift
-  2. Collects node resources (CPU, memory, GPUs)
-  3. Aggregates namespace counts and pod status
-  4. Produces comparison view
+- **cluster-report** verifies each kubeconfig context is OpenShift
+- **cluster-report** collects node resources (CPU, memory, GPUs)
+- **cluster-report** aggregates namespace counts and pod status
+- **cluster-report** produces a comparison view
 
 
 

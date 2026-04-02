@@ -45,7 +45,7 @@
             <div class="toolbar-left">
                 <a href="../index.html" class="collection-back">← Back to Catalog</a>
                 <h1>Red Hat AI Engineer Agentic Collection</h1>
-                <p class="subtitle">Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, registries, workbenches, and serving runtimes on OpenShift AI.</p>
+                <p class="subtitle">Automation tools for AI/ML engineers working with Red Hat OpenShift AI (RHOAI). Deploy and manage models, pipelines, reg</p>
             </div>
             <div class="toolbar-right">
                 <a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" class="toolbar-button">GitHub</a>
@@ -217,36 +217,29 @@ cp -r agentic-collections-main/rh-ai-engineer ~/.opencode/plugins/rh-ai-engineer
 </div>
 <h2>Sample Workflows</h2>
 <h3>Bootstrap then deploy a model</h3>
-<ol>
-<li><strong>ds-project-setup</strong> — create the project, connections, and serving prerequisites.</li>
-<li><strong>workbench-manage</strong> (optional) — attach a notebook for experimentation.</li>
-<li><strong>model-deploy</strong> — roll out the InferenceService; use <strong>nim-setup</strong> first if using NVIDIA NIM.</li>
-</ol>
+<p>User: "I need a new OpenShift AI project and a deployed model"<br />
+- <strong>ds-project-setup</strong> creates the project, connections, and serving prerequisites<br />
+- <strong>workbench-manage</strong> (optional) attaches a notebook for experimentation<br />
+- <strong>model-deploy</strong> rolls out the InferenceService; use <strong>nim-setup</strong> first if using NVIDIA NIM</p>
 <h3>Harden and monitor production inference</h3>
-<ol>
-<li><strong>model-deploy</strong> — ensure the model is ready.</li>
-<li><strong>ai-observability</strong> — validate latency, GPU, and trace signals.</li>
-<li><strong>model-monitor</strong> or <strong>guardrails-config</strong> — layer TrustyAI monitoring or guardrails as required.</li>
-</ol>
+<p>User: "Harden monitoring and guardrails on my production model"<br />
+- <strong>model-deploy</strong> ensures the model is ready<br />
+- <strong>ai-observability</strong> validates latency, GPU, and trace signals<br />
+- <strong>model-monitor</strong> or <strong>guardrails-config</strong> layers TrustyAI monitoring or guardrails as required</p>
 <h3>Debug a failed rollout</h3>
-<ol>
-<li><strong>debug-inference</strong> — isolate failing pods, events, or resources.</li>
-<li>Re-run <strong>model-deploy</strong> or adjust <strong>serving-runtime-config</strong> based on findings.</li>
-</ol>
+<p>User: "My InferenceService rollout failed—help me debug"<br />
+- <strong>debug-inference</strong> isolates failing pods, events, or resources<br />
+- Re-run <strong>model-deploy</strong> or adjust <strong>serving-runtime-config</strong> based on findings</p>
 <h3>Deploy a model from registry</h3>
-<p>User: "Deploy model v1.2 from the registry to production"</p>
-<ol>
-<li>Use <strong>model-registry</strong> to list and select a model version.</li>
-<li>Use <strong>model-deploy</strong> to deploy the selected model to a serving runtime.</li>
-<li>Use <strong>ai-observability</strong> to monitor inference performance.</li>
-</ol>
+<p>User: "Deploy model v1.2 from the registry to production"<br />
+- <strong>model-registry</strong> lists and selects a model version<br />
+- <strong>model-deploy</strong> deploys the selected model to a serving runtime<br />
+- <strong>ai-observability</strong> monitors inference performance</p>
 <h3>Set up a new data science project</h3>
-<p>User: "Create a new data science project with a Jupyter workbench"</p>
-<ol>
-<li>Use <strong>ds-project-setup</strong> to create the project with data connections and pipeline server.</li>
-<li>Use <strong>workbench-manage</strong> to create a Jupyter workbench for development.</li>
-<li>Use <strong>pipeline-manage</strong> to run and monitor pipelines.</li>
-</ol>
+<p>User: "Create a new data science project with a Jupyter workbench"<br />
+- <strong>ds-project-setup</strong> creates the project with data connections and pipeline server<br />
+- <strong>workbench-manage</strong> creates a Jupyter workbench for development<br />
+- <strong>pipeline-manage</strong> runs and monitors pipelines</p>
             </div>
         </div>
     </main>

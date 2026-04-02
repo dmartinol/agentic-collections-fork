@@ -152,21 +152,22 @@ deploy_and_use: |
 sample_workflows:
 - name: Deploy and verify a new cluster
   workflow: |
-    1. Run **cluster-creator** to provision the cluster via Assisted Installer.
-    2. Run **cluster-inventory** to confirm status and watch events until the cluster is ready.
-    3. Configure `KUBECONFIG`, then run **cluster-report** for a first health snapshot.
+    User: "Provision a new OpenShift cluster and verify it is healthy"
+    - **cluster-creator** provisions the cluster via Assisted Installer
+    - **cluster-inventory** confirms status and watches events until the cluster is ready
+    - Configure `KUBECONFIG`, then **cluster-report** captures a first health snapshot
 - name: Fleet health review
   workflow: |
-    1. Run **cluster-inventory** to list managed and self-managed clusters.
-    2. Align kubeconfig contexts, then run **cluster-report** for resource and pod health across the fleet.
+    User: "How is my fleet doing across kubeconfig contexts?"
+    - **cluster-inventory** lists managed and self-managed clusters
+    - Align kubeconfig contexts, then **cluster-report** reports resource and pod health across the fleet
 - name: Multi-Cluster Health Report
   workflow: |
     User: "Show me a report across all clusters"
-    - cluster-report skill:
-      1. Verifies each kubeconfig context is OpenShift
-      2. Collects node resources (CPU, memory, GPUs)
-      3. Aggregates namespace counts and pod status
-      4. Produces comparison view
+    - **cluster-report** verifies each kubeconfig context is OpenShift
+    - **cluster-report** collects node resources (CPU, memory, GPUs)
+    - **cluster-report** aggregates namespace counts and pod status
+    - **cluster-report** produces a comparison view
 resources:
   - title: OpenShift Container Platform Documentation
     url: https://docs.openshift.com/container-platform/latest/welcome/index.html

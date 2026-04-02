@@ -156,8 +156,10 @@ cp -r agentic-collections-main/ocp-admin ~/.opencode/plugins/ocp-admin
 - "Compare cluster health"<br />
 - "Multi-cluster status overview"</p>
 <p><strong>What it does:</strong><br />
-- Verifies each context targets OpenShift before reporting<br />
-- Aggregates nodes, GPUs, namespaces, and pod health</p>
+- Verifies each kubeconfig context targets OpenShift before reporting<br />
+- Collects node resources (CPU, memory, GPUs)<br />
+- Reports namespace counts and pod health<br />
+- Provides a single comparison view across clusters</p>
 <p><strong>Requires:</strong> <code>KUBECONFIG</code> with appropriate cluster access;<br />
 uses <strong>openshift-administration</strong> MCP (see <code>.mcp.json</code>).</p></div>
 </li>
@@ -170,7 +172,6 @@ uses <strong>openshift-administration</strong> MCP (see <code>.mcp.json</code>).
 <ul>
 <li><a href="https://docs.openshift.com/container-platform/latest/welcome/index.html" target="_blank" rel="noopener">OpenShift Container Platform Documentation</a> - Official OpenShift cluster management and administration docs.</li>
 <li><a href="https://docs.openshift.com/container-platform/latest/operators/operator_sdk/osdk-cli-managing-multicluster.html" target="_blank" rel="noopener">OpenShift Multi-Cluster Management</a> - Managing multiple OpenShift clusters. <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/ocp-admin/docs/multi-cluster-auth.md" target="_blank" rel="noopener">[embedded doc]</a></li>
-<li><a href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener">Main Repository</a> - agentic-collections</li>
 </ul>
             </div>
             <div id="tab-agents" class="collection-tab-panel" role="tabpanel">
@@ -197,23 +198,20 @@ uses <strong>openshift-administration</strong> MCP (see <code>.mcp.json</code>).
 </div>
 <h2>Sample Workflows</h2>
 <h3>Deploy and verify a new cluster</h3>
-<ol>
-<li>Run <strong>cluster-creator</strong> to provision the cluster via Assisted Installer.</li>
-<li>Run <strong>cluster-inventory</strong> to confirm status and watch events until the cluster is ready.</li>
-<li>Configure <code>KUBECONFIG</code>, then run <strong>cluster-report</strong> for a first health snapshot.</li>
-</ol>
+<p>User: "Provision a new OpenShift cluster and verify it is healthy"<br />
+- <strong>cluster-creator</strong> provisions the cluster via Assisted Installer<br />
+- <strong>cluster-inventory</strong> confirms status and watches events until the cluster is ready<br />
+- Configure <code>KUBECONFIG</code>, then <strong>cluster-report</strong> captures a first health snapshot</p>
 <h3>Fleet health review</h3>
-<ol>
-<li>Run <strong>cluster-inventory</strong> to list managed and self-managed clusters.</li>
-<li>Align kubeconfig contexts, then run <strong>cluster-report</strong> for resource and pod health across the fleet.</li>
-</ol>
+<p>User: "How is my fleet doing across kubeconfig contexts?"<br />
+- <strong>cluster-inventory</strong> lists managed and self-managed clusters<br />
+- Align kubeconfig contexts, then <strong>cluster-report</strong> reports resource and pod health across the fleet</p>
 <h3>Multi-Cluster Health Report</h3>
 <p>User: "Show me a report across all clusters"<br />
-- cluster-report skill:<br />
-  1. Verifies each kubeconfig context is OpenShift<br />
-  2. Collects node resources (CPU, memory, GPUs)<br />
-  3. Aggregates namespace counts and pod status<br />
-  4. Produces comparison view</p>
+- <strong>cluster-report</strong> verifies each kubeconfig context is OpenShift<br />
+- <strong>cluster-report</strong> collects node resources (CPU, memory, GPUs)<br />
+- <strong>cluster-report</strong> aggregates namespace counts and pod status<br />
+- <strong>cluster-report</strong> produces a comparison view</p>
             </div>
         </div>
     </main>

@@ -80,11 +80,6 @@ The pack will provide skills for technical support and troubleshooting (skills i
 ## Sample Workflows
 
 
-### See collection.yaml
-
-Add workflows in collection.yaml.
-
-
 
 ## License
 
