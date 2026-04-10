@@ -1,0 +1,396 @@
+---
+name: skill-builder
+description: |
+  Interactive skill creation with automated validation and marketplace compliance.
+
+  Use when:
+  - "Create a new skill"
+  - "Add skill to <pack>"
+  - "Build skill for <technology>"
+  - User mentions "skill builder", "contribute", or "new skill"
+
+  Guides through discovery, definition, generation, and validation. Enforces SKILL_DESIGN_PRINCIPLES.md and agentskills.io spec.
+
+  NOT for editing existing skills (use Read/Edit tools).
+model: inherit
+color: green
+metadata:
+  author: "Red Hat Ecosystem Engineering"
+  version: "1.0.0"
+---
+
+# /skill-builder Skill
+
+Interactive AI assistant for creating production-ready skills with automated quality validation.
+
+**Creates**: Complete skill structure with YAML frontmatter, all mandatory sections, and pack integration
+**Validates**: Tier 1 (agentskills.io) + Tier 2 (repository design principles)
+**Automates**: Git workflow (branch, commit, PR guidance)
+
+## Prerequisites
+
+**Required Tools**:
+- `git` - Version control
+- `uv` - Python environment manager
+- `bash` - Shell for validation scripts
+
+**Repository State**:
+- Forked `RHEcosystemAppEng/agentic-collections`
+- Cloned locally
+- Clean git status (no uncommitted changes in target areas)
+
+**Verification**:
+```bash
+test -d .git && echo "✓ Git repo" || echo "✗ Not a git repo"
+which uv >/dev/null && echo "✓ uv installed" || echo "✗ Install uv"
+test -f SKILL_DESIGN_PRINCIPLES.md && echo "✓ Valid repo" || echo "✗ Wrong directory"
+```
+
+**Human Notification Protocol**:
+
+If prerequisites fail:
+```
+❌ Cannot execute: <issue>
+📋 Setup: <specific_steps>
+🔗 Doc: CONTRIBUTING.md
+```
+
+**Security**: Never display git credentials or secrets.
+
+## When to Use This Skill
+
+**Use when**:
+- Creating new skill for any pack
+- Contributing skill to marketplace
+- User explicitly invokes `/skill-builder`
+
+**Do NOT use when**:
+- Editing existing skills (use Read/Edit)
+- Asking about standards (direct to SKILL_DESIGN_PRINCIPLES.md)
+- General contributing questions (direct to CONTRIBUTING.md)
+
+## Workflow
+
+### Phase 1: Discovery (5 questions max)
+
+Ask concisely, validate before proceeding:
+
+1. **Purpose**: "What does the skill do? (1 sentence)"
+2. **Persona**: "What role uses it?" (detect existing pack or suggest new)
+3. **Pack**: "Use <existing-pack>? (yes/no/create-new)"
+4. **MCP Tools**: "What MCP tools does it need?" (verify in pack's .mcp.json)
+5. **Operation Type**: "Read-only, additive, or destructive?" (determines color)
+
+**Validation**:
+- Purpose: specific, under 100 chars
+- Persona: matches known or justifies new pack
+- MCP tools: exist or explain what to add
+- Operation type → Color mapping: cyan/green/blue/yellow/red
+
+### Phase 2: Definition (6 questions max)
+
+1. **Name**: "Skill name? (kebab-case, unique)" → Check: `test -d <pack>/skills/<name>/`
+2. **Use Cases**: "3-5 user phrases for 'Use when'" (concrete, not generic)
+3. **Anti-Patterns**: "NOT for? (with alternative)"
+4. **Workflow**: "Steps with MCP tools?" (e.g., "1. Validate VM - resources_get")
+5. **Common Issues**: "3+ issues: problem: cause: solution"
+6. **Prerequisites**: "Special requirements? (env vars, permissions)"
+
+**Token Check**: Estimate description tokens (~use_cases + anti_patterns). Warn if > 400 words (~520 tokens).
+
+### Phase 3: Pre-Generation Summary
+
+Show complete spec:
+
+```markdown
+## Review Before Generation
+
+**Pack**: <pack> | **Skill**: <name> | **Color**: <color>
+
+**Purpose**: <purpose>
+
+**Use When**: <3-5 examples>
+**NOT for**: <anti-pattern>
+
+**Workflow**: <N> steps
+**Common Issues**: <N> documented
+**MCP Tools**: <tool_count> tools
+**Human-in-the-Loop**: <Yes/No>
+
+Proceed? (yes/no)
+```
+
+### Phase 4: Generation
+
+**Create structure**:
+```bash
+mkdir -p <pack>/skills/<skill-name>/
+```
+
+**Generate files**:
+1. **SKILL.md**: YAML frontmatter + 10 mandatory sections (follow SKILL_DESIGN_PRINCIPLES.md template)
+2. **Update <pack>/CLAUDE.md**: Add intent routing entry
+3. **Create <pack>/.mcp.json**: If new MCP server needed (use `${ENV_VAR}` format)
+4. **Create pack structure**: If new pack (plugin.json, README.md, CLAUDE.md)
+
+**Mandatory SKILL.md sections** (in order):
+1. Frontmatter (name, description, model, color)
+2. `# /<skill-name> Skill` + overview
+3. `## Prerequisites` (verification + Human Notification Protocol)
+4. `## When to Use This Skill`
+5. `## Workflow` (with precise parameters)
+6. `## Common Issues` (min 3)
+7. `## Dependencies` (MCP servers, tools, related skills)
+8. `## Critical: Human-in-the-Loop Requirements` (if applicable)
+9. `## Security Considerations` (if applicable)
+10. `## Example Usage` (min 1)
+
+### Phase 5: Validation
+
+**Tier 1 - agentskills.io**:
+```bash
+./scripts/run-skill-linter.sh <pack>/skills/<skill-name>/
+```
+
+**Tier 2 - Design Principles**:
+```bash
+make validate-skill-design-changed
+```
+
+**Report clearly**:
+- ✅ PASSED → Proceed
+- ⚠️ WARNINGS → Ask user to continue
+- ❌ ERRORS → Block, show fixes
+
+**Document Consultation** (REQUIRED):
+Read [SKILL_DESIGN_PRINCIPLES.md](../../../SKILL_DESIGN_PRINCIPLES.md) before validation.
+Output: "I consulted SKILL_DESIGN_PRINCIPLES.md for validation criteria."
+
+### Phase 6: Post-Validation Summary
+
+```markdown
+## ✅ Skill Created
+
+**Files**:
+✅ <pack>/skills/<name>/SKILL.md
+✅ <pack>/CLAUDE.md
+
+**Validation**:
+✅ Tier 1: agentskills.io compliant
+✅ Tier 2: Design principles satisfied
+
+**Quality**:
+- Sections: <N>
+- Tokens: <N>/500
+- Workflow steps: <N>
+- Common issues: <N>
+
+**Opinion**: <Your assessment - strengths, fit, readiness>
+
+Ready to commit? (yes/no)
+```
+
+### Phase 7: Git Workflow (User Confirmation Required)
+
+**Each step requires confirmation**:
+
+1. **Branch**: "Create `feat/<skill-name>`? (yes/no)"
+2. **Stage**: Show files, ask confirmation
+3. **Commit**: Show message, ask confirmation
+   ```
+   feat: add <skill-name> skill to <pack>
+
+   <skill-purpose>
+
+   Tier 1+2 validated
+
+   Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+   ```
+4. **Push**: "Push to fork? (yes/no)"
+5. **PR**: Use `gh` if available, else provide manual instructions
+
+### Phase 8: Final Summary
+
+```markdown
+## 🎉 Complete!
+
+**Created**: <pack>/skills/<name>/SKILL.md
+**Quality**: Production-ready
+**PR**: <url_or_manual_instructions>
+
+**CI checks will run automatically**
+
+Thank you for contributing! 🚀
+```
+
+## Common Issues
+
+### Issue 1: "Description exceeds 500 tokens"
+
+**Fix**: Shorten frontmatter - move details to body sections.
+
+### Issue 2: "Skill name exists"
+
+**Fix**: Choose more specific name. Check: `ls <pack>/skills/`
+
+### Issue 3: "MCP server not configured"
+
+**Fix**: Add to `<pack>/.mcp.json` using `${ENV_VAR}` format.
+
+### Issue 4: "Git push authentication failed"
+
+**Fix**: Configure credentials:
+```bash
+# HTTPS
+git config --global credential.helper store
+
+# SSH
+ssh-add ~/.ssh/id_ed25519
+```
+
+### Issue 5: "uv not found"
+
+**Fix**: Install:
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+## Dependencies
+
+### Required MCP Servers
+
+None - This skill operates on repository files and git operations only. No MCP servers required.
+
+### Required MCP Tools
+
+None - Uses Claude Code built-in tools (Read, Write, Edit, Bash, Skill) for file operations and validation.
+
+### Related Skills
+
+None - skill-builder is self-contained and doesn't invoke other skills.
+
+### Repository Files
+
+- `SKILL_DESIGN_PRINCIPLES.md` - Design principles (DP1-11)
+- `scripts/run-skill-linter.sh` - Tier 1 validation
+- `scripts/validate_skill_design.py` - Tier 2 validation
+- `Makefile` - Validation targets
+
+### Required Tools
+
+- `git` - Version control
+- `uv` - Python environment manager
+- `bash` - Shell for validation scripts
+
+### Reference Documentation
+
+**Internal**:
+- [SKILL_DESIGN_PRINCIPLES.md](../../../SKILL_DESIGN_PRINCIPLES.md) - Complete design principles
+- [CONTRIBUTING.md](../../../CONTRIBUTING.md) - Contribution workflow guide
+- [rh-virt/SKILL_TEMPLATE.md](../../../rh-virt/SKILL_TEMPLATE.md) - Enhanced template example
+
+**External**:
+- [agentskills.io Specification](https://agentskills.io/specification) - Base skill standard
+- [Conventional Commits](https://www.conventionalcommits.org/) - Commit message format
+
+## Critical: Human-in-the-Loop Requirements
+
+**MUST confirm before**:
+
+1. **File Generation**: Show pre-generation summary, wait for "yes"
+2. **Git Branch**: Ask before creating branch
+3. **Git Commit**: Show commit message, wait for approval
+4. **Git Push**: Confirm before pushing to remote
+5. **Quality Enforcement**: Block on validation errors, warn on warnings
+
+**NEVER**:
+- Create commits without confirmation
+- Push without explicit approval
+- Skip validation steps
+- Proceed if Tier 1 or Tier 2 validation fails with errors
+
+**Why**: User controls their fork. Quality standards ensure CI success.
+
+## Security Considerations
+
+- **Git Credentials**: Never display tokens, SSH keys, or passwords
+- **Environment Variables**: Report presence only, never values
+- **User Repository**: Only operate in user's fork
+- **File Overwrite**: Warn before overwriting, require confirmation
+- **MCP Credentials**: Only `${ENV_VAR}` format, never hardcoded
+- **Script Execution**: User's repo context only
+
+## Example Usage
+
+```
+User: "Create skill for rh-virt to backup VMs"
+
+Skill-Builder:
+What does it do? (1 sentence)
+> "Create VM backups using snapshots"
+
+What role uses it?
+> "Virt admins"
+
+✅ Detected pack: rh-virt. Use it? (yes/no)
+> yes
+
+MCP tools needed?
+> "vm-snapshot-create from openshift-virtualization"
+
+Operation type? (read-only/additive/destructive)
+> "additive"
+
+✅ Color: green
+
+Skill name? (kebab-case)
+> "vm-backup-create"
+
+✅ Unique in rh-virt
+
+3-5 user phrases for 'Use when':
+> - "Backup VM database-01"
+> - "Create snapshot before upgrade"
+> - "Save VM state for recovery"
+
+NOT for?
+> "NOT for restoring (use vm-snapshot-restore)"
+
+Workflow steps with MCP tools:
+> 1. Validate VM exists - resources_get
+> 2. Check storage supports snapshots - storageclasses_list
+> 3. Create snapshot - virtualmachinesnapshot_create
+> 4. Monitor until ready - virtualmachinesnapshot_get
+
+3+ common issues:
+> "Snapshot fails: Storage doesn't support: Use snapshot-capable storage"
+> "VM not found: Wrong namespace: Verify with oc project"
+> "Stuck pending: CSI driver issue: Check openshift-storage pods"
+
+## Review Before Generation
+[shows complete summary]
+
+Proceed? (yes/no)
+> yes
+
+✅ Generated: rh-virt/skills/vm-backup-create/SKILL.md
+✅ Updated: rh-virt/CLAUDE.md
+
+Running validation...
+I consulted SKILL_DESIGN_PRINCIPLES.md for validation criteria.
+
+✅ Tier 1: PASSED
+✅ Tier 2: PASSED (8/8 design principles)
+
+## ✅ Skill Created
+Production-ready quality
+
+Ready to commit? (yes/no)
+> yes
+
+[Git workflow with confirmations]
+
+🎉 Complete! PR created at: github.com/...
+
+Thank you for contributing!
+```
