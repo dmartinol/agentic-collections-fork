@@ -11,6 +11,8 @@
 
 ## 🚀 Quick Start
 
+**💡 Want to contribute your own skill?** See the [Contributing](#-contributing) section below for the easy skill-builder tool.
+
 ### 1. Add the Marketplace
 
 ```bash
@@ -67,7 +69,7 @@ See each plugin's README for available skills and usage examples.
 
 ## 📦 Available Plugins
 
-7 persona-focused plugins with **100+ production-ready skills**:
+8 persona-focused plugins with **100+ production-ready skills**:
 
 | Plugin | Version | Skills | Description | Personas |
 |--------|---------|--------|-------------|----------|
@@ -77,9 +79,10 @@ See each plugin's README for available skills and usage examples.
 | **[ocp-admin](ocp-admin/README.md)** | 1.0.0 | 1 | Multi-cluster management, health reports, monitoring | OpenShift Administrators |
 | **[rh-ai-engineer](rh-ai-engineer/README.md)** | 1.0.0 | 18 | Model serving, vLLM, KServe, NVIDIA NIM | AI/ML Engineers |
 | **[rh-automation](rh-automation/README.md)** | 1.0.0 | 13 | Ansible Automation Platform governance, safety checks | Automation Leads |
+| **[rh-contributor](rh-contributor/README.md)** | 1.0.0 | 1 | Interactive skill builder with automated validation | Contributors & Maintainers |
 | **[rh-support-engineer](rh-support-engineer/README.md)** | 1.0.0 | 0* | Technical support and troubleshooting | Support Engineers |
 
-**Total:** 100 skills across 7 plugins | **License:** Apache 2.0 | **Status:** Production Ready
+**Total:** 101 skills across 8 plugins | **License:** Apache 2.0 | **Status:** Production Ready
 
 <sub>* Coming soon</sub>
 
@@ -203,6 +206,68 @@ make validate-skill-design PACK=rh-sre
 uv run python scripts/validate_skill_design.py --warnings-as-errors
 
 ```
+
+---
+
+## 🤝 Contributing
+
+**Want to add your own skill to the marketplace?** We've made it easy!
+
+### Quick Start: Using skill-builder (Recommended)
+
+The **skill-builder** tool creates production-ready skills with automated quality validation:
+
+```bash
+# Install the contributor plugin
+/plugin marketplace add RHEcosystemAppEng/agentic-collections
+/plugin install rh-contributor@redhat-agentic-collections
+
+# Launch the interactive skill builder
+/skill-builder
+```
+
+**Example prompts to get started**:
+```
+"I want to create a skill for backing up VMs in OpenShift Virtualization"
+"Create a skill for rh-sre to check RHEL system compliance"
+"Build a skill that deploys models to OpenShift AI"
+"Help me contribute a skill for Ansible playbook validation"
+```
+
+The skill-builder guides you through:
+- ✅ **Discovery**: What does your skill do and who needs it?
+- ✅ **Definition**: Detailed specifications with MCP tools
+- ✅ **Generation**: Complete skill structure following best practices
+- ✅ **Validation**: Tier 1 (agentskills.io) + Tier 2 (design principles)
+- ✅ **Git Workflow**: Branch, commit, and PR automation
+
+**No prior experience needed** - the tool ensures your skill meets all quality standards and passes CI checks.
+
+📖 **Full Guide**: [CONTRIBUTING.md](CONTRIBUTING.md) | **Plugin Details**: [rh-contributor/README.md](rh-contributor/README.md)
+
+### Manual Contribution (Advanced)
+
+For advanced contributors who prefer manual creation:
+
+1. Follow the [Skill Design Principles](SKILL_DESIGN_PRINCIPLES.md)
+2. Use the appropriate template:
+   - General: See SKILL_DESIGN_PRINCIPLES.md
+   - rh-virt collection: Use `rh-virt/SKILL_TEMPLATE.md`
+3. Create `skills/<skill-name>/SKILL.md` with proper YAML frontmatter
+4. Validate with the linter:
+   ```bash
+   make validate-skill-design-changed
+   ```
+5. Update the pack's `CLAUDE.md` intent routing table
+
+### Pull Request Guidelines
+
+- Run `make validate-skill-design-changed` before committing
+- Ensure CI checks pass (compliance + linter)
+- Follow conventional commits format
+- Update relevant documentation
+
+---
 
 ## Security
 
@@ -453,53 +518,6 @@ This will check:
 - ✅ YAML frontmatter in skills
 - ✅ Duplicate names
 - ✅ Invalid paths
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how to add or improve skills:
-
-### Adding a New Skill
-
-1. Follow the [Skill Design Principles](SKILL_DESIGN_PRINCIPLES.md)
-2. Use the appropriate template:
-   - General: See SKILL_DESIGN_PRINCIPLES.md
-   - rh-virt collection: Use `rh-virt/SKILL_TEMPLATE.md`
-3. Create `skills/<skill-name>/SKILL.md` with proper YAML frontmatter
-4. Validate with the linter:
-   ```bash
-   make validate-skill-design-changed
-   ```
-5. Update the pack's `CLAUDE.md` intent routing table
-
-### Adding a New Plugin
-
-1. Create plugin directory: `<pack-name>/`
-2. Add `.claude-plugin/plugin.json` with metadata
-3. Add `skills/` directory
-4. Add `CLAUDE.md` with persona and skill routing (see [rh-ai-engineer/CLAUDE.md](rh-ai-engineer/CLAUDE.md))
-5. Add `README.md` with plugin description
-6. Update marketplace.json:
-   ```json
-   {
-     "name": "your-plugin",
-     "description": "Plugin description",
-     "version": "1.0.0",
-     "author": {...},
-     "source": "./your-plugin",
-     "category": "your-category",
-     "skills": "./skills"
-   }
-   ```
-7. Validate: `make validate && claude plugin validate .`
-
-### Pull Request Guidelines
-
-- Run `make validate-skill-design-changed` before committing
-- Ensure CI checks pass (compliance + linter)
-- Follow conventional commits format
-- Update relevant documentation
 
 ---
 
