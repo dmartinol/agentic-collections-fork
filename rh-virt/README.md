@@ -214,7 +214,7 @@ Clone existing virtual machines for testing, scaling, or creating VM templates.
 
 ## MCP Server Integration
 
-The pack integrates with the OpenShift MCP server (configured in `.mcp.json`), which provides two toolsets for comprehensive cluster and virtualization management:
+The pack integrates with the OpenShift MCP server (configured in `mcps.json`), which provides two toolsets for comprehensive cluster and virtualization management:
 
 ### **openshift-virtualization** - OpenShift MCP Server
 
@@ -413,7 +413,7 @@ Agent: "✓ Workaround Applied Successfully
 
 ## Configuration
 
-MCP server is configured in `.mcp.json`:
+MCP server is configured in `mcps.json`:
 
 ```json
 {
@@ -511,9 +511,7 @@ The **vm-create** skill includes automatic error diagnosis and workaround propos
 ```
 rh-virt/
 ├── README.md                    # This file
-├── .claude-plugin/
-│   └── plugin.json              # Plugin metadata
-├── .mcp.json                    # MCP server configuration
+├── mcps.json                    # MCP server configuration
 ├── docs/                        # AI-optimized knowledge base
 │   └── troubleshooting/         # VM error diagnosis and workarounds (categorized by error type)
 │       ├── INDEX.md             # Navigation hub for troubleshooting docs
@@ -531,6 +529,8 @@ rh-virt/
     ├── vm-delete/SKILL.md       # VM destruction and cleanup
     └── vm-clone/SKILL.md        # VM cloning and duplication
 ```
+
+*Optional:* `.claude-plugin/plugin.json` — only if publishing via Claude Code’s plugin format; not required for [Lola](https://github.com/RedHatProductSecurity/lola) install.
 
 ### Key Patterns
 

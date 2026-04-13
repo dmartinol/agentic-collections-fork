@@ -1,6 +1,37 @@
 # Red Hat Agentic Collections
 
-**Production-ready AI skills and automation for Red Hat platforms** - Install specialized plugins for SREs, developers, platform administrators, and AI engineers working with RHEL, OpenShift, and Red Hat automation platforms.
+**Production-ready AI skills and automation for Red Hat platforms** — install specialized plugins for SREs, developers, platform administrators, and AI engineers working with RHEL, OpenShift, and Red Hat automation platforms.
+
+## Installation (Lola package manager)
+
+Install collections using [Lola](https://github.com/RedHatProductSecurity/lola), the AI skills package manager. **Installation applies to the current folder only** — run commands from your project directory.
+
+### One-time setup: add marketplace
+
+```bash
+lola market add rh-agentic-collections https://raw.githubusercontent.com/RHEcosystemAppEng/agentic-collections/main/marketplace/rh-agentic-collection.yml
+```
+
+### Install individual module
+
+```bash
+lola install -f rh-sre
+```
+
+### Install all modules at once
+
+```bash
+for m in ocp-admin rh-ai-engineer rh-automation rh-developer rh-sre rh-virt; do lola install -f $m; done
+```
+
+### Install to a specific assistant only
+
+Use the `-a` option to target Claude Code or Cursor:
+
+```bash
+lola install -f rh-sre -a claude-code   # Claude Code only
+lola install -f rh-sre -a cursor        # Cursor only
+```
 
 [![Validate Agentic Collections](https://github.com/RHEcosystemAppEng/agentic-collections/actions/workflows/compliance-check.yml/badge.svg)](https://github.com/RHEcosystemAppEng/agentic-collections/actions/workflows/compliance-check.yml)
 [![Skill Specification Linter](https://github.com/RHEcosystemAppEng/agentic-collections/actions/workflows/skill-spec-report.yml/badge.svg)](https://github.com/RHEcosystemAppEng/agentic-collections/actions/workflows/skill-spec-report.yml)
@@ -156,7 +187,7 @@ Generate and view documentation locally:
 # Install dependencies (first time only)
 make install
 
-# Validate pack structure (plugin.json, .mcp.json, frontmatter)
+# Validate pack structure (mcps.json, CLAUDE.md, frontmatter; plugin.json if present)
 make validate
 
 # Validate skills against Design Principles (SKILL_DESIGN_PRINCIPLES.md)
@@ -284,7 +315,7 @@ scripts/install-hooks.sh
 
 - **API keys**: OpenAI, GitHub, AWS, Google Cloud
 - **Private keys**: SSH, SSL/TLS certificates
-- **Hardcoded credentials** in `.mcp.json` files
+- **Hardcoded credentials** in `mcps.json` files
 - **Database connection strings** with passwords
 - **JWT tokens** and authentication secrets
 
@@ -327,7 +358,7 @@ To add a new MCP server to an agentic pack and display it on the documentation s
 
 ### Step 1: Add MCP Configuration to Pack
 
-Add the server configuration to `<pack>/.mcp.json`:
+Add the server configuration to `<pack>/mcps.json`:
 
 ```json
 {
@@ -391,7 +422,7 @@ make generate
 ```
 
 This will:
-1. Parse the `.mcp.json` file from your pack
+1. Parse the `mcps.json` file from your pack
 2. Merge it with custom data from `docs/mcp.json`
 3. Update `docs/data.json` with the new server
 
@@ -413,7 +444,7 @@ Visit http://localhost:8000 and verify:
 ### Step 5: Commit and Deploy
 
 ```bash
-git add <pack>/.mcp.json docs/mcp.json docs/data.json
+git add <pack>/mcps.json docs/mcp.json docs/data.json
 git commit -m "feat: add <server-name> MCP server to <pack>"
 git push
 ```
@@ -422,7 +453,7 @@ The documentation site will automatically update via GitHub Actions.
 
 ### Example: Adding Red Hat Lightspeed MCP Server
 
-**File: `rh-sre/.mcp.json`**
+**File: `rh-sre/mcps.json`**
 ```json
 {
   "mcpServers": {
@@ -470,7 +501,7 @@ The documentation site will automatically update via GitHub Actions.
 
 **Server not appearing:**
 - Run `make validate` to check for JSON syntax errors
-- Verify `.mcp.json` file is in the pack directory
+- Verify `mcps.json` file is in the pack directory
 - Check that pack directory is listed in `scripts/generate_pack_data.py` PACK_DIRS
 
 **Tools not showing:**
@@ -502,22 +533,60 @@ cd /path/to/agentic-collections
 /plugin install rh-sre@redhat-agentic-collections
 ```
 
-### Validate Marketplace
+### Validate packs (recommended)
 
 ```bash
-# Validate marketplace.json and all plugins
-claude plugin validate .
+# Structure, mcps.json, CLAUDE.md, skill frontmatter; validates plugin.json only when present
+make validate
+```
 
+### Optional: Claude Code plugin CLI
+
+If you use the Claude Code `/plugin` marketplace workflow against a local checkout:
+
+```bash
+claude plugin validate .
 # Or from within Claude Code
 /plugin validate .
 ```
 
-This will check:
-- ✅ Marketplace.json schema compliance
-- ✅ All plugin.json files syntax
-- ✅ YAML frontmatter in skills
-- ✅ Duplicate names
-- ✅ Invalid paths
+That CLI checks marketplace/plugin manifests for that workflow, including `plugin.json` when present under `.claude-plugin/`.
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how to add or improve skills:
+
+### Adding a New Skill
+
+1. Follow the [Skill Design Principles](SKILL_DESIGN_PRINCIPLES.md)
+2. Use the appropriate template:
+   - General: See SKILL_DESIGN_PRINCIPLES.md
+   - rh-virt collection: Use `rh-virt/SKILL_TEMPLATE.md`
+3. Create `skills/<skill-name>/SKILL.md` with proper YAML frontmatter
+4. Validate with the linter:
+   ```bash
+   make validate-skill-design-changed
+   ```
+5. Update the pack's `CLAUDE.md` intent routing table
+
+### Adding a New Plugin (pack)
+
+1. Create pack directory: `<pack-name>/`
+2. Add `README.md`, `CLAUDE.md`, and `skills/` (see [CLAUDE.md](CLAUDE.md))
+3. Add `mcps.json` when the pack uses MCP servers
+4. Register the module in [`marketplace/rh-agentic-collection.yml`](marketplace/rh-agentic-collection.yml) (add a `modules:` entry with `name`, `path`, `repository`, `version`, etc.)
+5. Optional: Add `.claude-plugin/plugin.json` only if you also publish through Claude Code’s plugin format (not required for Lola)
+6. Validate: `make validate`
+7. Optional: `claude plugin validate .` if you use the Claude Code plugin CLI locally
+
+### Pull Request Guidelines
+
+- Run `make validate-skill-design-changed` before committing
+- Ensure CI checks pass (compliance + linter)
+- Follow conventional commits format
+- Update relevant documentation
 
 ---
 
