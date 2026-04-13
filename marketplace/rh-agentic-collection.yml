@@ -1,12 +1,12 @@
 name: "redhat-agentic-collections"
 description: "Validated Agentic Collections from Red Hat Ecosystem Engineering"
 url: "https://github.com/RHEcosystemAppEng/agentic-collections"
-version: "0.0.1"
+version: "0.1.0"
 
 modules:
   - name: "ocp-admin"
     description: "Automation capabilities for OpenShift Container Platform cluster management, workload orchestration, security policies, and operational tasks."
-    version: "0.0.1"
+    version: "0.1.0"
     repository: "https://github.com/RHEcosystemAppEng/agentic-collections"
     path: "ocp-admin"
     tags:
@@ -17,7 +17,7 @@ modules:
 
   - name: "rh-developer"
     description: "Plugins for building and deploying applications on Red Hat platforms."
-    version: "0.0.1"
+    version: "0.1.0"
     repository: "https://github.com/RHEcosystemAppEng/agentic-collections"
     path: "rh-developer"
     tags:
@@ -32,7 +32,7 @@ modules:
 
   - name: "rh-sre"
     description: "Site reliability engineering tools and automation for managing Red Hat platforms and infrastructure."
-    version: "0.0.1"
+    version: "0.1.0"
     repository: "https://github.com/RHEcosystemAppEng/agentic-collections"
     path: "rh-sre"
     tags:
@@ -44,7 +44,7 @@ modules:
 
   - name: "rh-ai-engineer"
     description: "Red Hat OpenShift AI Engineering Agentic Collection"
-    version: "0.0.1"
+    version: "0.1.0"
     repository: "https://github.com/RHEcosystemAppEng/agentic-collections"
     path: "rh-ai-engineer"
     tags:
@@ -60,7 +60,7 @@ modules:
 
   - name: "rh-virt"
     description: "Virtual machine management and automation for OpenShift Virtualization and KubeVirt workloads."
-    version: "0.0.1"
+    version: "0.1.0"
     repository: "https://github.com/RHEcosystemAppEng/agentic-collections"
     path: "rh-virt"
     tags:
@@ -72,7 +72,7 @@ modules:
 
   - name: "rh-automation"
     description: "Ansible Automation Platform governance, execution safety, and forensic troubleshooting tools for Red Hat automation engineers."
-    version: "0.0.1"
+    version: "0.1.0"
     repository: "https://github.com/RHEcosystemAppEng/agentic-collections"
     path: "rh-automation"
     tags:
