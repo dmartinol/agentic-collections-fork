@@ -283,7 +283,7 @@ Validate Red Hat Lightspeed MCP server configuration and connectivity.
 - Other skills need to verify lightspeed-mcp availability
 
 **What it does:**
-- Checks MCP server configuration in .mcp.json
+- Checks MCP server configuration in mcps.json
 - Verifies environment variables (CLIENT_ID, CLIENT_SECRET)
 - Tests server connectivity and tool availability
 - Reports validation status (PASSED/PARTIAL/FAILED)
@@ -413,7 +413,7 @@ See [docs/INDEX.md](docs/INDEX.md) for the complete documentation map.
 
 ## MCP Server Integrations
 
-The pack integrates with three MCP servers (configured in `.mcp.json`):
+The pack integrates with three MCP servers (configured in `mcps.json`):
 
 ### 1. **lightspeed-mcp** - Red Hat Lightspeed Platform
 - CVE data and vulnerability management
@@ -493,7 +493,7 @@ All MCP servers run locally in containers for security:
 
 ## Configuration
 
-MCP servers are configured in `.mcp.json`:
+MCP servers are configured in `mcps.json`:
 
 ```json
 {
@@ -600,9 +600,7 @@ This pack demonstrates the complete agentic pack architecture:
 ```
 rh-sre/
 ├── README.md                    # This file
-├── .claude-plugin/
-│   └── plugin.json              # Plugin metadata
-├── .mcp.json                    # MCP server configurations
+├── mcps.json                    # MCP server configurations
 ├── skills/
 │   ├── remediation/SKILL.md     # Orchestration skill (end-to-end CVE remediation)
 │   ├── fleet-inventory/SKILL.md
@@ -622,6 +620,8 @@ rh-sre/
     ├── SOURCES.md
     └── .ai-index/               # Semantic indexing
 ```
+
+*Optional:* `.claude-plugin/plugin.json` — only if publishing via Claude Code’s plugin format; not required for [Lola](https://github.com/RedHatProductSecurity/lola) install.
 
 ### Key Patterns
 - **Skills encapsulate tools** - Never call MCP tools directly
