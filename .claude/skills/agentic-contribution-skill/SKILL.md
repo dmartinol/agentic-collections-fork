@@ -24,9 +24,10 @@ Interactive AI assistant for creating production-ready skills and agentic packs 
 
 All skills created follow **Red Hat product guidelines, official documentation standards** (docs.redhat.com, access.redhat.com), and **best practices** for Red Hat Enterprise Linux, OpenShift Container Platform, Ansible Automation Platform, Red Hat Lightspeed, and other Red Hat ecosystem products.
 
-**Creates**: Complete skill structure with YAML frontmatter, all mandatory sections, pack integration, and new agentic packs
+**Creates**: Complete skill structure with YAML frontmatter, all mandatory sections, pack integration, and new agentic packs (Lola-compatible)
 **Validates**: Tier 1 (agentskills.io) + Tier 2 (repository design principles)
 **Applies**: Red Hat documentation compliance (uses official Red Hat documentation to adapt skill content to manufacturer guidelines - not automated validation)
+**Marketplace**: Registers packs in `marketplace/rh-agentic-collection.yml` for Lola package manager installation
 
 ## Prerequisites
 
@@ -74,7 +75,7 @@ Ask concisely, validate before proceeding. Make additional questions if needed t
 1. **Purpose & Red Hat Product**: "What does the skill do? (1 sentence) For which Red Hat product(s) is this skill targeted?"
 2. **Persona**: "What role uses it?" (detect existing pack or suggest new)
 3. **Pack**: "Use <existing-pack>? (yes/no/create-new)"
-4. **MCP Tools**: "What MCP tools does it need?" (verify in pack's .mcp.json)
+4. **MCP Tools**: "What MCP tools does it need?" (verify in pack's mcps.json)
 5. **Operation Type**: "Read-only, additive, or destructive?" (determines color)
 
 **Validation**:
@@ -128,8 +129,10 @@ mkdir -p <pack>/skills/<skill-name>/
 **Generate files**:
 1. **SKILL.md**: YAML frontmatter + 10 mandatory sections (follow SKILL_DESIGN_PRINCIPLES.md template)
 2. **Update <pack>/CLAUDE.md**: Add intent routing entry
-3. **Create <pack>/.mcp.json**: If new MCP server needed (use `${ENV_VAR}` format)
-4. **Create pack structure**: If new pack (plugin.json, README.md, CLAUDE.md)
+3. **Create <pack>/mcps.json**: If new MCP server needed (use `${ENV_VAR}` format)
+4. **Update marketplace/rh-agentic-collection.yml**: If new pack (register pack for Lola installation)
+5. **Create pack structure**: If new pack (README.md, CLAUDE.md, skills/ directory)
+6. **Optional - plugin.json**: Only if publishing via Claude Code plugin mechanism (`.claude-plugin/plugin.json`)
 
 **Mandatory SKILL.md sections** (in order):
 1. Frontmatter (name, description, model, color)
@@ -171,7 +174,12 @@ Output: "I consulted SKILL_DESIGN_PRINCIPLES.md for validation criteria."
 
 **Files**:
 ✅ <pack>/skills/<name>/SKILL.md
+✅ <pack>/CLAUDE.md (intent routing updated)
+[If new pack]:
+✅ <pack>/README.md
 ✅ <pack>/CLAUDE.md
+✅ <pack>/mcps.json (if MCP servers needed)
+✅ marketplace/rh-agentic-collection.yml (pack registered)
 
 **Validation**:
 ✅ Tier 1: agentskills.io compliant
@@ -182,6 +190,9 @@ Output: "I consulted SKILL_DESIGN_PRINCIPLES.md for validation criteria."
 - Tokens: <N>/500
 - Workflow steps: <N>
 - Common issues: <N>
+
+**Lola Installation**:
+After merge: `lola install -f <pack-name>`
 
 **Opinion**: <Your assessment - strengths, fit, readiness>
 
@@ -233,7 +244,7 @@ Thank you for contributing! 🚀
 
 ### Issue 3: "MCP server not configured"
 
-**Fix**: Add to `<pack>/.mcp.json` using `${ENV_VAR}` format.
+**Fix**: Add to `<pack>/mcps.json` using `${ENV_VAR}` format.
 
 ### Issue 4: "Git push authentication failed"
 
@@ -251,6 +262,18 @@ ssh-add ~/.ssh/id_ed25519
 **Fix**: Install:
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Issue 6: "New pack not installable via Lola"
+
+**Cause**: Pack not registered in `marketplace/rh-agentic-collection.yml`
+
+**Fix**: Add pack entry to marketplace file:
+```yaml
+- name: <pack-name>
+  version: 0.1.0
+  description: <pack-description>
+  path: <pack-name>
 ```
 
 ## Dependencies
@@ -273,6 +296,7 @@ None - agentic-contribution-skill is self-contained and doesn't invoke other ski
 - `scripts/run-skill-linter.sh` - Tier 1 validation
 - `scripts/validate_skill_design.py` - Tier 2 validation
 - `Makefile` - Validation targets
+- `marketplace/rh-agentic-collection.yml` - Lola marketplace registry
 
 ### System Requirements
 
@@ -288,6 +312,7 @@ See [Prerequisites](#prerequisites) section for required system tools (git, uv, 
 **External**:
 - [agentskills.io Specification](https://agentskills.io/specification) - Base skill standard
 - [Conventional Commits](https://www.conventionalcommits.org/) - Commit message format
+- [Lola Package Manager](https://github.com/RedHatProductSecurity/lola) - AI skills package manager
 
 ## Critical: Human-in-the-Loop Requirements
 
@@ -371,7 +396,7 @@ Proceed? (yes/no)
 > yes
 
 ✅ Generated: rh-virt/skills/vm-backup-create/SKILL.md
-✅ Updated: rh-virt/CLAUDE.md
+✅ Updated: rh-virt/CLAUDE.md (intent routing)
 
 Running validation...
 I consulted SKILL_DESIGN_PRINCIPLES.md for validation criteria.
