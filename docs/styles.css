@@ -1027,6 +1027,11 @@ footer a:hover {
     color: var(--text-primary);
 }
 
+h1.collection-page-title {
+    font-size: 1.85rem;
+    font-weight: 700;
+}
+
 .collection-page-sub,
 .collection-tags {
     color: var(--text-muted);
@@ -1121,4 +1126,182 @@ footer a:hover {
     border-top: 1px solid var(--border);
     font-size: 0.85rem;
     color: var(--text-muted);
+}
+
+/* Fork-aligned tab strip (review_catalog / collection_page.html.j2) */
+.collection-content-inner {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.collection-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin: 1.5rem 0 0;
+}
+
+.collection-tab {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    font-family: inherit;
+}
+
+.collection-tab:hover {
+    color: var(--primary);
+}
+
+.collection-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.collection-tab-panel {
+    display: none;
+    padding: 1.5rem 0 2rem;
+}
+
+.collection-tab-panel.active {
+    display: block;
+}
+
+.collection-tab-panel h2 {
+    margin-top: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    font-size: 1.15rem;
+}
+
+.collection-tab-panel h2:first-child {
+    margin-top: 0;
+}
+
+.collection-tab-panel h3 {
+    margin-top: 1.25rem;
+    font-size: 1.05rem;
+}
+
+.install-accordion {
+    margin-top: 1rem;
+}
+
+.install-accordion-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+}
+
+.install-accordion-item:last-child {
+    margin-bottom: 0;
+}
+
+.install-accordion-header {
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    list-style: none;
+    background: var(--bg-section);
+    transition: background 0.2s ease;
+}
+
+.install-accordion-header::-webkit-details-marker {
+    display: none;
+}
+
+.install-accordion-header::before {
+    content: '▶';
+    display: inline-block;
+    margin-right: 0.5rem;
+    font-size: 0.7em;
+    transition: transform 0.2s ease;
+}
+
+.install-accordion-item[open] .install-accordion-header::before {
+    transform: rotate(90deg);
+}
+
+.install-accordion-header:hover {
+    background: var(--bg-hover);
+}
+
+.install-accordion-body {
+    padding: 1rem 1rem 1rem 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.collection-skill-list {
+    margin: 1rem 0 1rem 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.collection-skill-list li {
+    margin-bottom: 1.5rem;
+}
+
+.collection-skill-list li:last-child {
+    margin-bottom: 0;
+}
+
+.collection-decision-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.collection-decision-table th,
+.collection-decision-table td {
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.collection-decision-table th {
+    background: var(--bg-section);
+    font-weight: 600;
+}
+
+.collection-mcp-grid {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.collection-mcp-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    background: var(--bg-card);
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.collection-mcp-card:hover {
+    border-color: var(--primary);
+    background: var(--bg-hover);
+}
+
+.collection-mcp-card-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.collection-mcp-card-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
 }

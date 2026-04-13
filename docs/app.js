@@ -1489,11 +1489,354 @@ function applyHashRoute() {
     }
 }
 
-function collectionSectionHeader(label) {
-    const d = document.createElement('div');
-    d.className = 'modal-section-header';
-    d.textContent = label;
-    return d;
+/**
+ * Split deploy_and_use into prose before first "### Installation (...)" and per-platform sections.
+ * Aligns with review_catalog scripts/generate_collection_pages.py::_split_deploy_into_sections.
+ */
+function splitDeployIntoSections(deploy) {
+    const text = String(deploy);
+    const pattern = /### Installation \((Claude Code|Cursor|Open Code)\)\s*\n([\s\S]*?)(?=### Installation \(|\s*$)/g;
+    const all = Array.from(text.matchAll(pattern));
+    if (all.length === 0) {
+        return { pre: text.trim(), sections: [] };
+    }
+    const preEnd = text.indexOf('### Installation (');
+    const pre = preEnd > 0 ? text.slice(0, preEnd).trim() : '';
+    return {
+        pre,
+        sections: all.map(m => ({ platform: m[1], content: m[2].trim() }))
+    };
+}
+
+function collectionTabHeading(container, text) {
+    const h = document.createElement('h2');
+    h.textContent = text;
+    container.appendChild(h);
+}
+
+function decisionGuideUserQuote(row) {
+    if (!row || typeof row !== 'object') return '';
+    if (row.user_request != null) return String(row.user_request);
+    if (row.user_quote != null) return String(row.user_quote);
+    return '';
+}
+
+function wireCollectionTabs(root) {
+    root.querySelectorAll('.collection-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetId = `tab-${tab.dataset.tab}`;
+            root.querySelectorAll('.collection-tab').forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+            root.querySelectorAll('.collection-tab-panel').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+            const panel = document.getElementById(targetId);
+            if (panel) {
+                panel.classList.add('active');
+            }
+        });
+    });
+}
+
+function appendSkillListUl(container, skills, blob, packName) {
+    const ul = document.createElement('ul');
+    ul.className = 'collection-skill-list';
+    skills.forEach(skill => {
+        if (!skill || typeof skill !== 'object') return;
+        const li = document.createElement('li');
+        const head = document.createElement('div');
+        const code = document.createElement('code');
+        code.textContent = `/${skill.name || ''}`;
+        head.appendChild(code);
+        head.appendChild(document.createTextNode(` — ${skill.description || ''}`));
+        li.appendChild(head);
+        if (skill.summary_markdown) {
+            const sm = document.createElement('div');
+            sm.className = 'collection-prose collection-prose-tight';
+            sm.appendChild(createExpandableText(String(skill.summary_markdown), 500));
+            li.appendChild(sm);
+        }
+        if (blob && skill.name) {
+            const gh = document.createElement('a');
+            gh.href = `${blob}/${packName}/skills/${encodeURIComponent(skill.name)}/SKILL.md`;
+            gh.target = '_blank';
+            gh.rel = 'noopener noreferrer';
+            gh.textContent = 'View SKILL.md on GitHub →';
+            gh.className = 'collection-inline-link';
+            li.appendChild(gh);
+        }
+        ul.appendChild(li);
+    });
+    container.appendChild(ul);
+}
+
+function buildCollectionOverviewPanel(panel, pack, c, blob) {
+    if (c.summary) {
+        collectionTabHeading(panel, 'Overview');
+        const wrap = document.createElement('div');
+        wrap.className = 'collection-prose';
+        wrap.appendChild(renderMarkdown(String(c.summary)));
+        panel.appendChild(wrap);
+    }
+
+    if (c.documentation_section) {
+        collectionTabHeading(panel, 'Documentation');
+        const w = document.createElement('div');
+        w.className = 'collection-prose';
+        w.appendChild(createExpandableText(String(c.documentation_section), 800));
+        panel.appendChild(w);
+    }
+
+    if (c.mcp_section) {
+        collectionTabHeading(panel, 'MCP');
+        const w = document.createElement('div');
+        w.className = 'collection-prose';
+        w.appendChild(createExpandableText(String(c.mcp_section), 800));
+        panel.appendChild(w);
+    }
+
+    if (c.deploy_and_use) {
+        collectionTabHeading(panel, 'Quick Start');
+        const { pre, sections } = splitDeployIntoSections(c.deploy_and_use);
+        if (pre) {
+            const preWrap = document.createElement('div');
+            preWrap.className = 'collection-prose';
+            preWrap.appendChild(createExpandableText(pre, 1200));
+            panel.appendChild(preWrap);
+        }
+        if (sections.length > 0) {
+            const acc = document.createElement('div');
+            acc.className = 'install-accordion';
+            sections.forEach((sec, i) => {
+                const det = document.createElement('details');
+                det.className = 'install-accordion-item';
+                if (i === 0) det.open = true;
+                const summ = document.createElement('summary');
+                summ.className = 'install-accordion-header';
+                summ.textContent = `Installation (${sec.platform})`;
+                det.appendChild(summ);
+                const accBody = document.createElement('div');
+                accBody.className = 'install-accordion-body collection-prose';
+                accBody.appendChild(renderMarkdown(sec.content));
+                det.appendChild(accBody);
+                acc.appendChild(det);
+            });
+            panel.appendChild(acc);
+        } else if (!pre) {
+            const w = document.createElement('div');
+            w.className = 'collection-prose';
+            w.appendChild(createExpandableText(String(c.deploy_and_use), 1200));
+            panel.appendChild(w);
+        }
+    }
+
+    if (c.security_model) {
+        collectionTabHeading(panel, 'Security Model');
+        const w = document.createElement('div');
+        w.className = 'collection-prose';
+        w.appendChild(createExpandableText(String(c.security_model), 800));
+        panel.appendChild(w);
+    }
+
+    collectionTabHeading(panel, 'License');
+    const legal = c.legal_resources || {};
+    const lic = c.license != null ? String(c.license) : 'Apache-2.0';
+    if (legal.license_agreement_url) {
+        const p = document.createElement('p');
+        p.className = 'collection-prose';
+        const a = document.createElement('a');
+        a.href = String(legal.license_agreement_url);
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = lic;
+        p.appendChild(a);
+        panel.appendChild(p);
+    } else {
+        const p = document.createElement('p');
+        p.className = 'collection-prose';
+        p.textContent = lic;
+        panel.appendChild(p);
+    }
+}
+
+function buildCollectionSkillsPanel(panel, pack, c, blob) {
+    const contents = c.contents || {};
+    collectionTabHeading(panel, 'Skills');
+    if (contents.description) {
+        const w = document.createElement('div');
+        w.className = 'collection-prose';
+        w.appendChild(createExpandableText(String(contents.description), 600));
+        panel.appendChild(w);
+    }
+
+    const orch = contents.orchestration_skills || [];
+    if (orch.length) {
+        const h3 = document.createElement('h3');
+        h3.textContent = orch.length === 1 ? 'Orchestration Skill' : 'Orchestration Skills';
+        panel.appendChild(h3);
+        appendSkillListUl(panel, orch, blob, pack.name);
+    }
+
+    const skills = contents.skills || [];
+    if (skills.length) {
+        const h3 = document.createElement('h3');
+        h3.textContent = orch.length ? 'Basic Skills' : 'Skills';
+        panel.appendChild(h3);
+        appendSkillListUl(panel, skills, blob, pack.name);
+    }
+
+    const guide = contents.skills_decision_guide || [];
+    if (guide.length) {
+        collectionTabHeading(panel, 'Skills Decision Guide');
+        const table = document.createElement('table');
+        table.className = 'collection-decision-table';
+        const thead = document.createElement('thead');
+        const hr = document.createElement('tr');
+        ['User request', 'Skill to use', 'Reason'].forEach(label => {
+            const th = document.createElement('th');
+            th.textContent = label;
+            hr.appendChild(th);
+        });
+        thead.appendChild(hr);
+        table.appendChild(thead);
+        const tb = document.createElement('tbody');
+        guide.forEach(row => {
+            if (!row || typeof row !== 'object') return;
+            const tr = document.createElement('tr');
+            const td1 = document.createElement('td');
+            td1.appendChild(renderMarkdown(decisionGuideUserQuote(row)));
+            const td2 = document.createElement('td');
+            const st = row.skill_to_use != null ? String(row.skill_to_use) : '';
+            td2.textContent = st.startsWith('/') ? st : (st ? `/${st}` : '');
+            const td3 = document.createElement('td');
+            td3.appendChild(renderMarkdown(row.reason != null ? String(row.reason) : ''));
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tb.appendChild(tr);
+        });
+        table.appendChild(tb);
+        panel.appendChild(table);
+    }
+
+    if (!contents.description && !orch.length && !skills.length && !guide.length) {
+        const p = document.createElement('p');
+        p.className = 'collection-missing';
+        p.textContent = 'No skills content.';
+        panel.appendChild(p);
+    }
+}
+
+function buildCollectionResourcesPanel(panel, pack, c, blob) {
+    collectionTabHeading(panel, 'References');
+    const resources = c.resources || [];
+    if (!resources.length) {
+        const p = document.createElement('p');
+        p.className = 'collection-missing';
+        p.textContent = 'No resources.';
+        panel.appendChild(p);
+        return;
+    }
+    const ul = document.createElement('ul');
+    ul.className = 'simple-list collection-resources';
+    resources.forEach(r => {
+        if (!r || typeof r !== 'object') return;
+        const li = document.createElement('li');
+        const title = document.createElement('strong');
+        title.textContent = String(r.title || '');
+        li.appendChild(title);
+        if (r.description) {
+            li.appendChild(document.createTextNode(` — ${String(r.description)}`));
+        }
+        if (r.url) {
+            li.appendChild(document.createTextNode(' '));
+            const a = document.createElement('a');
+            a.href = String(r.url);
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = String(r.url);
+            li.appendChild(a);
+        }
+        if (r.embedded_doc && blob) {
+            const ed = document.createElement('a');
+            ed.href = `${blob}/${pack.name}/${String(r.embedded_doc).replace(/^\//, '')}`;
+            ed.target = '_blank';
+            ed.rel = 'noopener noreferrer';
+            ed.textContent = ' [embedded doc]';
+            ed.className = 'collection-inline-link';
+            li.appendChild(ed);
+        }
+        ul.appendChild(li);
+    });
+    panel.appendChild(ul);
+}
+
+function buildCollectionAgentsPanel(panel, pack, c) {
+    const packMcp = [...allMCPServers, ...allCommunityMCPServers].filter(s => s.pack === pack.name);
+
+    collectionTabHeading(panel, 'MCP Server Integrations');
+    if (!packMcp.length) {
+        const p = document.createElement('p');
+        p.className = 'collection-missing';
+        p.textContent = 'No MCP servers are associated with this pack in the published site data.';
+        panel.appendChild(p);
+    } else {
+        const grid = document.createElement('div');
+        grid.className = 'collection-mcp-grid';
+        packMcp.forEach(server => {
+            const card = document.createElement('div');
+            card.className = 'collection-mcp-card';
+            card.setAttribute('role', 'button');
+            card.tabIndex = 0;
+            const titleRow = document.createElement('div');
+            titleRow.className = 'collection-mcp-card-title';
+            if (server.icon) {
+                const ic = document.createElement('span');
+                ic.textContent = server.icon;
+                titleRow.appendChild(ic);
+            }
+            const t = document.createElement('span');
+            t.textContent = server.title || server.name;
+            titleRow.appendChild(t);
+            card.appendChild(titleRow);
+            const meta = document.createElement('div');
+            meta.className = 'collection-mcp-card-meta';
+            meta.textContent = `By ${server.owner || 'Red Hat'} · ${server.type === 'http' ? 'HTTP Remote' : 'Container'}`;
+            card.appendChild(meta);
+            const openMcp = () => showMCPDetails(server.name, server.pack);
+            card.addEventListener('click', openMcp);
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openMcp();
+                }
+            });
+            grid.appendChild(card);
+        });
+        panel.appendChild(grid);
+    }
+
+    collectionTabHeading(panel, 'Sample Workflows');
+    let workflows = (c.sample_workflows || []).filter(w => w && w.name !== 'TODO: Add workflow');
+    if (!workflows.length) {
+        workflows = [{ name: 'See collection.yaml', workflow: 'Add workflows in collection.yaml.' }];
+    }
+    workflows.forEach(wf => {
+        const name = wf.name != null ? String(wf.name) : (wf.title != null ? String(wf.title) : '');
+        if (name) {
+            const h3 = document.createElement('h3');
+            h3.textContent = name;
+            panel.appendChild(h3);
+        }
+        if (wf.workflow) {
+            const prose = document.createElement('div');
+            prose.className = 'collection-prose';
+            prose.appendChild(renderMarkdown(String(wf.workflow)));
+            panel.appendChild(prose);
+        }
+    });
 }
 
 function renderCollectionPage(pack) {
@@ -1515,13 +1858,21 @@ function renderCollectionPage(pack) {
 
     const c = pack.collection;
     const titleText = (c && c.name) ? c.name : (pack.plugin.title || pack.plugin.name || pack.name);
-    const h2 = document.createElement('h2');
-    h2.className = 'collection-page-title';
-    h2.textContent = titleText;
-    body.appendChild(h2);
+    const h1 = document.createElement('h1');
+    h1.className = 'collection-page-title';
+    h1.textContent = titleText;
+    body.appendChild(h1);
 
-    const sub = document.createElement('p');
-    sub.className = 'collection-page-sub';
+    if (c && c.description) {
+        const sub = document.createElement('p');
+        sub.className = 'collection-page-sub';
+        const d = String(c.description);
+        sub.textContent = d.length > 120 ? `${d.slice(0, 120).trim()}…` : d;
+        body.appendChild(sub);
+    }
+
+    const metaLine = document.createElement('p');
+    metaLine.className = 'collection-page-sub';
     const bits = [`Module: ${pack.name}`];
     if (pack.plugin && pack.plugin.version) {
         bits.push(`v${pack.plugin.version}`);
@@ -1529,8 +1880,8 @@ function renderCollectionPage(pack) {
     if (c && Array.isArray(c.personas) && c.personas.length) {
         bits.push(c.personas.join(', '));
     }
-    sub.textContent = bits.join(' · ');
-    body.appendChild(sub);
+    metaLine.textContent = bits.join(' · ');
+    body.appendChild(metaLine);
 
     if (!c) {
         const note = document.createElement('p');
@@ -1557,169 +1908,64 @@ function renderCollectionPage(pack) {
         body.appendChild(catRow);
     }
 
-    if (c.summary) {
-        body.appendChild(collectionSectionHeader('SUMMARY'));
-        const wrap = document.createElement('div');
-        wrap.className = 'collection-prose';
-        wrap.appendChild(renderMarkdown(String(c.summary)));
-        body.appendChild(wrap);
-    }
+    const tabStrip = document.createElement('div');
+    tabStrip.className = 'collection-tabs';
+    tabStrip.setAttribute('role', 'tablist');
 
-    if (c.contents && c.contents.description) {
-        body.appendChild(collectionSectionHeader('ABOUT THIS COLLECTION'));
-        const wrap = document.createElement('div');
-        wrap.className = 'collection-prose';
-        wrap.appendChild(createExpandableText(String(c.contents.description), 400));
-        body.appendChild(wrap);
-    }
+    const tabDefs = [
+        { id: 'overview', label: 'Overview' },
+        { id: 'skills', label: 'Skills' },
+        { id: 'resources', label: 'Resources' },
+        { id: 'agents', label: 'Agents' }
+    ];
+    tabDefs.forEach((t, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `collection-tab${i === 0 ? ' active' : ''}`;
+        b.dataset.tab = t.id;
+        b.textContent = t.label;
+        b.setAttribute('role', 'tab');
+        b.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+        b.setAttribute('aria-controls', `tab-${t.id}`);
+        tabStrip.appendChild(b);
+    });
+    body.appendChild(tabStrip);
 
-    if (c.deploy_and_use) {
-        body.appendChild(collectionSectionHeader('DEPLOY AND USE'));
-        const wrap = document.createElement('div');
-        wrap.className = 'collection-prose';
-        wrap.appendChild(createExpandableText(String(c.deploy_and_use), 1200));
-        body.appendChild(wrap);
-    }
+    const pOverview = document.createElement('div');
+    pOverview.id = 'tab-overview';
+    pOverview.className = 'collection-tab-panel active';
+    pOverview.setAttribute('role', 'tabpanel');
+    buildCollectionOverviewPanel(pOverview, pack, c, blob);
+    body.appendChild(pOverview);
 
-    function appendSkillGroup(skills, label) {
-        if (!skills || !skills.length) return;
-        body.appendChild(collectionSectionHeader(label));
-        const list = document.createElement('div');
-        list.className = 'item-list';
-        skills.forEach(skill => {
-            const row = document.createElement('div');
-            row.className = 'skill-definition';
+    const pSkills = document.createElement('div');
+    pSkills.id = 'tab-skills';
+    pSkills.className = 'collection-tab-panel';
+    pSkills.setAttribute('role', 'tabpanel');
+    buildCollectionSkillsPanel(pSkills, pack, c, blob);
+    body.appendChild(pSkills);
 
-            const syn = document.createElement('div');
-            syn.className = 'definition-syntax';
-            const code = document.createElement('code');
-            code.textContent = skill.name || '';
-            syn.appendChild(code);
-            row.appendChild(syn);
+    const pRes = document.createElement('div');
+    pRes.id = 'tab-resources';
+    pRes.className = 'collection-tab-panel';
+    pRes.setAttribute('role', 'tabpanel');
+    buildCollectionResourcesPanel(pRes, pack, c, blob);
+    body.appendChild(pRes);
 
-            if (skill.description) {
-                const desc = document.createElement('div');
-                desc.className = 'definition-description';
-                desc.appendChild(createExpandableText(String(skill.description), 220));
-                row.appendChild(desc);
-            }
-            if (skill.summary_markdown) {
-                const sm = document.createElement('div');
-                sm.className = 'definition-description collection-prose-tight';
-                sm.appendChild(createExpandableText(String(skill.summary_markdown), 400));
-                row.appendChild(sm);
-            }
-            if (blob && skill.name) {
-                const gh = document.createElement('a');
-                gh.href = `${blob}/${pack.name}/skills/${encodeURIComponent(skill.name)}/SKILL.md`;
-                gh.target = '_blank';
-                gh.rel = 'noopener noreferrer';
-                gh.textContent = 'View SKILL.md on GitHub →';
-                gh.className = 'collection-inline-link';
-                row.appendChild(gh);
-            }
-            list.appendChild(row);
-        });
-        body.appendChild(list);
-    }
+    const pAgents = document.createElement('div');
+    pAgents.id = 'tab-agents';
+    pAgents.className = 'collection-tab-panel';
+    pAgents.setAttribute('role', 'tabpanel');
+    buildCollectionAgentsPanel(pAgents, pack, c);
+    body.appendChild(pAgents);
 
-    appendSkillGroup(c.contents && c.contents.skills, 'SKILLS');
-    appendSkillGroup(c.contents && c.contents.orchestration_skills, 'ORCHESTRATION SKILLS');
+    wireCollectionTabs(body);
 
-    const guide = c.contents && c.contents.skills_decision_guide;
-    if (guide && guide.length) {
-        body.appendChild(collectionSectionHeader('SKILLS DECISION GUIDE'));
-        const gwrap = document.createElement('div');
-        gwrap.className = 'collection-guide';
-        guide.forEach((row, i) => {
-            if (!row || typeof row !== 'object') return;
-            const card = document.createElement('div');
-            card.className = 'collection-guide-row';
-            if (row.user_quote) {
-                const uq = document.createElement('p');
-                uq.className = 'collection-guide-user';
-                uq.appendChild(renderMarkdown(String(row.user_quote)));
-                card.appendChild(uq);
-            }
-            if (row.skill_to_use) {
-                const sk = document.createElement('p');
-                sk.className = 'collection-guide-skill';
-                const strong = document.createElement('strong');
-                strong.textContent = 'Skill: ';
-                sk.appendChild(strong);
-                sk.appendChild(document.createTextNode(String(row.skill_to_use)));
-                card.appendChild(sk);
-            }
-            if (row.reason) {
-                const rs = document.createElement('p');
-                rs.className = 'collection-guide-reason';
-                rs.appendChild(renderMarkdown(String(row.reason)));
-                card.appendChild(rs);
-            }
-            gwrap.appendChild(card);
-        });
-        body.appendChild(gwrap);
-    }
-
-    const workflows = c.sample_workflows;
-    if (workflows && workflows.length) {
-        body.appendChild(collectionSectionHeader('SAMPLE WORKFLOWS'));
-        workflows.forEach(wf => {
-            if (!wf || typeof wf !== 'object') return;
-            const block = document.createElement('div');
-            block.className = 'collection-workflow';
-            if (wf.title) {
-                const wt = document.createElement('h3');
-                wt.className = 'collection-workflow-title';
-                wt.textContent = String(wf.title);
-                block.appendChild(wt);
-            }
-            if (wf.workflow) {
-                const prose = document.createElement('div');
-                prose.className = 'collection-prose';
-                prose.appendChild(renderMarkdown(String(wf.workflow)));
-                block.appendChild(prose);
-            }
-            body.appendChild(block);
-        });
-    }
-
-    const resources = c.resources;
-    if (resources && resources.length) {
-        body.appendChild(collectionSectionHeader('RESOURCES'));
-        const ul = document.createElement('ul');
-        ul.className = 'simple-list collection-resources';
-        resources.forEach(r => {
-            if (!r || typeof r !== 'object') return;
-            const li = document.createElement('li');
-            if (r.title) {
-                const t = document.createElement('strong');
-                t.textContent = `${String(r.title)} — `;
-                li.appendChild(t);
-            }
-            if (r.url) {
-                const a = document.createElement('a');
-                a.href = String(r.url);
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-                a.textContent = String(r.url);
-                li.appendChild(a);
-            } else if (r.description) {
-                li.appendChild(document.createTextNode(String(r.description)));
-            }
-            ul.appendChild(li);
-        });
-        body.appendChild(ul);
-    }
-
-    if (c.license || c.repository) {
-        const meta = document.createElement('p');
-        meta.className = 'collection-footer-meta';
-        const parts = [];
-        if (c.license) parts.push(`License: ${c.license}`);
-        if (c.repository) parts.push(String(c.repository));
-        meta.textContent = parts.join(' · ');
-        body.appendChild(meta);
+    if (c.repository) {
+        const foot = document.createElement('p');
+        foot.className = 'collection-footer-meta';
+        foot.textContent = String(c.repository);
+        body.appendChild(foot);
     }
 }
 
