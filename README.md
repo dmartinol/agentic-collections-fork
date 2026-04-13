@@ -184,7 +184,7 @@ Generate and view documentation locally:
 # Install dependencies (first time only)
 make install
 
-# Validate pack structure + collection compliance (see COLLECTION_SPEC.md)
+# Validate pack structure + collection compliance (COLLECTION_SPEC.md, catalog/schema.yaml)
 make validate
 
 # Optional: collection-only targets

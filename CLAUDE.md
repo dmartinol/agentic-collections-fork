@@ -27,7 +27,7 @@ Each pack follows this structure:
 ├── CLAUDE.md            # Claude Code instruction routing (persona, skills, rules)
 ├── README.md            # Pack description, persona, target marketplaces
 ├── mcps.json            # MCP server configurations (uses env vars for credentials)
-├── .catalog/            # collection.yaml + collection.json (see COLLECTION_SPEC.md)
+├── .catalog/            # collection.yaml + collection.json (COLLECTION_SPEC.md, catalog/schema.yaml)
 ├── skills/              # Specialized task executors (including orchestration skills)
 │   └── <skill>/
 │       └── SKILL.md     # Skill definition with YAML frontmatter
@@ -59,7 +59,7 @@ Packs listed in `union(marketplace/rh-agentic-collection.yml modules[].path, doc
 - **`create-collection`** (`.claude/skills/create-collection/`) — workflow to author or refresh catalog YAML under `.catalog/`.
 - **`collection-compliance`** (`.claude/skills/collection-compliance/`) — interpret `make validate-collection-compliance` failures and fix drift.
 
-Validation: `make validate` runs pack structure checks plus **collection compliance**. Spec: [COLLECTION_SPEC.md](COLLECTION_SPEC.md). Pack list helper: [`scripts/pack_registry.py`](scripts/pack_registry.py).
+Validation: `make validate` runs pack structure checks plus **collection compliance**. Human rules (inline vs fragment paths, optional `#` on paths): [COLLECTION_SPEC.md](COLLECTION_SPEC.md). Machine schema: [catalog/schema.yaml](catalog/schema.yaml). Pack list helper: [`scripts/pack_registry.py`](scripts/pack_registry.py).
 
 ## Skill and Agent Requirements
 

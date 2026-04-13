@@ -33,10 +33,12 @@ allowed-tools: Read Glob Grep Bash
 
 2. **Classify**
    - **Missing file** — create `.catalog/collection.yaml` via create-collection skill (or `uv run python scripts/bootstrap_catalog.py --pack <pack>` for bootstrap baseline).
-   - **Schema** — align YAML with [catalog/collection.schema.json](../../catalog/collection.schema.json).
+   - **Schema** — align YAML with [catalog/schema.yaml](../../catalog/schema.yaml).
    - **Roster** — every `skills/<n>/SKILL.md` must appear once under `contents.skills` or `contents.orchestration_skills` with `name == <n>`.
    - **Banner** — `collection.yaml` must mention `create-collection` and `Golden sources` in the opening `#` block.
    - **`collection.json` drift** — run `uv run python scripts/catalog_yaml_to_json.py --pack <pack>` or `make catalog-mirror-json`.
+   - **Fragment refs / length** — `*_file` and `deploy_and_use` file refs must start with `#` and name a sibling `.md` under `.catalog/` (e.g. `#install.md`). Inline monitored fields over **500** code points must move to a fragment (see COLLECTION_SPEC).
+   - **Fragment provenance (`.catalog/*.md`)** — each referenced fragment must start with a leading HTML **`<!-- … -->`** block with the **same intent** as the `collection.yaml` banner: **create-collection** workflow and **Golden sources** (SKILL, README, CLAUDE, marketplace). See [COLLECTION_SPEC.md](../../COLLECTION_SPEC.md) **Provenance banners** (CI does not yet assert this text; fix when reviewing fragments).
 
 3. **Re-validate** — `make validate-collection-compliance`.
 

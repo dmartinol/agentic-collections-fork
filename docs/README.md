@@ -31,7 +31,7 @@ This script parses all agentic collections and MCP configurations.
 ## Manual Updates
 
 To manually update the site:
-1. Modify pack configurations (`mcps.json`, skills, agents; optional `.claude-plugin/plugin.json`) and per-pack **`.catalog/collection.yaml`** when catalog metadata changes (see [COLLECTION_SPEC.md](../COLLECTION_SPEC.md); use the **create-collection** / **collection-compliance** repo skills).
+1. Modify pack configurations (`mcps.json`, skills, agents; optional `.claude-plugin/plugin.json`) and per-pack **`.catalog/collection.yaml`** when catalog metadata changes (see [COLLECTION_SPEC.md](../COLLECTION_SPEC.md) and [catalog/schema.yaml](../catalog/schema.yaml); use the **create-collection** / **collection-compliance** repo skills).
 2. If you edit `collection.yaml`, refresh mirrors: `make catalog-mirror-json` from the repository root.
 3. Run `make generate` from the root directory (runs `make validate` first when using `make test`).
 4. Commit the updated `docs/data.json` and any `.catalog/` files.

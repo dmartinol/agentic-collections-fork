@@ -1,11 +1,12 @@
 """
-Shared validation for <pack>/.catalog/collection.yaml (schema, roster, banners, *_file, JSON mirror).
+Shared validation for <pack>/.catalog/collection.yaml (JSON Schema in catalog/schema.yaml, roster, banners, *_file, JSON mirror).
 Used by validate_collection_schema.py and validate_collection_compliance.py.
 """
 
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -15,25 +16,60 @@ from jsonschema import Draft202012Validator
 import pack_registry
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SCHEMA_JSON_PATH = REPO_ROOT / "catalog" / "collection.schema.json"
+SCHEMA_YAML_PATH = REPO_ROOT / "catalog" / "schema.yaml"
 
 YAML_BANNER_MARKERS = ("create-collection", "Golden sources")
 
 FORBIDDEN_WORKFLOW_TOKENS = ("TODO:", "TBD", "FIXME:", "Extract from README")
 
+# Inline prose in collection.yaml longer than this must move to a sibling .md and use a #fragment ref.
+CATALOG_INLINE_CHAR_LIMIT = 500
+
+# Top-level keys: if present as inline strings, length is checked (skills blocks excluded).
+CATALOG_INLINE_LENGTH_KEYS = ("documentation_section", "mcp_section", "security_model", "summary")
+
 _SCHEMA_CACHE: Optional[Dict[str, Any]] = None
 _VALIDATOR_CACHE: Optional[Draft202012Validator] = None
+
+
+def normalize_external_file_ref(ref: str) -> str:
+    """Strip leading ``#`` and optional ``.catalog/`` prefix; remainder is a path under ``<pack>/.catalog/``."""
+    s = ref.strip()
+    if s.startswith("#"):
+        s = s[1:].lstrip()
+    if len(s) >= 9 and s[:9].lower() == ".catalog/":
+        s = s[9:]
+    return s
+
+
+def catalog_fragment_rel_path(value: str) -> Optional[str]:
+    """If ``value`` is a one-line ``#name.md`` ref (sibling of ``collection.yaml``), return relative path; else ``None``."""
+    s = value.strip()
+    if "\n" in s or "\r" in s:
+        return None
+    m = re.fullmatch(r"#\s*(?:\.catalog/)?([\w./-]+\.md)\s*", s, flags=re.IGNORECASE)
+    if not m:
+        return None
+    rel = m.group(1)
+    if ".." in rel or rel.startswith("/"):
+        return None
+    return rel
+
+
+def deploy_and_use_external_rel_path(value: str) -> Optional[str]:
+    """If ``deploy_and_use`` is file-ref flavor, return path under ``.catalog/``; else ``None`` (inline markdown)."""
+    return catalog_fragment_rel_path(value)
 
 
 def _load_schema() -> Dict[str, Any]:
     global _SCHEMA_CACHE, _VALIDATOR_CACHE
     if _SCHEMA_CACHE is not None:
         return _SCHEMA_CACHE
-    path = SCHEMA_JSON_PATH if SCHEMA_JSON_PATH.exists() else None
+    path = SCHEMA_YAML_PATH if SCHEMA_YAML_PATH.exists() else None
     if not path:
-        raise FileNotFoundError(f"Missing JSON schema at {SCHEMA_JSON_PATH}")
+        raise FileNotFoundError(f"Missing catalog schema at {SCHEMA_YAML_PATH}")
     with open(path, "r", encoding="utf-8") as f:
-        _SCHEMA_CACHE = json.load(f)
+        _SCHEMA_CACHE = yaml.safe_load(f)
     Draft202012Validator.check_schema(_SCHEMA_CACHE)
     _VALIDATOR_CACHE = Draft202012Validator(_SCHEMA_CACHE)
     return _SCHEMA_CACHE
@@ -100,20 +136,33 @@ def validate_file_refs(pack_dir: str, data: Dict[str, Any], root: Optional[Path]
     root = root or REPO_ROOT
     refs: List[str] = []
     _collect_file_refs(data, refs)
+    dau = data.get("deploy_and_use")
+    if isinstance(dau, str) and deploy_and_use_external_rel_path(dau):
+        refs.append(dau.strip())
     errs: List[str] = []
     pack_root = root / pack_dir
+    catalog_dir = (pack_root / ".catalog").resolve()
     for ref in refs:
-        if ".." in ref or ref.startswith("/"):
-            errs.append(f"{pack_dir}: invalid *_file path {ref!r}")
+        if not ref.strip().startswith("#"):
+            errs.append(
+                f"{pack_dir}: fragment ref must start with '#' (e.g. #install.md), got {ref!r}"
+            )
             continue
-        target = (pack_root / ref).resolve()
+        path_part = normalize_external_file_ref(ref)
+        if not path_part:
+            errs.append(f"{pack_dir}: empty fragment path after normalizing {ref!r}")
+            continue
+        if ".." in path_part or path_part.startswith("/"):
+            errs.append(f"{pack_dir}: invalid fragment path {ref!r}")
+            continue
+        target = (catalog_dir / path_part).resolve()
         try:
-            target.relative_to(pack_root.resolve())
+            target.relative_to(catalog_dir)
         except ValueError:
-            errs.append(f"{pack_dir}: *__file {ref!r} escapes pack root")
+            errs.append(f"{pack_dir}: fragment {ref!r} escapes .catalog/ directory")
             continue
         if not target.is_file():
-            errs.append(f"{pack_dir}: missing *__file target {ref}")
+            errs.append(f"{pack_dir}: missing fragment file {path_part} (from {ref!r})")
     return errs
 
 
@@ -279,7 +328,30 @@ def validate_pack_catalog_compliance_extra(pack_dir: str, data: Dict[str, Any], 
             errs.append(f"{pack_dir}: sample_workflows[{i}] workflow must use bullet lines (-)")
 
     errs.extend(validate_embedded_docs(pack_dir, data, root))
+    errs.extend(validate_catalog_inline_length(pack_dir, data))
     errs.extend(validate_json_mirror(pack_dir, data, root))
+    return errs
+
+
+def validate_catalog_inline_length(pack_dir: str, data: Dict[str, Any]) -> List[str]:
+    """Require long prose to use a #fragment .md ref (sibling of collection.yaml), not huge inline strings."""
+    errs: List[str] = []
+    for key in CATALOG_INLINE_LENGTH_KEYS:
+        val = data.get(key)
+        if not isinstance(val, str):
+            continue
+        if len(val) > CATALOG_INLINE_CHAR_LIMIT:
+            errs.append(
+                f"{pack_dir}: {key} is {len(val)} chars (limit {CATALOG_INLINE_CHAR_LIMIT}); "
+                f"use a sibling .md file and {key}_file: #<filename>.md"
+            )
+    dau = data.get("deploy_and_use")
+    if isinstance(dau, str) and not deploy_and_use_external_rel_path(dau):
+        if len(dau) > CATALOG_INLINE_CHAR_LIMIT:
+            errs.append(
+                f"{pack_dir}: deploy_and_use is {len(dau)} chars inline (limit {CATALOG_INLINE_CHAR_LIMIT}); "
+                "use markdown in a sibling .md and deploy_and_use: #<filename>.md"
+            )
     return errs
 
 
