@@ -1,17 +1,16 @@
 ---
-name: skill-builder
+name: agentic-contribution-skill
 description: |
-  Interactive skill creation with automated validation and marketplace compliance.
+  Interactive skill and agentic pack creation with automated validation and marketplace compliance.
 
   Use when:
   - "Create a new skill"
+  - "Create a new agentic pack"
   - "Add skill to <pack>"
-  - "Build skill for <technology>"
-  - User mentions "skill builder", "contribute", or "new skill"
+  - "Build skill for <rh-product>"
+  - User mentions "skill builder", "contribute", "new skill", or "new pack"
 
   Guides through discovery, definition, generation, and validation. Enforces SKILL_DESIGN_PRINCIPLES.md and agentskills.io spec.
-
-  NOT for editing existing skills (use Read/Edit tools).
 model: inherit
 color: green
 metadata:
@@ -19,13 +18,15 @@ metadata:
   version: "1.0.0"
 ---
 
-# /skill-builder Skill
+# /agentic-contribution-skill Skill
 
-Interactive AI assistant for creating production-ready skills with automated quality validation.
+Interactive AI assistant for creating production-ready skills and agentic packs for **Red Hat products and platforms** with automated quality validation.
 
-**Creates**: Complete skill structure with YAML frontmatter, all mandatory sections, and pack integration
+All skills created follow **Red Hat product guidelines, official documentation standards** (docs.redhat.com, access.redhat.com), and **best practices** for Red Hat Enterprise Linux, OpenShift Container Platform, Ansible Automation Platform, Red Hat Lightspeed, and other Red Hat ecosystem products.
+
+**Creates**: Complete skill structure with YAML frontmatter, all mandatory sections, pack integration, and new agentic packs
 **Validates**: Tier 1 (agentskills.io) + Tier 2 (repository design principles)
-**Automates**: Git workflow (branch, commit, PR guidance)
+**Applies**: Red Hat documentation compliance (uses official Red Hat documentation to adapt skill content to manufacturer guidelines - not automated validation)
 
 ## Prerequisites
 
@@ -33,11 +34,6 @@ Interactive AI assistant for creating production-ready skills with automated qua
 - `git` - Version control
 - `uv` - Python environment manager
 - `bash` - Shell for validation scripts
-
-**Repository State**:
-- Forked `RHEcosystemAppEng/agentic-collections`
-- Cloned locally
-- Clean git status (no uncommitted changes in target areas)
 
 **Verification**:
 ```bash
@@ -61,11 +57,11 @@ If prerequisites fail:
 
 **Use when**:
 - Creating new skill for any pack
-- Contributing skill to marketplace
-- User explicitly invokes `/skill-builder`
+- Creating new agentic pack collection
+- Developing or editing skills for this agentic collection
+- User explicitly invokes `/agentic-contribution-skill`
 
 **Do NOT use when**:
-- Editing existing skills (use Read/Edit)
 - Asking about standards (direct to SKILL_DESIGN_PRINCIPLES.md)
 - General contributing questions (direct to CONTRIBUTING.md)
 
@@ -73,9 +69,9 @@ If prerequisites fail:
 
 ### Phase 1: Discovery (5 questions max)
 
-Ask concisely, validate before proceeding:
+Ask concisely, validate before proceeding. Make additional questions if needed to gather complete context.
 
-1. **Purpose**: "What does the skill do? (1 sentence)"
+1. **Purpose & Red Hat Product**: "What does the skill do? (1 sentence) For which Red Hat product(s) is this skill targeted?"
 2. **Persona**: "What role uses it?" (detect existing pack or suggest new)
 3. **Pack**: "Use <existing-pack>? (yes/no/create-new)"
 4. **MCP Tools**: "What MCP tools does it need?" (verify in pack's .mcp.json)
@@ -83,13 +79,14 @@ Ask concisely, validate before proceeding:
 
 **Validation**:
 - Purpose: specific, under 100 chars
+- Red Hat product: identified (OpenShift, RHEL, Ansible, etc.)
 - Persona: matches known or justifies new pack
 - MCP tools: exist or explain what to add
 - Operation type → Color mapping: cyan/green/blue/yellow/red
 
 ### Phase 2: Definition (6 questions max)
 
-1. **Name**: "Skill name? (kebab-case, unique)" → Check: `test -d <pack>/skills/<name>/`
+1. **Name**: Ask "Skill name? (kebab-case, unique)" → Validate if name is representative of purpose and Red Hat product. If NOT representative, propose 2-3 better alternatives and ask user to choose → Check: `test -d <pack>/skills/<name>/` for uniqueness
 2. **Use Cases**: "3-5 user phrases for 'Use when'" (concrete, not generic)
 3. **Anti-Patterns**: "NOT for? (with alternative)"
 4. **Workflow**: "Steps with MCP tools?" (e.g., "1. Validate VM - resources_get")
@@ -108,6 +105,7 @@ Show complete spec:
 **Pack**: <pack> | **Skill**: <name> | **Color**: <color>
 
 **Purpose**: <purpose>
+**Red Hat Product**: <rh-product>
 
 **Use When**: <3-5 examples>
 **NOT for**: <anti-pattern>
@@ -206,7 +204,7 @@ Ready to commit? (yes/no)
 
    Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
    ```
-4. **Push**: "Push to fork? (yes/no)"
+4. **Push**: "Push changes? (yes/no)"
 5. **PR**: Use `gh` if available, else provide manual instructions
 
 ### Phase 8: Final Summary
@@ -267,7 +265,7 @@ None - Uses Claude Code built-in tools (Read, Write, Edit, Bash, Skill) for file
 
 ### Related Skills
 
-None - skill-builder is self-contained and doesn't invoke other skills.
+None - agentic-contribution-skill is self-contained and doesn't invoke other skills.
 
 ### Repository Files
 
@@ -276,11 +274,9 @@ None - skill-builder is self-contained and doesn't invoke other skills.
 - `scripts/validate_skill_design.py` - Tier 2 validation
 - `Makefile` - Validation targets
 
-### Required Tools
+### System Requirements
 
-- `git` - Version control
-- `uv` - Python environment manager
-- `bash` - Shell for validation scripts
+See [Prerequisites](#prerequisites) section for required system tools (git, uv, bash).
 
 ### Reference Documentation
 
@@ -309,13 +305,13 @@ None - skill-builder is self-contained and doesn't invoke other skills.
 - Skip validation steps
 - Proceed if Tier 1 or Tier 2 validation fails with errors
 
-**Why**: User controls their fork. Quality standards ensure CI success.
+**Why**: User controls their repository. Quality standards ensure CI success.
 
 ## Security Considerations
 
 - **Git Credentials**: Never display tokens, SSH keys, or passwords
 - **Environment Variables**: Report presence only, never values
-- **User Repository**: Only operate in user's fork
+- **User Repository**: Only operate in user's workspace
 - **File Overwrite**: Warn before overwriting, require confirmation
 - **MCP Credentials**: Only `${ENV_VAR}` format, never hardcoded
 - **Script Execution**: User's repo context only
@@ -325,9 +321,9 @@ None - skill-builder is self-contained and doesn't invoke other skills.
 ```
 User: "Create skill for rh-virt to backup VMs"
 
-Skill-Builder:
-What does it do? (1 sentence)
-> "Create VM backups using snapshots"
+Agentic-Contribution-Skill:
+What does it do? For which Red Hat product(s) is this skill targeted?
+> "Create VM backups using snapshots for OpenShift Virtualization"
 
 What role uses it?
 > "Virt admins"
@@ -346,6 +342,7 @@ Operation type? (read-only/additive/destructive)
 Skill name? (kebab-case)
 > "vm-backup-create"
 
+✅ Name is representative of purpose (VM backup using snapshots for OpenShift Virtualization)
 ✅ Unique in rh-virt
 
 3-5 user phrases for 'Use when':
@@ -393,4 +390,25 @@ Ready to commit? (yes/no)
 🎉 Complete! PR created at: github.com/...
 
 Thank you for contributing!
+```
+
+---
+
+### Example 2: Non-representative name triggers AI suggestions
+
+```
+Skill name? (kebab-case)
+> "check-stuff"
+
+⚠️ Not representative of purpose (monitor cluster health for OpenShift).
+
+Suggestions:
+1. cluster-health-monitor
+2. ocp-health-check  
+3. cluster-metrics-monitor
+
+Choose (1-3) or provide your own:
+> 1
+
+✅ Using "cluster-health-monitor"
 ```

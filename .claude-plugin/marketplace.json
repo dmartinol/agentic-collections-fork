@@ -120,22 +120,6 @@
       "source": "./rh-automation",
       "category": "automation",
       "skills": "./skills"
-    },
-    {
-      "name": "rh-contributor",
-      "description": "Skill creation and contribution tools for building high-quality agentic collections with automated validation and marketplace compliance.",
-      "version": "1.0.0",
-      "author": {
-        "name": "Red Hat Ecosystem Engineering",
-        "email": "eco-engineering@redhat.com"
-      },
-      "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "repository": "https://github.com/RHEcosystemAppEng/agentic-collections",
-      "license": "Apache-2.0",
-      "keywords": ["contributor", "skill-builder", "marketplace", "quality", "automation", "validation"],
-      "source": "./rh-contributor",
-      "category": "tooling",
-      "skills": "./skills"
     }
   ]
 }
