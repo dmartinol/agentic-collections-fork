@@ -16,6 +16,7 @@ marketplaces:
 - Cursor
 - ChatGPT
 support_level: Unknown
+maturity: ORANGE
 description: Technical support and troubleshooting tools for Red Hat products and platforms, including diagnostics, issue
   resolution, knowledge workflows, and customer-ready guidance.
 summary: |

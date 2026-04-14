@@ -31,6 +31,7 @@
     "Cursor",
     "ChatGPT"
   ],
+  "maturity": "ORANGE",
   "name": "Red Hat Support Engineer Agentic Skills Collection",
   "personas": [
     "Support Engineer"

@@ -113,6 +113,7 @@
     "Claude Code",
     "Cursor"
   ],
+  "maturity": "GREEN",
   "mcp_section": "#mcp_section.md",
   "name": "Red Hat OpenShift Virtualization Agentic Collection",
   "personas": [

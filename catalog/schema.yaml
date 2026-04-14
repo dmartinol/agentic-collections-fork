@@ -16,6 +16,7 @@ required:
 - categories
 - personas
 - marketplaces
+- maturity
 - description
 - summary
 - contents
@@ -56,6 +57,14 @@ properties:
       minLength: 1
   support_level:
     type: string
+  maturity:
+    type: string
+    description: >
+      Publication readiness for the GitHub Pages catalog and bundled site data. GREEN collections are listed;
+      ORANGE are maintained in-repo but excluded from the public catalog until promoted.
+    enum:
+    - GREEN
+    - ORANGE
   description:
     type: string
     minLength: 1

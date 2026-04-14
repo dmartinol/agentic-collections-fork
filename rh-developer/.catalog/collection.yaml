@@ -17,6 +17,7 @@ marketplaces:
 - Claude Code
 - Cursor
 support_level: Unknown
+maturity: ORANGE
 description: Plugins for building and deploying applications on Red Hat platforms.
 summary: The rh-developer collection provides skills to detect projects, build images (S2I/Helm), deploy to OpenShift or RHEL,
   validate environments, and debug builds, pods, pipelines, networks, and hosts.

@@ -34,7 +34,7 @@ allowed-tools: Read Glob Grep Bash
 
 2. **Classify**
    - **Missing file** — create `.catalog/collection.yaml` via create-collection skill (or `uv run python scripts/bootstrap_catalog.py --pack <pack>` for bootstrap baseline).
-   - **Schema** — align YAML with [catalog/schema.yaml](../../catalog/schema.yaml).
+   - **Schema** — align YAML with [catalog/schema.yaml](../../catalog/schema.yaml) (includes required **`maturity`**: `GREEN` or `ORANGE`; site listing uses **`GREEN`** only per `pack_registry.get_docs_pack_dirs()`).
    - **Roster** — every `skills/<n>/SKILL.md` must appear once under `contents.skills` or `contents.orchestration_skills` with `name == <n>`.
    - **Banner** — `collection.yaml` must mention `create-collection` and `Golden sources` in the opening `#` block.
    - **`collection.json` drift** — run `uv run python scripts/catalog_yaml_to_json.py --pack <pack>` or `make catalog-mirror-json`.

@@ -147,6 +147,7 @@
     "Claude Code",
     "Cursor"
   ],
+  "maturity": "ORANGE",
   "mcp_section": "#mcp_section.md",
   "name": "Red Hat Developer Agentic Collection",
   "personas": [

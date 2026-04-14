@@ -22,6 +22,7 @@ marketplaces:
 - Claude Code
 - Cursor
 support_level: Unknown
+maturity: ORANGE
 description: Skills for OpenShift AI (RHOAI)—data science projects, workbenches, KServe and NIM model serving, pipelines,
   observability, TrustyAI monitoring and guardrails, model registry, and inference troubleshooting.
 summary: |

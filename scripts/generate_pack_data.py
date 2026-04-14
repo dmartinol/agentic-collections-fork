@@ -14,7 +14,6 @@ import pack_registry
 
 # Union registry (marketplace ∪ plugins.json); docs site uses subset helper
 PACK_DIRS = pack_registry.get_union_pack_dirs()
-DOCS_EXCLUDED_PACKS = pack_registry.DOCS_EXCLUDED_PACKS
 DOCS_PACK_DIRS = pack_registry.get_docs_pack_dirs()
 
 
