@@ -45,54 +45,40 @@ lola install -f rh-sre -a cursor        # Cursor only
 ### 1. Add the Marketplace
 
 ```bash
-/plugin marketplace add RHEcosystemAppEng/agentic-collections
+lola market add rh-agentic-collections https://raw.githubusercontent.com/RHEcosystemAppEng/agentic-collections/main/marketplace/rh-agentic-collection.yml
 ```
 
-### 2. Install a Plugin
+### 2. Install a Module
 
 ```bash
 # For Site Reliability Engineers
-/plugin install rh-sre@redhat-agentic-collections
+lola install -f rh-sre
 
 # For Developers
-/plugin install rh-developer@redhat-agentic-collections
+lola install -f rh-developer
 
 # For OpenShift Administrators
-/plugin install ocp-admin@redhat-agentic-collections
+lola install -f ocp-admin
 
 # For Virtualization Administrators
-/plugin install openshift-virtualization@redhat-agentic-collections
+lola install -f rh-virt
 
 # For AI/ML Engineers
-/plugin install rh-ai-engineer@redhat-agentic-collections
+lola install -f rh-ai-engineer
 
 # For Ansible Automation Platform Engineers
-/plugin install rh-automation@redhat-agentic-collections
+lola install -f rh-automation
 ```
 
-See each plugin's README for available skills and usage examples.
+See each module's README for available skills and usage examples.
 
-### 3. Update
+### 3. Install All Modules
 
 ```bash
-# Update the marketplace to get latest plugin versions
-/plugin marketplace update redhat-agentic-collections
-
-# Update a specific plugin to the latest version
-/plugin update rh-sre@redhat-agentic-collections
+for m in ocp-admin rh-ai-engineer rh-automation rh-developer rh-sre rh-virt; do lola install -f $m; done
 ```
 
-**Note:** Claude Code automatically checks for marketplace updates at startup. Manual updates are useful when you want the latest skills immediately.
-
-### 4. Uninstall
-
-```bash
-# Uninstall a specific plugin
-/plugin uninstall rh-sre@redhat-agentic-collections
-
-# Remove the marketplace (this will uninstall all plugins from this marketplace)
-/plugin marketplace remove redhat-agentic-collections
-```
+**Note:** Re-run `lola install -f <module>` anytime to pick up newer module content after marketplace updates.
 
 ---
 
@@ -196,8 +182,13 @@ Generate and view documentation locally:
 # Install dependencies (first time only)
 make install
 
-# Validate pack structure (mcps.json, CLAUDE.md, frontmatter; plugin.json if present)
+# Validate pack structure + collection compliance (COLLECTION_SPEC.md, catalog/schema.yaml)
 make validate
+
+# Optional: collection-only targets
+# make validate-collection-schema
+# make validate-collection-compliance
+# make catalog-mirror-json   # refresh .catalog/collection.json from YAML
 
 # Validate skills against Design Principles (SKILL_DESIGN_PRINCIPLES.md)
 # Validate only changed skills (staged + unstaged) - recommended for local dev:
@@ -250,14 +241,19 @@ uv run python scripts/validate_skill_design.py --warnings-as-errors
 
 ## Security
 
-This repository uses [gitleaks](https://github.com/gitleaks/gitleaks) to prevent accidental commits of sensitive data.
+This repository uses [gitleaks](https://github.com/gitleaks/gitleaks) and the [pre-commit](https://pre-commit.com/) framework to block accidental secrets and to run scoped validation before commits.
 
 ### Quick Start
 
 ```bash
-# Install gitleaks and pre-commit hook (one-time setup)
+# One-time: Python deps + dev tools (includes pre-commit), then install the git hook
+make install
 scripts/install-hooks.sh
 ```
+
+`scripts/install-hooks.sh` runs `uv sync` / `uv sync --group dev`, ensures `gitleaks` is available when possible, then `uv run pre-commit install`. It backs up a **non–pre-commit** `.git/hooks/pre-commit` (for example an old gitleaks-only hook) before replacing it.
+
+On commit, hooks defined in `.pre-commit-config.yaml` run: **gitleaks**, **`make validate`** when catalog/roster-related paths change, and **`make validate-skill-design-changed`** when pack `skills/*/SKILL.md` files change. CI still enforces the full checks in [`.github/workflows/compliance-check.yml`](.github/workflows/compliance-check.yml) (`make validate` and related jobs).
 
 ### What's Protected
 
@@ -472,13 +468,13 @@ Test the marketplace locally before publishing:
 
 ```bash
 cd /path/to/agentic-collections
-/plugin marketplace add .
+lola market add rh-agentic-collections ./marketplace/rh-agentic-collection.yml
 ```
 
-### Install Plugin Locally
+### Install Module Locally
 
 ```bash
-/plugin install rh-sre@redhat-agentic-collections
+lola install -f rh-sre
 ```
 
 ### Validate packs (recommended)
