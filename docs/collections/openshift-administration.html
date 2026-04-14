@@ -41,7 +41,29 @@
 
                     <div id="tab-overview" class="collection-tab-panel active" role="tabpanel"><h2>Overview</h2><div class="collection-prose"><p>The ocp-admin collection covers Assisted Installer cluster creation, multi-cluster discovery across self-managed and managed<br />
 OpenShift, and kubeconfig-backed fleet health reporting. Use CLAUDE.md intent routing to pick <code>/cluster-creator</code>,<br />
-<code>/cluster-inventory</code>, or <code>/cluster-report</code>.</p></div><h2>Quick Start</h2><div class="collection-prose"><h3>Prerequisites</h3>
+<code>/cluster-inventory</code>, or <code>/cluster-report</code>.</p></div><h2>MCP</h2><div class="collection-prose"><table>
+<thead>
+<tr>
+<th>Server</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>openshift-self-managed</strong></td>
+<td>Assisted Installer API for self-managed cluster lifecycle (OCP, SNO).</td>
+</tr>
+<tr>
+<td><strong>openshift-ocm-managed</strong></td>
+<td>OpenShift Cluster Manager API for managed service clusters (ROSA, ARO, OSD).</td>
+</tr>
+<tr>
+<td><strong>openshift-administration</strong></td>
+<td>Kubernetes/OpenShift operations for multi-context fleet reports; read-only where applicable.</td>
+</tr>
+</tbody>
+</table>
+<p>Configure servers through <strong><code>mcps.json</code></strong>; skills must be invoked instead of calling MCP tools directly from the agent.</p></div><h2>Quick Start</h2><div class="collection-prose"><h3>Prerequisites</h3>
 <ul>
 <li>Claude Code CLI or IDE extension (if using Claude Code)</li>
 <li>Podman (or Docker) for the container-based MCP servers in <strong><code>mcps.json</code></strong></li>
