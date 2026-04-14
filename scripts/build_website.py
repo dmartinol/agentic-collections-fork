@@ -11,6 +11,7 @@ from typing import Dict, Any
 
 # Import our data generators
 from catalog_site_bundle import bundle_catalog_for_site
+from generate_collection_pages import generate_collection_pages
 from generate_pack_data import generate_pack_data
 from generate_mcp_data import generate_mcp_data
 
@@ -64,6 +65,9 @@ def build_website():
         if cat_bundle is not None:
             pack['collection'] = cat_bundle
 
+    # Keep pack cards deterministic and alphabetically ordered.
+    pack_data = sorted(pack_data, key=lambda p: p['name'])
+
     print()
 
     # Generate MCP server data
@@ -75,6 +79,12 @@ def build_website():
         server_name = server['name']
         server['icon'] = icons['mcp_servers'].get(server_name, '')
     
+    print()
+
+    # Generate static collection pages (fork-compatible UX)
+    print("📄 Generating static collection pages...")
+    page_count = generate_collection_pages(pack_data, mcp_data)
+    print(f"✅ Generated {page_count} pages in docs/collections/")
     print()
 
     # Combine into final output

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Hat Developer Agentic Collection - Red Hat Agentic Catalog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css?v=34">
+</head>
+<body>
+    <div class="site-brand-accent" aria-hidden="true"></div>
+    <main>
+        <section class="collection-page">
+            <div class="collection-page-inner collection-content">
+                <nav class="collection-nav" aria-label="Collection">
+                    <div class="collection-nav-start">
+                        <a href="../index.html" class="collection-back">← Back to Catalog</a>
+                    </div>
+                    <div class="collection-nav-center">
+                        <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/.catalog/collection.yaml" target="_blank" rel="noopener noreferrer" class="collection-meta-link">catalog YAML →</a>
+                    </div>
+                    <div class="collection-nav-end">
+                        <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/README.md" target="_blank" rel="noopener noreferrer" class="collection-meta-link">README →</a>
+                        <a href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="collection-meta-link">Apache 2.0 License →</a>
+                    </div>
+                </nav>
+                <div class="collection-page-body collection-content-inner">
+                    <h1 class="collection-page-title">Red Hat Developer Agentic Collection</h1>
+                    <p class="collection-page-sub">Plugins for building and deploying applications on Red Hat platforms.</p>
+                    <p class="collection-page-sub"><strong>Module:</strong> rh-developer · v0.1.0 · Application developer</p>
+                    <p class="collection-tags"><strong>Categories:</strong> Application development, OpenShift, Containers, Automation</p>
+
+                    <div class="collection-tabs" role="tablist">
+                        <button type="button" class="collection-tab active" data-tab="overview" role="tab" aria-selected="true" aria-controls="tab-overview">Overview</button>
+                        <button type="button" class="collection-tab" data-tab="skills" role="tab" aria-selected="false" aria-controls="tab-skills">Skills</button>
+                        <button type="button" class="collection-tab" data-tab="resources" role="tab" aria-selected="false" aria-controls="tab-resources">Resources</button>
+                        <button type="button" class="collection-tab" data-tab="agents" role="tab" aria-selected="false" aria-controls="tab-agents">Agents</button>
+                    </div>
+
+                    <div id="tab-overview" class="collection-tab-panel active" role="tabpanel"><h2>Overview</h2><div class="collection-prose"><p>The rh-developer collection provides skills to detect projects, build images (S2I/Helm), deploy to OpenShift or RHEL, validate environments, and debug builds, pods, pipelines, networks, and hosts.</p></div><h2>Documentation</h2><div class="collection-prose"><h3>Why use skills instead of raw MCP tools?</h3>
+<ul>
+<li><strong>Safety</strong> — skills enforce confirmation before creates/updates/deletes and redact secrets.</li>
+<li><strong>Recovery</strong> — standardized debug skills (<code>/debug-pod</code>, <code>/debug-build</code>, …) chain to remediation steps.</li>
+<li><strong>Consistency</strong> — workflows follow pack docs (human-in-the-loop, image selection, RHEL patterns).</li>
+</ul>
+<h3>Pack documentation</h3>
+<p>See <strong><code>docs/</code></strong> for deep dives: <code>prerequisites.md</code>, <code>human-in-the-loop.md</code>, <code>image-selection-criteria.md</code>, <code>builder-images.md</code>, <code>rhel-deployment.md</code>, <code>debugging-patterns.md</code>.</p>
+<h3>Routing</h3>
+<p>Use <strong><code>CLAUDE.md</code></strong> intent routing to pick a single skill; use <strong><code>/containerize-deploy</code></strong> when the user wants an end-to-end guided path with checkpoints.</p></div><h2>MCP</h2><div class="collection-prose"><table>
+<thead>
+<tr>
+<th>Server</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>openshift</strong></td>
+<td>Cluster CRUD, logs, events, Helm — primary for OpenShift deploy and debug skills.</td>
+</tr>
+<tr>
+<td><strong>podman</strong></td>
+<td>Local image/build workflows used by S2I and container skills.</td>
+</tr>
+<tr>
+<td><strong>github</strong></td>
+<td>Repository analysis for <code>/detect-project</code> when sources are on GitHub.</td>
+</tr>
+<tr>
+<td><strong>lightspeed-mcp</strong></td>
+<td>Optional Insights-style data for RHEL-focused flows.</td>
+</tr>
+</tbody>
+</table>
+<p>Configure in <strong><code>mcps.json</code></strong>; invoke skills rather than MCP tools directly from the agent.</p></div><h2>Quick Start</h2><div class="collection-prose"><h3>Prerequisites</h3>
+<ul>
+<li>OpenShift cluster access (<code>oc</code>, valid <code>KUBECONFIG</code>) for OpenShift flows</li>
+<li>Podman (local builds and MCP)</li>
+<li>Optional: <code>GITHUB_PERSONAL_ACCESS_TOKEN</code> for GitHub-backed project detection</li>
+<li>Optional: Red Hat Lightspeed credentials for <code>/rhel-deploy</code> and <code>/debug-rhel</code> advisor paths</li>
+</ul>
+<h3>Environment setup</h3>
+<p>Variable <strong>names</strong> must match <strong><code>mcps.json</code></strong>. Do not commit secrets or print values in assistant output.</p>
+<p><strong>OpenShift + local tooling:</strong></p>
+<pre><code class="language-bash">export KUBECONFIG=&quot;/path/to/your/kubeconfig&quot;
+</code></pre>
+<p><strong>GitHub MCP (optional):</strong></p>
+<pre><code class="language-bash">export GITHUB_PERSONAL_ACCESS_TOKEN=&quot;your-github-token&quot;
+</code></pre>
+<p><strong>Red Hat Lightspeed MCP (optional):</strong></p>
+<pre><code class="language-bash">export LIGHTSPEED_CLIENT_ID=&quot;your-service-account-client-id&quot;
+export LIGHTSPEED_CLIENT_SECRET=&quot;your-service-account-client-secret&quot;
+</code></pre>
+<h3>Install (Lola)</h3>
+<pre><code class="language-bash">lola install -f rh-developer
+</code></pre>
+<p>Module path: <code>rh-developer</code> in <code>marketplace/rh-agentic-collection.yml</code>. See the root <a href="../../README.md">README.md</a> for full prerequisites and MCP notes.</p></div><div class="install-accordion"><details class="install-accordion-item" open><summary class="install-accordion-header">Installation (Claude Code)</summary><div class="install-accordion-body collection-prose"><pre><code class="language-bash">lola install -f rh-developer -a claude-code
+</code></pre></div></details><details class="install-accordion-item"><summary class="install-accordion-header">Installation (Cursor)</summary><div class="install-accordion-body collection-prose"><pre><code class="language-bash">lola install -f rh-developer -a cursor
+</code></pre></div></details></div><div class="collection-prose collection-mcp-after-install"><h3>MCP configuration</h3>
+<p>Servers are defined in <strong><code>mcps.json</code></strong> at the pack root. Use <strong><code>${VAR}</code></strong> placeholders only.</p>
+<p><strong>Note (Linux vs macOS):</strong> the OpenShift MCP <code>Podman</code> invocation may include user-namespace flags for <code>KUBECONFIG</code> readability; on macOS Podman-in-VM may require adjusting <code>mcps.json</code> per the pack README.</p></div><h2>Security Model</h2><div class="collection-prose"><ul>
+<li>Never echo tokens, kubeconfig contents, or registry passwords — only whether variables appear set.</li>
+<li>Confirm manifests and impact before mutating cluster or host resources; no silent deletes.</li>
+<li>Prefer <strong><code>/validate-environment</code></strong> before first deploy on a new machine or cluster context.</li>
+</ul></div></div>
+                    <div id="tab-skills" class="collection-tab-panel" role="tabpanel"><h2>Skills</h2><div class="collection-prose"><p>The pack provides 14 skills for developer workflows on OpenShift and RHEL, including one orchestration skill<br />
+for end-to-end containerize-and-deploy.</p></div><h3>Orchestration Skill</h3><ol class="collection-skill-list"><li>
+<div><code>/containerize-deploy</code> - End-to-end containerize and deploy</div>
+<div class="collection-prose collection-prose-tight"><p>Guided workflow from source to running application on OpenShift or RHEL with checkpoints.<br />
+<strong>Use when:</strong><br />
+- "Deploy my app end to end"<br />
+- "Take me from repo to running service"<br />
+<strong>What it does:</strong><br />
+- Phase: detect project and target environment.<br />
+- Phase: choose OpenShift (S2I / Helm / Podman) or RHEL path.<br />
+- Invokes specialized skills with explicit user approvals between phases.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/containerize-deploy/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li></ol><h3>Basic Skills</h3><ol class="collection-skill-list"><li>
+<div><code>/detect-project</code> - Project and runtime detection</div>
+<div class="collection-prose collection-prose-tight"><p>Analyze repositories and local trees to detect language, framework, and runtime signals.<br />
+<strong>Use when:</strong><br />
+- "What language is this repo?"<br />
+- "Scan my project for frameworks"<br />
+- "Identify runtime from source"<br />
+<strong>What it does:</strong><br />
+- Reads project files and optional GitHub context.<br />
+- Summarizes stack signals for build and deploy skills.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/detect-project/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/recommend-image</code> - Image and builder recommendations</div>
+<div class="collection-prose collection-prose-tight"><p>Recommend S2I builder or base images aligned with Red Hat guidance.<br />
+<strong>Use when:</strong><br />
+- "Which S2I image for Node?"<br />
+- "Best UBI image for this app?"<br />
+<strong>What it does:</strong><br />
+- Uses image selection criteria and builder catalog patterns.<br />
+- Prepares inputs for <code>/s2i-build</code>.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/recommend-image/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/s2i-build</code> - Source-to-image builds</div>
+<div class="collection-prose collection-prose-tight"><p>Build container images on OpenShift using S2I / BuildConfig flows.<br />
+<strong>Use when:</strong><br />
+- "S2I build this repo"<br />
+- "Create a BuildConfig"<br />
+- "Build image from source"<br />
+<strong>What it does:</strong><br />
+- Validates inputs, drives build logs, surfaces common build failures.<br />
+- Pairs with <code>/debug-build</code> on failure.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/s2i-build/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/deploy</code> - OpenShift deployment</div>
+<div class="collection-prose collection-prose-tight"><p>Deploy images to OpenShift with Deployment, Service, and Route.<br />
+<strong>Use when:</strong><br />
+- "Deploy to OpenShift"<br />
+- "Expose my app with a Route"<br />
+<strong>What it does:</strong><br />
+- Generates manifests with approval gates.<br />
+- Coordinates with cluster MCP safely.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/deploy/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/helm-deploy</code> - Helm-based deployment</div>
+<div class="collection-prose collection-prose-tight"><p>Install or upgrade Helm charts on OpenShift.<br />
+<strong>Use when:</strong><br />
+- "Helm install my chart"<br />
+- "Upgrade release with new values"<br />
+<strong>What it does:</strong><br />
+- Validates chart paths and values.<br />
+- Reports release status and common Helm errors.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/helm-deploy/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/rhel-deploy</code> - RHEL / SSH deployment</div>
+<div class="collection-prose collection-prose-tight"><p>Deploy to standalone RHEL/Fedora hosts via SSH and systemd/Podman patterns.<br />
+<strong>Use when:</strong><br />
+- "Deploy on RHEL over SSH"<br />
+- "systemd unit for my container"<br />
+<strong>What it does:</strong><br />
+- Uses SSH and host workflows from pack docs.<br />
+- Optional Lightspeed context when configured.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/rhel-deploy/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/validate-environment</code> - Environment validation</div>
+<div class="collection-prose collection-prose-tight"><p>Verify local tools and cluster connectivity before deploy or debug work.<br />
+<strong>Use when:</strong><br />
+- "Check oc and helm"<br />
+- "Validate my environment"<br />
+<strong>What it does:</strong><br />
+- Checks binaries, kubeconfig reachability, and common misconfigurations.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/validate-environment/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/debug-build</code> - OpenShift build diagnostics</div>
+<div class="collection-prose collection-prose-tight"><p>Diagnose BuildConfig / S2I / image build failures.<br />
+<strong>Use when:</strong><br />
+- "Build failed on OpenShift"<br />
+- "ImagePullBackOff during build"<br />
+<strong>What it does:</strong><br />
+- Collects build logs and events.<br />
+- Suggests fixes and retries with <code>/s2i-build</code>.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/debug-build/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/debug-pod</code> - Pod diagnostics</div>
+<div class="collection-prose collection-prose-tight"><p>Diagnose running pod failures on OpenShift.<br />
+<strong>Use when:</strong><br />
+- "CrashLoopBackOff"<br />
+- "Pod pending"<br />
+- "OOMKilled pod"<br />
+<strong>What it does:</strong><br />
+- Inspects status, events, current/previous logs.<br />
+- Coordinates with <code>/debug-network</code> when needed.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/debug-pod/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/debug-pipeline</code> - Tekton / pipeline diagnostics</div>
+<div class="collection-prose collection-prose-tight"><p>Diagnose PipelineRun and TaskRun failures.<br />
+<strong>Use when:</strong><br />
+- "PipelineRun failed"<br />
+- "Tekton step error"<br />
+<strong>What it does:</strong><br />
+- Surfaces pipeline logs and workspace issues.<br />
+- Guides toward green reruns.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/debug-pipeline/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/debug-network</code> - Cluster networking diagnostics</div>
+<div class="collection-prose collection-prose-tight"><p>Diagnose Services, Routes, DNS, and NetworkPolicy issues.<br />
+<strong>Use when:</strong><br />
+- "Service not reachable"<br />
+- "Route returns 503"<br />
+<strong>What it does:</strong><br />
+- Traces endpoints and policies.<br />
+- Feeds back into <code>/deploy</code> verification.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/debug-network/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/debug-container</code> - Local container diagnostics</div>
+<div class="collection-prose collection-prose-tight"><p>Diagnose Podman/Docker local container failures.<br />
+<strong>Use when:</strong><br />
+- "Container exits immediately locally"<br />
+- "Cannot pull image locally"<br />
+<strong>What it does:</strong><br />
+- Inspects local container state and logs.<br />
+- Complements OpenShift debug skills.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/debug-container/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li><li>
+<div><code>/debug-rhel</code> - RHEL host diagnostics</div>
+<div class="collection-prose collection-prose-tight"><p>Diagnose systemd, SELinux, firewall, and resource issues on RHEL hosts.<br />
+<strong>Use when:</strong><br />
+- "SELinux denial"<br />
+- "systemd service failed on host"<br />
+<strong>What it does:</strong><br />
+- Uses journal and policy signals.<br />
+- Optional Lightspeed insights when available.</p></div>
+<a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/skills/debug-rhel/SKILL.md" target="_blank" rel="noopener noreferrer">View SKILL.md on GitHub -></a>
+</li></ol><h2>Skills Decision Guide</h2><table class="collection-decision-table"><thead><tr><th>User request</th><th>Skill to use</th><th>Reason</th></tr></thead><tbody><tr><td><p>"Deploy to OpenShift" or "expose my image"</p></td><td>/deploy</td><td><p>Creates workload, Service, and Route with confirmation gates.</p></td></tr><tr><td><p>"Helm install" or "upgrade my chart"</p></td><td>/helm-deploy</td><td><p>Helm-focused install/upgrade with values and release checks.</p></td></tr><tr><td><p>"S2I build" or "BuildConfig from source"</p></td><td>/s2i-build</td><td><p>OpenShift-native build flow before <code>/deploy</code>.</p></td></tr><tr><td><p>"From repo to running app" or "full deploy workflow"</p></td><td>/containerize-deploy</td><td><p>Orchestrates detect → strategy → deploy with checkpoints.</p></td></tr><tr><td><p>"CrashLoopBackOff" or "pod not starting"</p></td><td>/debug-pod</td><td><p>Pod logs, events, and resource pressure analysis.</p></td></tr><tr><td><p>"Build failed" or "S2I error"</p></td><td>/debug-build</td><td><p>Build logs and BuildConfig diagnosis.</p></td></tr><tr><td><p>"Check my tools" or "validate cluster access"</p></td><td>/validate-environment</td><td><p>Pre-flight before deploy or heavy debug.</p></td></tr></tbody></table></div>
+                    <div id="tab-resources" class="collection-tab-panel" role="tabpanel"><h2>References</h2><ul class="simple-list collection-resources"><li><a class="collection-resource-link" href="https://docs.redhat.com/en/documentation/openshift_container_platform/" target="_blank" rel="noopener noreferrer">OpenShift documentation</a> - OpenShift platform guides for developers and administrators. <a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/prerequisites.md" target="_blank" rel="noopener noreferrer">[embedded doc]</a></li><li><a class="collection-resource-link" href="https://helm.sh/docs/" target="_blank" rel="noopener noreferrer">Helm documentation</a> - Helm install, upgrade, and chart authoring. <a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/dynamic-validation.md" target="_blank" rel="noopener noreferrer">[embedded doc]</a></li><li><a class="collection-resource-link" href="https://docs.openshift.com/container-platform/latest/cicd/builds/understanding-image-builds.html" target="_blank" rel="noopener noreferrer">Source-to-Image (S2I)</a> - OpenShift builds and S2I concepts. <a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/builder-images.md" target="_blank" rel="noopener noreferrer">[embedded doc]</a></li><li><a class="collection-resource-link" href="https://developers.redhat.com/products/rhel/ubi" target="_blank" rel="noopener noreferrer">Red Hat Universal Base Images</a> - UBI and base image guidance. <a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/image-selection-criteria.md" target="_blank" rel="noopener noreferrer">[embedded doc]</a></li><li><a class="collection-resource-link" href="https://docs.podman.io/" target="_blank" rel="noopener noreferrer">Podman</a> - Local container workflows used by the pack. <a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/debugging-patterns.md" target="_blank" rel="noopener noreferrer">[embedded doc]</a></li><li><a class="collection-resource-link" href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener noreferrer">Human-in-the-loop (pack)</a> - Pack policy for confirmations and destructive actions. <a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/human-in-the-loop.md" target="_blank" rel="noopener noreferrer">[embedded doc]</a></li><li><a class="collection-resource-link" href="https://github.com/RHEcosystemAppEng/agentic-collections" target="_blank" rel="noopener noreferrer">RHEL deployment notes (pack)</a> - SSH/systemd patterns for `/rhel-deploy`. <a class="collection-inline-link" href="https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/rh-developer/docs/rhel-deployment.md" target="_blank" rel="noopener noreferrer">[embedded doc]</a></li></ul></div>
+                    <div id="tab-agents" class="collection-tab-panel" role="tabpanel"><h2>MCP Server Integrations</h2><div class="collection-mcp-grid"><div class="collection-mcp-card" role="button" tabindex="0" data-mcp-pack="rh-developer" data-mcp-name="openshift"><div class="collection-mcp-card-title"><span>☸️</span><span>OpenShift MCP Server</span></div><div class="collection-mcp-card-meta">By Official - Container</div></div><div class="collection-mcp-card" role="button" tabindex="0" data-mcp-pack="rh-developer" data-mcp-name="podman"><div class="collection-mcp-card-title"><span>🐳</span><span>Podman MCP Server</span></div><div class="collection-mcp-card-meta">By Marc Nuri (Red Hat) - Container</div></div><div class="collection-mcp-card" role="button" tabindex="0" data-mcp-pack="rh-developer" data-mcp-name="github"><div class="collection-mcp-card-title"><span>🐙</span><span>GitHub MCP Server</span></div><div class="collection-mcp-card-meta">By GitHub - Container</div></div><div class="collection-mcp-card" role="button" tabindex="0" data-mcp-pack="rh-developer" data-mcp-name="lightspeed-mcp"><div class="collection-mcp-card-title"><span>💡</span><span>Red Hat Lightspeed MCP</span></div><div class="collection-mcp-card-meta">By Red Hat - Container</div></div></div><h2>Sample Workflows</h2><h3>S2I path: detect → image → build → deploy</h3><div class="collection-prose"><p>User: "I have a Node app in this repo; put it on OpenShift"<br />
+- <code>/detect-project</code> identifies the stack<br />
+- <code>/recommend-image</code> picks a builder (optional)<br />
+- <code>/s2i-build</code> creates the image<br />
+- <code>/deploy</code> rolls out Deployment, Service, and Route with approval</p></div><h3>Helm install on cluster</h3><div class="collection-prose"><p>User: "Install this Helm chart into namespace apps"<br />
+- <code>/validate-environment</code> checks <code>oc</code>/<code>helm</code><br />
+- <code>/helm-deploy</code> installs or upgrades the chart and reports release status</p></div><h3>End-to-end with checkpoints</h3><div class="collection-prose"><p>User: "Take my Python service from source to running on the cluster"<br />
+- <code>/containerize-deploy</code> walks phases with confirmations between detect, strategy, and deploy steps</p></div><h3>Build failure then retry</h3><div class="collection-prose"><p>User: "S2I build failed with ImagePullBackOff"<br />
+- <code>/debug-build</code> gathers build and registry signals<br />
+- User applies fix; <code>/s2i-build</code> retries with updated inputs</p></div><h3>Pod triage</h3><div class="collection-prose"><p>User: "My pod keeps restarting"<br />
+- <code>/debug-pod</code> inspects events and logs<br />
+- If networking suspected, <code>/debug-network</code> narrows DNS/Route/Service issues</p></div></div>
+
+                    <p class="collection-footer-meta">https://github.com/RHEcosystemAppEng/agentic-collections</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="mcp-modal" class="modal">
+        <div class="modal-content" id="mcp-details"></div>
+    </div>
+
+    <script src="../app.js?v=34"></script>
+</body>
+</html>

@@ -123,6 +123,23 @@ def parse_plugin_json(pack_dir: str, plugin_titles: Dict[str, str]) -> Dict[str,
         return defaults
 
 
+def overlay_plugin_version_from_marketplace(pack_dir: str, plugin: Dict[str, Any]) -> None:
+    """
+    Set plugin['version'] from marketplace/rh-agentic-collection.yml modules[].version
+    when present. Overrides defaults and .claude-plugin/plugin.json so the docs site
+    matches the Lola marketplace module version.
+    """
+    mod = pack_registry.load_marketplace_module_by_path(pack_dir)
+    if not mod:
+        return
+    raw = mod.get("version")
+    if raw is None:
+        return
+    ver = str(raw).strip()
+    if ver:
+        plugin["version"] = ver
+
+
 def parse_skills(pack_dir: str) -> List[Dict[str, Any]]:
     """
     Parse skills from skills/*/SKILL.md files.
@@ -293,10 +310,13 @@ def generate_pack_data() -> List[Dict[str, Any]]:
 
         docs = parse_docs(pack_dir)
 
+        plugin = parse_plugin_json(pack_dir, plugin_titles)
+        overlay_plugin_version_from_marketplace(pack_dir, plugin)
+
         pack = {
             'name': pack_dir,
             'path': f'./{pack_dir}',
-            'plugin': parse_plugin_json(pack_dir, plugin_titles),
+            'plugin': plugin,
             'skills': parse_skills(pack_dir),
             'agents': parse_agents(pack_dir),
             'docs': docs,
