@@ -38,22 +38,13 @@ Module path: **`ocp-admin`** in **`marketplace/rh-agentic-collection.yml`**. See
 ### Installation (Claude Code)
 
 ```bash
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install ocp-admin
-```
-
-Or for local development:
-
-```bash
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install ocp-admin
+lola install -f ocp-admin -a claude-code
 ```
 
 ### Installation (Cursor)
 
 ```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/ocp-admin ~/.cursor/plugins/ocp-admin
+lola install -f ocp-admin -a cursor
 ```
 
 ### MCP configuration

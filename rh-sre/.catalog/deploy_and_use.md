@@ -37,34 +37,14 @@ The module is declared in **`marketplace/rh-agentic-collection.yml`** (`path: rh
 
 ### Installation (Claude Code)
 
-Install the collection as a Claude Code plugin:
-
 ```bash
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install rh-sre
-```
-
-Or for local development:
-
-```bash
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install rh-sre
+lola install -f rh-sre -a claude-code
 ```
 
 ### Installation (Cursor)
 
-Cursor does not support direct marketplace install via CLI. Clone the repository and copy the pack:
-
 ```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-sre ~/.cursor/plugins/rh-sre
-```
-
-Or download and extract:
-
-```bash
-wget -qO- https://github.com/RHEcosystemAppEng/agentic-collections/archive/refs/heads/main.tar.gz | tar xz
-cp -r agentic-collections-main/rh-sre ~/.cursor/plugins/rh-sre
+lola install -f rh-sre -a cursor
 ```
 
 ### MCP configuration

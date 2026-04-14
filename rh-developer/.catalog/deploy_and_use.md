@@ -44,22 +44,13 @@ Module path: `rh-developer` in `marketplace/rh-agentic-collection.yml`. See the 
 ### Installation (Claude Code)
 
 ```bash
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install rh-developer
-```
-
-Or for local development:
-
-```bash
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install rh-developer
+lola install -f rh-developer -a claude-code
 ```
 
 ### Installation (Cursor)
 
 ```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-developer ~/.cursor/plugins/rh-developer
+lola install -f rh-developer -a cursor
 ```
 
 ### MCP configuration

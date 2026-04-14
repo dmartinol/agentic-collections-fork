@@ -2,7 +2,7 @@
 
 This repository uses a **pack-local collection catalog**: curated metadata and summaries live under **`<pack>/.catalog/`** (YAML as the source of record, JSON as a deterministic mirror for consumers that prefer it). **Golden sources** are pack `SKILL.md` files, `README.md`, `CLAUDE.md`, and [`marketplace/rh-agentic-collection.yml`](marketplace/rh-agentic-collection.yml). Catalog files **describe** the collection for tooling and documentation; they are **authored** primarily via the [**create-collection**](.claude/skills/create-collection/SKILL.md) skill (assistant + maintainer + PR review) and must not overwrite READMEs or marketplace YAML.
 
-**Machine validation:** [`catalog/schema.yaml`](catalog/schema.yaml) (JSON Schema expressed in YAML) and [`scripts/validate_collection_compliance.py`](scripts/validate_collection_compliance.py). **Pack list:** union of Lola marketplace `modules[].path` and keys of [`docs/plugins.json`](docs/plugins.json), limited to directories that exist on disk — see [`scripts/pack_registry.py`](scripts/pack_registry.py).
+**Machine validation:** [`catalog/schema.yaml`](catalog/schema.yaml) (JSON Schema expressed in YAML) and [`scripts/validate_collection_compliance.py`](scripts/validate_collection_compliance.py). These checks are primarily structural and cannot fully evaluate semantic parity with golden-source docs. **Required review gate:** run an AI semantic alignment review (via [`.claude/skills/collection-compliance/SKILL.md`](.claude/skills/collection-compliance/SKILL.md)) to confirm catalog metadata/fragments remain aligned with `SKILL.md`, `README.md`, `CLAUDE.md`, and marketplace module metadata. **Pack list:** union of Lola marketplace `modules[].path` and keys of [`docs/plugins.json`](docs/plugins.json), limited to directories that exist on disk — see [`scripts/pack_registry.py`](scripts/pack_registry.py).
 
 ## Layout
 
@@ -24,7 +24,7 @@ This repository uses a **pack-local collection catalog**: curated metadata and s
 
 ### `deploy_and_use` content (install + env + MCP)
 
-Consumers read **`deploy_and_use`** (resolved from inline YAML or from **`#deploy_and_use.md`**) for marketplace install steps and operator setup. **CI does not yet cross-check `mcps.json`;** reviewers enforce this section with the [**create-collection**](.claude/skills/create-collection/SKILL.md) workflow.
+Consumers read **`deploy_and_use`** (resolved from inline YAML or from **`#deploy_and_use.md`**) for marketplace install steps and operator setup. **CI does not yet cross-check `mcps.json` or README install parity;** reviewers enforce this section with the [**create-collection**](.claude/skills/create-collection/SKILL.md) and [**collection-compliance**](.claude/skills/collection-compliance/SKILL.md) workflows.
 
 **When `<pack>/mcps.json` defines one or more MCP servers**, the prose behind **`deploy_and_use`** (inline or fragment) **must** cover, in substance:
 

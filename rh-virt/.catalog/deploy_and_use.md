@@ -43,24 +43,13 @@ The module is declared in **`marketplace/rh-agentic-collection.yml`** (`path: rh
 ### Installation (Claude Code)
 
 ```bash
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install rh-virt
-```
-
-Or for local development:
-
-```bash
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install rh-virt
+lola install -f rh-virt -a claude-code
 ```
 
 ### Installation (Cursor)
 
-Clone the repository and copy the pack:
-
 ```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-virt ~/.cursor/plugins/rh-virt
+lola install -f rh-virt -a cursor
 ```
 
 ### MCP configuration

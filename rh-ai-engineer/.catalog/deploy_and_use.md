@@ -42,22 +42,13 @@ Module path: **`rh-ai-engineer`** in **`marketplace/rh-agentic-collection.yml`**
 ### Installation (Claude Code)
 
 ```bash
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install rh-ai-engineer
-```
-
-Or for local development:
-
-```bash
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install rh-ai-engineer
+lola install -f rh-ai-engineer -a claude-code
 ```
 
 ### Installation (Cursor)
 
 ```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-ai-engineer ~/.cursor/plugins/rh-ai-engineer
+lola install -f rh-ai-engineer -a cursor
 ```
 
 ### MCP configuration

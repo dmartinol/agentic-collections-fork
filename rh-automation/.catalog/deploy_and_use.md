@@ -31,22 +31,13 @@ Module path: **`rh-automation`** in **`marketplace/rh-agentic-collection.yml`**.
 ### Installation (Claude Code)
 
 ```bash
-claude plugin marketplace add https://github.com/RHEcosystemAppEng/agentic-collections
-claude plugin install rh-automation
-```
-
-Or for local development:
-
-```bash
-claude plugin marketplace add /path/to/agentic-collections
-claude plugin install rh-automation
+lola install -f rh-automation -a claude-code
 ```
 
 ### Installation (Cursor)
 
 ```bash
-git clone https://github.com/RHEcosystemAppEng/agentic-collections.git
-cp -r agentic-collections/rh-automation ~/.cursor/plugins/rh-automation
+lola install -f rh-automation -a cursor
 ```
 
 ### MCP configuration
