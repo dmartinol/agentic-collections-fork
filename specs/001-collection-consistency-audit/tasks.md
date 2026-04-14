@@ -19,10 +19,10 @@
 
 **Purpose**: Create the audit implementation scaffold and policy/config entry points.
 
-- [ ] T001 Create audit script package directory at `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/`
-- [ ] T002 Create CLI entrypoint scaffold in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit.py`
-- [ ] T003 [P] Create rule catalog file in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_rules.yml`
-- [ ] T004 [P] Add consistency audit Make target definitions in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/Makefile`
+- [X] T001 Create audit script package directory at `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/`
+- [X] T002 Create CLI entrypoint scaffold in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit.py`
+- [X] T003 [P] Create rule catalog file in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_rules.yml`
+- [X] T004 [P] Add consistency audit Make target definitions in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/Makefile`
 
 ---
 
@@ -32,13 +32,13 @@
 
 **CRITICAL**: User story work starts only after this phase.
 
-- [ ] T005 Implement repository file discovery utilities in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/discovery.py`
-- [ ] T006 [P] Implement canonical source loaders for marketplace/readme/docs assets in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/sources.py`
-- [ ] T007 [P] Implement findings and severity model objects from data model in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/models.py`
-- [ ] T008 Implement audit-report and CI-violations schema validators in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/contracts.py`
-- [ ] T009 Implement severity-to-CI enforcement mapper (`fail|warn|report`) in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/enforcement.py`
-- [ ] T010 Implement JSON/Markdown report writers using schema contracts in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/reporting.py`
-- [ ] T011 Wire CLI flags (`--format`, `--output`, `--ci`, `--changed-only`) to foundational modules in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit.py`
+- [X] T005 Implement repository file discovery utilities in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/discovery.py`
+- [X] T006 [P] Implement canonical source loaders for marketplace/readme/docs assets in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/sources.py`
+- [X] T007 [P] Implement findings and severity model objects from data model in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/models.py`
+- [X] T008 Implement audit-report and CI-violations schema validators in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/contracts.py`
+- [X] T009 Implement severity-to-CI enforcement mapper (`fail|warn|report`) in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/enforcement.py`
+- [X] T010 Implement JSON/Markdown report writers using schema contracts in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/reporting.py`
+- [X] T011 Wire CLI flags (`--format`, `--output`, `--ci`, `--changed-only`) to foundational modules in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit.py`
 
 **Checkpoint**: Foundation complete; user-story audits can now be implemented independently.
 
@@ -52,14 +52,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Implement pack-scope matrix row generation in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/matrix.py`
-- [ ] T013 [US1] Implement marketplace registration and canonical version checks against `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/marketplace/rh-agentic-collection.yml` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/version_checks.py`
-- [ ] T014 [US1] Implement root and pack README version reconciliation checks for `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-sre/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-developer/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/ocp-admin/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-support-engineer/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-virt/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-ai-engineer/README.md`, and `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-automation/README.md` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/readme_version_checks.py`
-- [ ] T015 [US1] Implement dedicated root README claim drift check (skill count totals and “agents vs orchestration skills” wording) in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/readme_claim_checks.py`
-- [ ] T016 [US1] Implement dedicated rh-support-engineer policy branch check (registered vs explicit exclusion note) in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/scope_policy_checks.py`
-- [ ] T017 [US1] Add explicit `rh-support-engineer` policy documentation section in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/README.md`
-- [ ] T018 [US1] Implement baseline severity summary aggregation (blocking/high/medium/informational) in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/summary.py`
-- [ ] T019 [US1] Validate that README and marketplace references are internally consistent by running and documenting output examples in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
+- [X] T012 [P] [US1] Implement pack-scope matrix row generation in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/matrix.py`
+- [X] T013 [US1] Implement marketplace registration and canonical version checks against `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/marketplace/rh-agentic-collection.yml` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/version_checks.py`
+- [X] T014 [US1] Implement root and pack README version reconciliation checks for `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-sre/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-developer/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/ocp-admin/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-support-engineer/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-virt/README.md`, `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-ai-engineer/README.md`, and `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/rh-automation/README.md` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/readme_version_checks.py`
+- [X] T015 [US1] Implement dedicated root README claim drift check (skill count totals and “agents vs orchestration skills” wording) in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/readme_claim_checks.py`
+- [X] T016 [US1] Implement dedicated rh-support-engineer policy branch check (registered vs explicit exclusion note) in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/scope_policy_checks.py`
+- [X] T017 [US1] Add explicit `rh-support-engineer` policy documentation section in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/README.md`
+- [X] T018 [US1] Implement baseline severity summary aggregation (blocking/high/medium/informational) in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/summary.py`
+- [X] T019 [US1] Validate that README and marketplace references are internally consistent by running and documenting output examples in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
 
 **Checkpoint**: Baseline matrix and authoritative source alignment are functional and independently verifiable.
 
@@ -73,12 +73,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Implement skill frontmatter model/color scanner for `skills/*/SKILL.md` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/model_metadata_checks.py`
-- [ ] T021 [US2] Update `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/validate_skill_design.py` to require `model` presence and enforce valid model values aligned with repository policy
-- [ ] T022 [US2] Update `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/SKILL_DESIGN_PRINCIPLES.md` where necessary to keep model/color policy and enforcement statements consistent with validators
-- [ ] T023 [US2] Add model/color policy consistency checks between shell and Python validators in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/validator_alignment_checks.py`
-- [ ] T024 [US2] Update local validation guidance for model policy enforcement in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/README.md`
-- [ ] T025 [US2] Verify skill model/color policy checks are enforceable via script by running documented commands and recording expected pass/fail behavior in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
+- [X] T020 [P] [US2] Implement skill frontmatter model/color scanner for `skills/*/SKILL.md` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/model_metadata_checks.py`
+- [X] T021 [US2] Update `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/validate_skill_design.py` to require `model` presence and enforce valid model values aligned with repository policy
+- [X] T022 [US2] Update `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/SKILL_DESIGN_PRINCIPLES.md` where necessary to keep model/color policy and enforcement statements consistent with validators
+- [X] T023 [US2] Add model/color policy consistency checks between shell and Python validators in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/validator_alignment_checks.py`
+- [X] T024 [US2] Update local validation guidance for model policy enforcement in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/README.md`
+- [X] T025 [US2] Verify skill model/color policy checks are enforceable via script by running documented commands and recording expected pass/fail behavior in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
 
 **Checkpoint**: Model/frontmatter policy is explicit, validator-aligned, and script-enforceable.
 
@@ -92,14 +92,14 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Implement style token extraction and hardcoded style detection for `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/styles.css` and `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/app.js` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/style_checks.py`
-- [ ] T027 [P] [US3] Implement icon and title mapping completeness checks for `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/icons.json` and `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/plugins.json` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/icon_mapping_checks.py`
-- [ ] T028 [US3] Implement MCP presentation metadata consistency checks for `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/mcp.json` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/mcp_metadata_checks.py`
-- [ ] T029 [US3] Refactor conflicting hardcoded style values to canonical token usage in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/app.js`
-- [ ] T030 [US3] Add optional centralized style token metadata file at `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/style-tokens.json` and align docs checks to it where practical
-- [ ] T031 [US3] Add CI drift-check step for consistency audit in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/.github/workflows/compliance-check.yml`
-- [ ] T032 [US3] Add changed-scope consistency audit invocation for PRs in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/.github/workflows/skill-spec-report.yml`
-- [ ] T033 [US3] Verify docs-site style tokens and icon mappings are complete and single-sourced where possible, and document verification procedure in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
+- [X] T026 [P] [US3] Implement style token extraction and hardcoded style detection for `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/styles.css` and `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/app.js` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/style_checks.py`
+- [X] T027 [P] [US3] Implement icon and title mapping completeness checks for `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/icons.json` and `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/plugins.json` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/icon_mapping_checks.py`
+- [X] T028 [US3] Implement MCP presentation metadata consistency checks for `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/mcp.json` in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/scripts/consistency_audit_lib/checks/mcp_metadata_checks.py`
+- [X] T029 [US3] Refactor conflicting hardcoded style values to canonical token usage in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/app.js`
+- [X] T030 [US3] Add optional centralized style token metadata file at `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/style-tokens.json` and align docs checks to it where practical
+- [X] T031 [US3] Add CI drift-check step for consistency audit in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/.github/workflows/compliance-check.yml`
+- [X] T032 [US3] Add changed-scope consistency audit invocation for PRs in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/.github/workflows/skill-spec-report.yml`
+- [X] T033 [US3] Verify docs-site style tokens and icon mappings are complete and single-sourced where possible, and document verification procedure in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
 
 **Checkpoint**: Visual/style consistency and CI drift prevention are operational.
 
@@ -109,10 +109,10 @@
 
 **Purpose**: Final documentation, contributor guidance, and rollout hardening.
 
-- [ ] T034 [P] Update consistency-audit contributor guide and command reference in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/README.md`
-- [ ] T035 [P] Add remediation and severity interpretation guidance for contributors in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/README.md`
-- [ ] T036 Add rollout notes for fail/warn/report policy phases in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
-- [ ] T037 Run end-to-end local validation commands and capture final expected workflow in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
+- [X] T034 [P] Update consistency-audit contributor guide and command reference in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/docs/README.md`
+- [X] T035 [P] Add remediation and severity interpretation guidance for contributors in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/README.md`
+- [X] T036 Add rollout notes for fail/warn/report policy phases in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
+- [X] T037 Run end-to-end local validation commands and capture final expected workflow in `/wip/src/github.com/RHEcosystemAppEng/agentic-collections/specs/001-collection-consistency-audit/quickstart.md`
 
 ---
 

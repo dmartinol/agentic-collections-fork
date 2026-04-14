@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-04-14T13:52:45.883020+00:00",
+  "branch": "001-collection-consistency-audit",
+  "summary": {
+    "packs_total": 7,
+    "findings_total": 1,
+    "by_severity": {
+      "blocking": 0,
+      "high": 0,
+      "medium": 0,
+      "informational": 1
+    }
+  },
+  "matrix": [
+    {
+      "pack_name": "rh-sre",
+      "registration_status": "registered",
+      "version_consistency_status": "pass",
+      "model_metadata_status": "pass",
+      "claim_reality_status": "pass",
+      "style_icon_status": "pass",
+      "overall_severity": "none",
+      "observed_versions": {}
+    },
+    {
+      "pack_name": "rh-developer",
+      "registration_status": "registered",
+      "version_consistency_status": "pass",
+      "model_metadata_status": "pass",
+      "claim_reality_status": "pass",
+      "style_icon_status": "pass",
+      "overall_severity": "none",
+      "observed_versions": {}
+    },
+    {
+      "pack_name": "ocp-admin",
+      "registration_status": "registered",
+      "version_consistency_status": "pass",
+      "model_metadata_status": "pass",
+      "claim_reality_status": "pass",
+      "style_icon_status": "pass",
+      "overall_severity": "none",
+      "observed_versions": {}
+    },
+    {
+      "pack_name": "rh-support-engineer",
+      "registration_status": "excluded-by-policy",
+      "version_consistency_status": "pass",
+      "model_metadata_status": "pass",
+      "claim_reality_status": "pass",
+      "style_icon_status": "pass",
+      "overall_severity": "informational",
+      "observed_versions": {}
+    },
+    {
+      "pack_name": "rh-virt",
+      "registration_status": "registered",
+      "version_consistency_status": "pass",
+      "model_metadata_status": "pass",
+      "claim_reality_status": "pass",
+      "style_icon_status": "pass",
+      "overall_severity": "none",
+      "observed_versions": {}
+    },
+    {
+      "pack_name": "rh-ai-engineer",
+      "registration_status": "registered",
+      "version_consistency_status": "pass",
+      "model_metadata_status": "pass",
+      "claim_reality_status": "pass",
+      "style_icon_status": "pass",
+      "overall_severity": "none",
+      "observed_versions": {}
+    },
+    {
+      "pack_name": "rh-automation",
+      "registration_status": "registered",
+      "version_consistency_status": "pass",
+      "model_metadata_status": "pass",
+      "claim_reality_status": "pass",
+      "style_icon_status": "pass",
+      "overall_severity": "none",
+      "observed_versions": {}
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "VER-001-rh-support-engineer",
+      "rule_id": "VER-001",
+      "severity": "informational",
+      "artifact_path": "marketplace/rh-agentic-collection.yml",
+      "message": "Pack 'rh-support-engineer' is not listed in marketplace modules",
+      "ci_enforcement": "report",
+      "pack_name": "rh-support-engineer",
+      "expected": "Pack is listed or explicitly excluded by policy",
+      "actual": "Not listed",
+      "autofixable": false
+    }
+  ],
+  "policy_decisions": [],
+  "remediation_plan": []
+}

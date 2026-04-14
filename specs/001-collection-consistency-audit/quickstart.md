@@ -19,9 +19,9 @@ For local incremental work:
 make validate-skill-design-changed
 ```
 
-## 2) Run Consistency Audit (Planned Command Surface)
+## 2) Run Consistency Audit
 
-Planned repository-native commands:
+Repository-native commands:
 
 ```bash
 # Full matrix + findings for all packs
@@ -39,7 +39,58 @@ Expected outputs follow contracts in:
 - `specs/001-collection-consistency-audit/contracts/audit-report.schema.json`
 - `specs/001-collection-consistency-audit/contracts/ci-violations.schema.json`
 
-## 3) Severity and CI Behavior
+## 3) Validate README and Marketplace Consistency
+
+Run the audit and verify that the matrix and findings reflect internal consistency for:
+
+- `marketplace/rh-agentic-collection.yml`
+- root `README.md`
+- pack `README.md` files
+
+Recommended check:
+
+```bash
+uv run python scripts/consistency_audit.py --format markdown --output reports/consistency-audit.md
+```
+
+Then confirm in report output:
+
+- all seven packs appear in matrix rows
+- registration/version findings are severity-classified
+- claim findings include root README skill count and wording checks
+
+## 4) Verify Model/Color Policy Enforceability
+
+Run all model-policy validators:
+
+```bash
+make validate-skill-design
+./scripts/validate-skills.sh
+uv run python scripts/consistency_audit.py --format json --output reports/consistency-audit-model.json
+```
+
+Expected behavior:
+
+- missing/invalid `model` values are flagged as blocking
+- non-standard `color` values are detected and reported
+- validator drift between shell/Python checks is reported
+
+## 5) Verify Style/Icon Single-Source Consistency
+
+Validate style token and icon mapping consistency:
+
+```bash
+uv run python scripts/consistency_audit.py --format json --output reports/consistency-audit-style.json
+```
+
+Confirm that:
+
+- token metadata exists in `docs/style-tokens.json`
+- icon mappings in `docs/icons.json` cover all packs
+- titles in `docs/plugins.json` cover all packs
+- `docs/app.js` avoids hardcoded hex/rgba values where practical
+
+## 6) Severity and CI Behavior
 
 - `blocking`: fail CI immediately
 - `high`: warning-only in initial rollout; promotable to fail on changed scope
@@ -48,7 +99,7 @@ Expected outputs follow contracts in:
 
 CI policy should be explicit and versioned in repository scripts/workflows.
 
-## 4) Safe Metadata Updates
+## 7) Safe Metadata Updates
 
 When updating versions or metadata:
 
@@ -57,7 +108,7 @@ When updating versions or metadata:
 3. If optional plugin metadata exists, reconcile plugin version too
 4. Re-run local validation and consistency audit before opening PR
 
-## 5) Safe Style/Icon Updates
+## 8) Safe Style/Icon Updates
 
 When updating docs presentation:
 
@@ -66,7 +117,7 @@ When updating docs presentation:
 3. Validate MCP presentation metadata in `docs/mcp.json`
 4. Regenerate site data (`make generate`) and verify rendering (`make test`)
 
-## 6) Rh-Support-Engineer Decision Branch
+## 9) Rh-Support-Engineer Decision Branch
 
 You must choose one explicit policy:
 
@@ -75,10 +126,33 @@ You must choose one explicit policy:
 
 If neither path is documented, treat as blocking ambiguity.
 
-## 7) Recommended PR Checklist
+Current policy decision: **intentionally excluded** with explicit root README policy note.
+
+## 10) Rollout Phases (Fail/Warn/Report)
+
+1. **Phase A**: fail on blocking findings, warn on high/medium, report informational.
+2. **Phase B**: fail on blocking + high findings for changed scope.
+3. **Phase C**: strict mode on main for full repository scans.
+
+## 11) Recommended PR Checklist
 
 - Run: `make validate`
 - Run: `make validate-skill-design-changed` (or full)
 - Run consistency audit in markdown and JSON modes
 - Attach/report severity summary and remediation deltas
 - Ensure no new blocking findings before merge
+
+## 12) End-to-End Validation Flow
+
+```bash
+make validate
+make validate-skill-design
+make validate-consistency-audit
+make validate-consistency-audit-ci
+```
+
+Expected result:
+
+- structure and skill checks pass
+- consistency reports are generated in `reports/`
+- CI gate command exits successfully when no blocking findings remain
