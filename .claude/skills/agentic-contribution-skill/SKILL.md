@@ -213,10 +213,9 @@ Ready to commit? (yes/no)
 
    Tier 1+2 validated
 
-   Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
    ```
 4. **Push**: "Push changes? (yes/no)"
-5. **PR**: Use `gh` if available, else provide manual instructions
+5. **PR**: Use `gh` and/or `git` if available, else provide manual instructions
 
 ### Phase 8: Final Summary
 
