@@ -132,6 +132,21 @@ properties:
     type: array
     items:
       type: string
+  documentation_section:
+    description: >
+      Inline markdown, or a one-line sibling fragment ref `#name.md` under .catalog/ (same rules as deploy_and_use).
+    type: string
+    minLength: 1
+  mcp_section:
+    description: >
+      Inline markdown, or a one-line sibling fragment ref `#name.md` under .catalog/ (same rules as deploy_and_use).
+    type: string
+    minLength: 1
+  security_model:
+    description: >
+      Inline markdown, or a one-line sibling fragment ref `#name.md` under .catalog/ (same rules as deploy_and_use).
+    type: string
+    minLength: 1
 $defs:
   catalogSkill:
     type: object

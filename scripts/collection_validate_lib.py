@@ -27,7 +27,11 @@ FORBIDDEN_WORKFLOW_TOKENS = ("TODO:", "TBD", "FIXME:", "Extract from README")
 CATALOG_INLINE_CHAR_LIMIT = 500
 
 # Top-level keys: if present as inline strings, length is checked (skills blocks excluded).
+# File refs use the same `#name.md` form as deploy_and_use — not counted as "inline" for length.
 CATALOG_INLINE_LENGTH_KEYS = ("documentation_section", "mcp_section", "security_model", "summary")
+
+# Optional markdown fields that may be inline or a one-line `#fragment.md` under .catalog/ (like deploy_and_use).
+CATALOG_MARKDOWN_OR_FRAGMENT_KEYS = ("documentation_section", "mcp_section", "security_model")
 
 # Deprecated: use documentation_section / mcp_section / security_model with inline or #fragment.md (same as deploy_and_use).
 DEPRECATED_CATALOG_FILE_KEYS = (
@@ -145,7 +149,7 @@ def validate_deprecated_catalog_file_keys(pack_dir: str, data: Dict[str, Any]) -
 def _collect_top_level_catalog_fragment_refs(data: Dict[str, Any]) -> List[str]:
     """Fragment refs on top-level fields that may be inline markdown or #sibling.md (like deploy_and_use)."""
     refs: List[str] = []
-    for key in ("documentation_section", "mcp_section", "security_model", "deploy_and_use"):
+    for key in (*CATALOG_MARKDOWN_OR_FRAGMENT_KEYS, "deploy_and_use"):
         v = data.get(key)
         if isinstance(v, str) and v.strip() and catalog_fragment_rel_path(v):
             refs.append(v.strip())

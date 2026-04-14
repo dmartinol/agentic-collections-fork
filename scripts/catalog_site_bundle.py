@@ -54,28 +54,16 @@ def bundle_catalog_for_site(pack_dir: str, root: Path) -> Tuple[Optional[Dict[st
     out: Dict[str, Any] = copy.deepcopy(data)
     warnings: list[str] = []
 
-    for key in list(out.keys()):
-        if not (isinstance(key, str) and key.endswith("_file")):
-            continue
+    for key in (*cvl.CATALOG_MARKDOWN_OR_FRAGMENT_KEYS, "deploy_and_use"):
         val = out.get(key)
         if not isinstance(val, str) or not val.strip():
-            del out[key]
+            continue
+        if not cvl.catalog_fragment_rel_path(val):
             continue
         text, err = _read_fragment(pack_dir, val, root)
         if err:
             warnings.append(f"{pack_dir}: {key}: {err}")
-            del out[key]
             continue
-        base = key[: -len("_file")]
-        out[base] = text
-        del out[key]
-
-    dau = out.get("deploy_and_use")
-    if isinstance(dau, str) and cvl.deploy_and_use_external_rel_path(dau):
-        text, err = _read_fragment(pack_dir, dau, root)
-        if err:
-            warnings.append(f"{pack_dir}: deploy_and_use: {err}")
-        else:
-            out["deploy_and_use"] = text
+        out[key] = text
 
     return out, warnings
