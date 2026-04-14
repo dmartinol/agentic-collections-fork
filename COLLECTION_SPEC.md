@@ -10,16 +10,17 @@ This repository uses a **pack-local collection catalog**: curated metadata and s
 |------|---------|
 | `<pack>/.catalog/collection.yaml` | Canonical catalog document (YAML) |
 | `<pack>/.catalog/collection.json` | Deterministic JSON mirror of YAML (regenerate with `make catalog-mirror-json`; CI fails on drift) |
-| `<pack>/.catalog/*.md` | Optional prose fragments, **siblings of** `collection.yaml`. Reference them with **`#<filename>.md`** (quoted in YAML). If inline text in `collection.yaml` for a monitored field exceeds **`CATALOG_INLINE_CHAR_LIMIT`** (500 Unicode code points; see `scripts/collection_validate_lib.py`), move it here and point with the matching `*_file` key or `deploy_and_use` file-ref flavor. |
+| `<pack>/.catalog/*.md` | Optional prose fragments, **siblings of** `collection.yaml`. Reference them with **`#<filename>.md`** (quoted in YAML) **on the same logical field** as inline text would use—for example `documentation_section: '#docs.md'` or `deploy_and_use: '#install.md'`. If inline text exceeds **`CATALOG_INLINE_CHAR_LIMIT`** (500 Unicode code points; see `scripts/collection_validate_lib.py`), move prose into a fragment and set that field to the ref. |
 
 **Multiline YAML in `collection.yaml`:** For `contents.description`, each **`summary_markdown`**, and each **`sample_workflows[].workflow`**, authors should use YAML **literal block scalars** (`field: |`) with indented lines—see step 4 of the [**create-collection**](.claude/skills/create-collection/SKILL.md) skill (reference **`rh-sre`** / **`rh-developer`** `.catalog/collection.yaml`). CI does not assert this style; it is a maintainability convention.
 
-### External references (`#…md` and `*_file`)
+### External references (`#…md` on the same field)
 
 - **Path rule:** refs are **siblings of** `collection.yaml` inside **`<pack>/.catalog/`**. Write **`#install.md`**, not `#.catalog/install.md` (omit the `.catalog/` segment in the string).
-- **Monitored inline length:** for **`summary`**, **`documentation_section`**, **`mcp_section`**, and **`security_model`**, if the value is an inline string longer than **500 Unicode code points**, move the prose to a fragment file and set the matching `*_file` key to **`#<filename>.md`**. For **`deploy_and_use`**, the same limit applies when it is **inline** markdown (not a one-line ref).
+- **One field, two shapes:** for **`deploy_and_use`**, **`documentation_section`**, **`mcp_section`**, and **`security_model`**, the value is either **inline** markdown or a **one-line** fragment ref **`#<filename>.md`**.
+- **Monitored inline length:** for **`summary`**, **`documentation_section`**, **`mcp_section`**, and **`security_model`**, if the value is **inline** (not a `#…md` ref) and longer than **500 Unicode code points**, move the prose to a fragment file and set the **same field** to **`#<filename>.md`**. For **`deploy_and_use`**, the same limit applies when it is **inline** markdown (not a one-line ref).
 - **`deploy_and_use` (two flavors):** (1) **Inline** — markdown in YAML, ≤ **500** code points unless you externalize. (2) **File ref** — one line only: **`#<file>.md`** (same directory as `collection.yaml`). CI resolves the file under **`<pack>/.catalog/`**.
-- **`*_file` values:** must start with **`#`** (e.g. `#documentation_section.md`). Legacy `#.catalog/…` is accepted and normalized.
+- **Fragment ref values:** must start with **`#`** (e.g. `#documentation_section.md`). Legacy `#.catalog/…` is accepted and normalized.
 
 ### `deploy_and_use` content (install + env + MCP)
 

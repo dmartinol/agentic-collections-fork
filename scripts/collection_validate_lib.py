@@ -1,5 +1,6 @@
 """
-Shared validation for <pack>/.catalog/collection.yaml (JSON Schema in catalog/schema.yaml, roster, banners, *_file, JSON mirror).
+Shared validation for <pack>/.catalog/collection.yaml (JSON Schema in catalog/schema.yaml, roster, banners,
+#fragment refs on top-level prose fields, JSON mirror).
 Used by validate_collection_schema.py and validate_collection_compliance.py.
 """
 
@@ -27,6 +28,13 @@ CATALOG_INLINE_CHAR_LIMIT = 500
 
 # Top-level keys: if present as inline strings, length is checked (skills blocks excluded).
 CATALOG_INLINE_LENGTH_KEYS = ("documentation_section", "mcp_section", "security_model", "summary")
+
+# Deprecated: use documentation_section / mcp_section / security_model with inline or #fragment.md (same as deploy_and_use).
+DEPRECATED_CATALOG_FILE_KEYS = (
+    "documentation_section_file",
+    "mcp_section_file",
+    "security_model_file",
+)
 
 _SCHEMA_CACHE: Optional[Dict[str, Any]] = None
 _VALIDATOR_CACHE: Optional[Draft202012Validator] = None
@@ -121,24 +129,32 @@ def validate_yaml_banner(pack_dir: str, root: Optional[Path] = None) -> List[str
     return []
 
 
-def _collect_file_refs(obj: Any, acc: List[str]) -> None:
-    if isinstance(obj, dict):
-        for k, v in obj.items():
-            if isinstance(k, str) and k.endswith("_file") and isinstance(v, str) and v.strip():
-                acc.append(v.strip())
-            _collect_file_refs(v, acc)
-    elif isinstance(obj, list):
-        for item in obj:
-            _collect_file_refs(item, acc)
+def validate_deprecated_catalog_file_keys(pack_dir: str, data: Dict[str, Any]) -> List[str]:
+    """Reject legacy ``*_file`` split keys; prose fields use the same key for inline or ``#fragment.md``."""
+    errs: List[str] = []
+    for k in DEPRECATED_CATALOG_FILE_KEYS:
+        if k in data and data[k] is not None and str(data[k]).strip() != "":
+            base = k[: -len("_file")]
+            errs.append(
+                f"{pack_dir}: deprecated key {k!r}; use {base!r} with inline markdown or "
+                f"a one-line fragment ref like '#{base}.md' (same pattern as deploy_and_use; see COLLECTION_SPEC.md)."
+            )
+    return errs
+
+
+def _collect_top_level_catalog_fragment_refs(data: Dict[str, Any]) -> List[str]:
+    """Fragment refs on top-level fields that may be inline markdown or #sibling.md (like deploy_and_use)."""
+    refs: List[str] = []
+    for key in ("documentation_section", "mcp_section", "security_model", "deploy_and_use"):
+        v = data.get(key)
+        if isinstance(v, str) and v.strip() and catalog_fragment_rel_path(v):
+            refs.append(v.strip())
+    return refs
 
 
 def validate_file_refs(pack_dir: str, data: Dict[str, Any], root: Optional[Path] = None) -> List[str]:
     root = root or REPO_ROOT
-    refs: List[str] = []
-    _collect_file_refs(data, refs)
-    dau = data.get("deploy_and_use")
-    if isinstance(dau, str) and deploy_and_use_external_rel_path(dau):
-        refs.append(dau.strip())
+    refs = _collect_top_level_catalog_fragment_refs(data)
     errs: List[str] = []
     pack_root = root / pack_dir
     catalog_dir = (pack_root / ".catalog").resolve()
@@ -251,12 +267,13 @@ def validate_schema_instance(pack_dir: str, data: Dict[str, Any]) -> List[str]:
 def validate_pack_iteration3(
     pack_dir: str, root: Optional[Path] = None, check_banner: bool = True
 ) -> List[str]:
-    """Iteration 3: schema + *_file + roster + optional YAML banner (no collection.json mirror)."""
+    """Iteration 3: schema + fragment refs + roster + optional YAML banner (no collection.json mirror)."""
     root = root or REPO_ROOT
     data, errs = read_yaml_catalog(pack_dir, root)
     if errs or data is None:
         return errs
     out: List[str] = []
+    out.extend(validate_deprecated_catalog_file_keys(pack_dir, data))
     out.extend(validate_schema_instance(pack_dir, data))
     out.extend(validate_file_refs(pack_dir, data, root))
     out.extend(validate_skill_roster(pack_dir, data, root))
@@ -340,10 +357,13 @@ def validate_catalog_inline_length(pack_dir: str, data: Dict[str, Any]) -> List[
         val = data.get(key)
         if not isinstance(val, str):
             continue
+        if catalog_fragment_rel_path(val):
+            continue
         if len(val) > CATALOG_INLINE_CHAR_LIMIT:
             errs.append(
                 f"{pack_dir}: {key} is {len(val)} chars (limit {CATALOG_INLINE_CHAR_LIMIT}); "
-                f"use a sibling .md file and {key}_file: #<filename>.md"
+                f"move prose to a sibling .md under .catalog/ and set {key}: '#<filename>.md' "
+                f"(same pattern as deploy_and_use)."
             )
     dau = data.get("deploy_and_use")
     if isinstance(dau, str) and not deploy_and_use_external_rel_path(dau):

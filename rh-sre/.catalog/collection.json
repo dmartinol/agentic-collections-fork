@@ -108,7 +108,7 @@
   },
   "deploy_and_use": "#deploy_and_use.md",
   "description": "Site reliability engineering tools and automation for managing Red Hat platforms and infrastructure.",
-  "documentation_section_file": "#documentation_section.md",
+  "documentation_section": "#documentation_section.md",
   "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
   "id": "rh-sre",
   "keywords": [
@@ -127,7 +127,7 @@
     "Claude Code",
     "Cursor"
   ],
-  "mcp_section_file": "#mcp_section.md",
+  "mcp_section": "#mcp_section.md",
   "name": "Red Hat SRE Agentic Collection",
   "personas": [
     "Site Reliability Engineer"
@@ -215,7 +215,7 @@
       "workflow": "User: \"Execute the CVE remediation playbook\"\n- playbook-executor skill:\n  - Validates AAP prerequisites\n  - Lists and selects job template\n  - Offers dry-run first (check mode)\n  - Proceeds to actual execution after approval\n  - Monitors job status and reports results\n"
     }
   ],
-  "security_model_file": "#security_model.md",
+  "security_model": "#security_model.md",
   "summary": "The rh-sre collection provides skills for site reliability tasks.",
   "support_level": "Unknown",
   "version": "0.1.0"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Iteration 3: validate .catalog/collection.yaml (presence, schema, roster, *_file, YAML banner)."""
+"""Iteration 3: validate .catalog/collection.yaml (presence, schema, roster, #fragment refs, YAML banner)."""
 
 import sys
 from pathlib import Path

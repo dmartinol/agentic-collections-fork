@@ -88,6 +88,25 @@ properties:
   deploy_and_use:
     type: string
     minLength: 1
+    description: >
+      Inline markdown (≤500 code points unless externalized) or a one-line fragment ref
+      '#filename.md' sibling under .catalog/.
+  documentation_section:
+    type: string
+    minLength: 1
+    description: >
+      How documentation is organized; inline markdown or one-line '#fragment.md' under .catalog/
+      (same convention as deploy_and_use).
+  mcp_section:
+    type: string
+    minLength: 1
+    description: >
+      MCP usage summary; inline or '#fragment.md' under .catalog/.
+  security_model:
+    type: string
+    minLength: 1
+    description: >
+      Security posture narrative; inline or '#fragment.md' under .catalog/.
   sample_workflows:
     type: array
     minItems: 1

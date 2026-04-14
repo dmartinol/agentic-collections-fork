@@ -125,7 +125,7 @@
   },
   "deploy_and_use": "#deploy_and_use.md",
   "description": "Plugins for building and deploying applications on Red Hat platforms.",
-  "documentation_section_file": "#documentation_section.md",
+  "documentation_section": "#documentation_section.md",
   "homepage": "https://github.com/RHEcosystemAppEng/agentic-collections",
   "id": "rh-developer",
   "keywords": [
@@ -147,7 +147,7 @@
     "Claude Code",
     "Cursor"
   ],
-  "mcp_section_file": "#mcp_section.md",
+  "mcp_section": "#mcp_section.md",
   "name": "Red Hat Developer Agentic Collection",
   "personas": [
     "Application developer"
@@ -220,7 +220,7 @@
       "workflow": "User: \"My pod keeps restarting\"\n- `/debug-pod` inspects events and logs\n- If networking suspected, `/debug-network` narrows DNS/Route/Service issues\n"
     }
   ],
-  "security_model_file": "#security_model.md",
+  "security_model": "#security_model.md",
   "summary": "The rh-developer collection provides skills to detect projects, build images (S2I/Helm), deploy to OpenShift or RHEL, validate environments, and debug builds, pods, pipelines, networks, and hosts.",
   "support_level": "Unknown",
   "version": "0.1.0"

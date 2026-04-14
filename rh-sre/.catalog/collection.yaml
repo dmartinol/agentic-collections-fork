@@ -311,6 +311,6 @@ keywords:
 - platforms
 - products
 - automation
-documentation_section_file: '#documentation_section.md'
-mcp_section_file: '#mcp_section.md'
-security_model_file: '#security_model.md'
+documentation_section: '#documentation_section.md'
+mcp_section: '#mcp_section.md'
+security_model: '#security_model.md'
