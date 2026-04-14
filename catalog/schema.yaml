@@ -20,6 +20,7 @@ required:
 - summary
 - contents
 - deploy_and_use
+- mcp_section
 - sample_workflows
 - resources
 properties:

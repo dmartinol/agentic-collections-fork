@@ -67,6 +67,7 @@
     "Claude Code",
     "Cursor"
   ],
+  "mcp_section": "#mcp_section.md",
   "name": "Red Hat OpenShift Administration Agentic Skills Collection",
   "personas": [
     "OpenShift Administrator"

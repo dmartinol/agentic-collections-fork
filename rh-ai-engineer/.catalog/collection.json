@@ -129,6 +129,7 @@
     "Claude Code",
     "Cursor"
   ],
+  "mcp_section": "#mcp_section.md",
   "name": "Red Hat OpenShift AI Engineering Agentic Collection",
   "personas": [
     "Red Hat platform engineer"

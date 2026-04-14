@@ -166,6 +166,7 @@ contents:
   - user_request: "\"Is execution safe?\""
     skill_to_use: execution-risk-analyzer
     reason: "Inventory class, extra_vars scan, scope assessment."
+mcp_section: '#mcp_section.md'
 deploy_and_use: '#deploy_and_use.md'
 sample_workflows:
 - name: "Governed production deploy"

@@ -158,6 +158,7 @@ contents:
   - user_request: "\"Rebalance\" or \"drain node\""
     skill_to_use: vm-rebalance
     reason: "Migrations for load and maintenance."
+mcp_section: '#mcp_section.md'
 deploy_and_use: '#deploy_and_use.md'
 sample_workflows:
 - name: "Create and verify VM"

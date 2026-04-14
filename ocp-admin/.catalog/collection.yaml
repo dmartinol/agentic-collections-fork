@@ -72,6 +72,7 @@ contents:
   - user_request: '"Fleet health" or "multi-cluster report from kubeconfig"'
     skill_to_use: cluster-report
     reason: Read-only aggregation after OpenShift context verification.
+mcp_section: '#mcp_section.md'
 deploy_and_use: '#deploy_and_use.md'
 sample_workflows:
 - name: Assisted install then verify

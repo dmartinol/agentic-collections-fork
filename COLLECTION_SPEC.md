@@ -63,7 +63,7 @@ When multiple sources could supply the same logical field:
 
 ## Completeness and CI
 
-All **required** schema fields must be present on merge to `main` (no empty placeholders, no `TODO:` / `TBD` in `sample_workflows.workflow`). CI runs **`make validate`** (includes structure + **collection compliance**).
+All **required** schema fields must be present on merge to `main` (no empty placeholders, no `TODO:` / `TBD` in `sample_workflows.workflow`). Author field values so they stay aligned with **`CLAUDE.md`**, **`mcps.json`**, and **`README.md`** where those sources define behavior; fragment refs follow [External references](#external-references-md-on-the-same-field). CI runs **`make validate`** (includes structure + **collection compliance**).
 
 ## Related
 
