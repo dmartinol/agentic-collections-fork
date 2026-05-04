@@ -2,8 +2,8 @@
   "status": "pass",
   "failure_threshold": "blocking>0",
   "blocking_count": 0,
-  "high_count": 5,
+  "high_count": 2,
   "medium_count": 0,
-  "informational_count": 1,
+  "informational_count": 0,
   "violations": []
 }

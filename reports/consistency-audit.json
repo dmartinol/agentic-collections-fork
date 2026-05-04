@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-04-21T12:52:58.750389+00:00",
+  "generated_at": "2026-05-04T12:15:03.912956+00:00",
   "branch": "001-collection-consistency-audit",
   "summary": {
-    "packs_total": 7,
-    "findings_total": 6,
+    "packs_total": 6,
+    "findings_total": 2,
     "by_severity": {
       "blocking": 0,
-      "high": 5,
+      "high": 2,
       "medium": 0,
-      "informational": 1
+      "informational": 0
     }
   },
   "matrix": [
@@ -41,16 +41,6 @@
       "claim_reality_status": "warn",
       "style_icon_status": "warn",
       "overall_severity": "none",
-      "observed_versions": {}
-    },
-    {
-      "pack_name": "rh-support-engineer",
-      "registration_status": "excluded-by-policy",
-      "version_consistency_status": "warn",
-      "model_metadata_status": "pass",
-      "claim_reality_status": "warn",
-      "style_icon_status": "warn",
-      "overall_severity": "high",
       "observed_versions": {}
     },
     {
@@ -86,30 +76,6 @@
   ],
   "findings": [
     {
-      "finding_id": "VER-001-rh-support-engineer",
-      "rule_id": "VER-001",
-      "severity": "informational",
-      "artifact_path": "marketplace/rh-agentic-collection.yml",
-      "message": "Pack 'rh-support-engineer' is not listed in marketplace modules",
-      "ci_enforcement": "report",
-      "pack_name": "rh-support-engineer",
-      "expected": "Pack is listed or explicitly excluded by policy",
-      "actual": "Not listed",
-      "autofixable": false
-    },
-    {
-      "finding_id": "VER-002-MISSING-rh-support-engineer",
-      "rule_id": "VER-002",
-      "severity": "high",
-      "artifact_path": "rh-support-engineer/README.md",
-      "message": "Pack README missing for 'rh-support-engineer'",
-      "ci_enforcement": "warn",
-      "pack_name": "rh-support-engineer",
-      "expected": "README exists with version reference",
-      "actual": "README missing",
-      "autofixable": false
-    },
-    {
       "finding_id": "CLM-001-ROOT-SKILL-TOTAL",
       "rule_id": "CLM-001",
       "severity": "high",
@@ -119,30 +85,6 @@
       "pack_name": null,
       "expected": "62",
       "actual": "63",
-      "autofixable": false
-    },
-    {
-      "finding_id": "VIS-002-MISSING-ICON-rh-support-engineer",
-      "rule_id": "VIS-002",
-      "severity": "high",
-      "artifact_path": "docs/icons.json",
-      "message": "Missing icon mapping for pack 'rh-support-engineer'",
-      "ci_enforcement": "warn",
-      "pack_name": "rh-support-engineer",
-      "expected": "Pack icon exists in docs/icons.json",
-      "actual": "No icon mapping",
-      "autofixable": false
-    },
-    {
-      "finding_id": "VIS-002-MISSING-PLUGIN-TITLE-rh-support-engineer",
-      "rule_id": "VIS-002",
-      "severity": "high",
-      "artifact_path": "docs/plugins.json",
-      "message": "Missing plugin display metadata for pack 'rh-support-engineer'",
-      "ci_enforcement": "warn",
-      "pack_name": "rh-support-engineer",
-      "expected": "Pack title exists in docs/plugins.json",
-      "actual": "No plugin metadata",
       "autofixable": false
     },
     {

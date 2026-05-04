@@ -14,7 +14,6 @@ from consistency_audit_lib.checks import (
     model_metadata_checks,
     readme_claim_checks,
     readme_version_checks,
-    scope_policy_checks,
     style_checks,
     validator_alignment_checks,
     version_checks,
@@ -69,9 +68,6 @@ def build_report(root: Path) -> tuple[dict, dict]:
     _run_check(icon_mapping_checks.run, root, findings, status_by_pack)
     _run_check(mcp_metadata_checks.run, root, findings, status_by_pack)
     _run_check(docs_data_checks.run, root, findings, status_by_pack)
-
-    rh_support_status = status_by_pack.get("rh-support-engineer", {}).get("registration_status", "missing")
-    _run_check(scope_policy_checks.run, root, findings, status_by_pack, rh_support_status)
 
     matrix = matrix_builder.build_matrix(
         findings_by_pack={

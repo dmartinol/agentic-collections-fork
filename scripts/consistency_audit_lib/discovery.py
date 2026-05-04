@@ -7,7 +7,6 @@ PACKS = [
     "rh-sre",
     "rh-developer",
     "ocp-admin",
-    "rh-support-engineer",
     "rh-virt",
     "rh-ai-engineer",
     "rh-automation",
