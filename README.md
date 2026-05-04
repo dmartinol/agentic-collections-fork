@@ -84,7 +84,7 @@ for m in ocp-admin rh-ai-engineer rh-automation rh-developer rh-sre rh-virt; do 
 
 ## 📦 Available Plugins
 
-7 persona-focused plugins with **60+ production-ready skills**:
+6 persona-focused plugins with **60+ production-ready skills**:
 
 | Plugin | Version | Skills | Description | Personas |
 |--------|---------|--------|-------------|----------|
@@ -94,15 +94,8 @@ for m in ocp-admin rh-ai-engineer rh-automation rh-developer rh-sre rh-virt; do 
 | **[ocp-admin](ocp-admin/README.md)** | 1.0.0 | 3 | Multi-cluster management, health reports, monitoring | OpenShift Administrators |
 | **[rh-ai-engineer](rh-ai-engineer/README.md)** | 1.0.0 | 12 | Model serving, vLLM, KServe, NVIDIA NIM | AI/ML Engineers |
 | **[rh-automation](rh-automation/README.md)** | 1.0.0 | 11 | Ansible Automation Platform governance, safety checks | Automation Leads |
-| **[rh-support-engineer](rh-support-engineer/README.md)** | 1.0.0 | 0* | Technical support and troubleshooting | Support Engineers |
 
-**Total:** 63 skills across 7 plugins | **Standalone Agents:** 0 | **Orchestration:** Delivered through orchestration skills where applicable | **License:** Apache 2.0 | **Status:** Production Ready
-
-<sub>* Coming soon</sub>
-
-### rh-support-engineer policy
-
-`rh-support-engineer` is intentionally excluded from `marketplace/rh-agentic-collection.yml` while content remains in a pre-release placeholder state. This exclusion is explicit policy (not an omission), and consistency checks treat this pack as `excluded-by-policy` until it is formally registered.
+**Total:** 63 skills across 6 plugins | **Standalone Agents:** 0 | **Orchestration:** Delivered through orchestration skills where applicable | **License:** Apache 2.0 | **Status:** Production Ready
 
 ---
 

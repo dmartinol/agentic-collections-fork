@@ -11,7 +11,7 @@ Defines one auditable policy rule.
 | `rule_id` | string | Stable identifier (example: `VER-001`) |
 | `scope` | enum | `pack` \| `skill` \| `docs-site` \| `marketplace` |
 | `severity` | enum | `blocking` \| `high` \| `medium` \| `informational` |
-| `check_method` | enum | `script` \| `schema` \| `regex` \| `computed` \| `manual-policy` |
+| `check_method` | enum | `script` \| `schema` \| `regex` \| `computed` |
 | `autofixable` | boolean | Whether automated remediation can be safely applied |
 | `source_of_truth_files` | string[] | Authoritative file path list used for validation |
 | `description` | string | Rule intent and pass criteria |
@@ -24,7 +24,7 @@ Represents one row in the per-pack consistency matrix.
 | Field | Type | Description |
 |---|---|---|
 | `pack_name` | string | Pack identifier (example: `rh-sre`) |
-| `registration_status` | enum | `registered` \| `missing` \| `excluded-by-policy` |
+| `registration_status` | enum | `registered` \| `missing` |
 | `canonical_version` | string or null | Canonical version from source-of-truth (if applicable) |
 | `observed_versions` | object | Versions found in root README, pack README, plugin metadata |
 | `model_metadata_summary` | object | Skill count, compliant count, missing model count, invalid values |
@@ -86,7 +86,6 @@ Prioritized action derived from one or more findings.
 | `VIS-001` | docs-site | medium | regex | true | `docs/styles.css` |
 | `VIS-002` | docs-site | high | regex | true | `docs/app.js`, `docs/icons.json`, `docs/plugins.json`, `docs/mcp.json` |
 | `CLM-001` | pack | high | computed | false | `README.md`, `<pack>/README.md`, filesystem counts |
-| `SCP-001` | pack | blocking | manual-policy | false | Policy note + marketplace state for `rh-support-engineer` |
 
 ## 3) Per-Pack Matrix Projection
 
@@ -109,10 +108,9 @@ Each `PackAuditRow` is rendered to matrix columns:
 | `medium` | warn | warn (optionally fail on changed scope later) |
 | `informational` | report | report |
 
-## 5) Rh-Support-Engineer Decision Branch Model
+## 5) Registration Status Semantics
 
-`PackAuditRow.registration_status` and `PolicyDecision.topic=scope-policy` must encode one of:
+`PackAuditRow.registration_status` uses:
 
-- `registered`: normal version and claim checks apply.
-- `excluded-by-policy`: explicit policy note required; version parity checks limited.
-- `missing`: no registration and no policy note -> `SCP-001` blocking finding.
+- `registered`: pack exists in source-of-truth registration and receives full parity checks.
+- `missing`: pack is absent from registration and is flagged by applicable registration/version rules.

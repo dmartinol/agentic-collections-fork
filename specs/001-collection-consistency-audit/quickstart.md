@@ -55,7 +55,7 @@ uv run python scripts/consistency_audit.py --format markdown --output reports/co
 
 Then confirm in report output:
 
-- all seven packs appear in matrix rows
+- all in-scope packs appear in matrix rows
 - registration/version findings are severity-classified
 - claim findings include root README skill count and wording checks
 
@@ -117,24 +117,13 @@ When updating docs presentation:
 3. Validate MCP presentation metadata in `docs/mcp.json`
 4. Regenerate site data (`make generate`) and verify rendering (`make test`)
 
-## 9) Rh-Support-Engineer Decision Branch
-
-You must choose one explicit policy:
-
-- **Register now**: add marketplace module and enforce full parity checks.
-- **Intentionally excluded**: keep unregistered but document explicit exclusion policy and rationale.
-
-If neither path is documented, treat as blocking ambiguity.
-
-Current policy decision: **intentionally excluded** with explicit root README policy note.
-
-## 10) Rollout Phases (Fail/Warn/Report)
+## 9) Rollout Phases (Fail/Warn/Report)
 
 1. **Phase A**: fail on blocking findings, warn on high/medium, report informational.
 2. **Phase B**: fail on blocking + high findings for changed scope.
 3. **Phase C**: strict mode on main for full repository scans.
 
-## 11) Recommended PR Checklist
+## 10) Recommended PR Checklist
 
 - Run: `make validate`
 - Run: `make validate-skill-design-changed` (or full)
@@ -142,7 +131,7 @@ Current policy decision: **intentionally excluded** with explicit root README po
 - Attach/report severity summary and remediation deltas
 - Ensure no new blocking findings before merge
 
-## 12) End-to-End Validation Flow
+## 11) End-to-End Validation Flow
 
 ```bash
 make validate

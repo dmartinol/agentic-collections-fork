@@ -17,7 +17,7 @@ description: |
   - NEVER execute playbooks using ansible-playbook CLI
   - ALWAYS delegate execution to /playbook-executor skill
 model: inherit
-color: green
+color: yellow
 ---
 
 # Ansible Playbook Generator Skill

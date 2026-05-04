@@ -14,11 +14,11 @@ It is intentionally scoped to pre-rebase planning and execution ordering.
 
 - [X] **F001 (D0.1)** Update pack scope in `scripts/consistency_audit_lib/discovery.py` to remove `rh-support-engineer`.
 - [X] **F002 (D0.1)** Remove `rh-support-engineer` policy branch logic from runtime audit code (`scripts/consistency_audit_lib/checks/scope_policy_checks.py` and wiring in `scripts/consistency_audit.py`).
-- [ ] **F003 (D0.1)** Remove `SCP-001` from `scripts/consistency_rules.yml` and align rule catalog references in docs/spec artifacts.
-- [ ] **F004 (D0.1)** Update scope-dependent checks and docs to six-pack scope (`README.md`, `specs/001-collection-consistency-audit/spec.md`, `plan.md`, `research.md`, `data-model.md`, `quickstart.md`).
-- [ ] **F005 (D0.3)** Set `color: yellow` in `rh-sre/skills/playbook-generator/SKILL.md`.
-- [ ] **F006 (D0.2)** Keep model-policy enforcement unchanged (`inherit|sonnet|haiku`) and verify docs/validators remain aligned (no inherit-only migration work).
-- [ ] **F007 (D0.4)** Remove/de-emphasize `spec-kit` workflow references from contributor-facing docs and ensure spec-kit artifacts are not treated as required project workflow.
+- [X] **F003 (D0.1)** Remove `SCP-001` from `scripts/consistency_rules.yml` and align rule catalog references in docs/spec artifacts.
+- [X] **F004 (D0.1)** Update scope-dependent checks and docs to six-pack scope (`README.md`, `specs/001-collection-consistency-audit/spec.md`, `plan.md`, `research.md`, `data-model.md`, `quickstart.md`).
+- [X] **F005 (D0.3)** Set `color: yellow` in `rh-sre/skills/playbook-generator/SKILL.md`.
+- [X] **F006 (D0.2)** Keep model-policy enforcement unchanged (`inherit|sonnet|haiku`) and verify docs/validators remain aligned (no inherit-only migration work).
+- [X] **F007 (D0.4)** Remove/de-emphasize `spec-kit` workflow references from contributor-facing docs and ensure spec-kit artifacts are not treated as required project workflow.
 
 ## Phase 2 - Remaining Reviewer Feedback (Still Applicable)
 

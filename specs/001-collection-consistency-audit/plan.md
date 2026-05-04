@@ -17,7 +17,7 @@ Introduce a repository-native consistency audit workflow that builds a per-pack 
 **Project Type**: Monorepo policy and validation enhancement  
 **Performance Goals**: Full audit completes within normal validation window and is suitable for PR-time execution on changed scope and full-main execution  
 **Constraints**: Repository-native only; minimal disruption; incremental adoption with clear fail/warn/info boundaries; no secret exposure  
-**Scale/Scope**: 7 packs (`rh-sre`, `rh-developer`, `ocp-admin`, `rh-support-engineer`, `rh-virt`, `rh-ai-engineer`, `rh-automation`) plus docs-site metadata files and marketplace/readme sources
+**Scale/Scope**: 6 packs (`rh-sre`, `rh-developer`, `ocp-admin`, `rh-virt`, `rh-ai-engineer`, `rh-automation`) plus docs-site metadata files and marketplace/readme sources
 
 ## Constitution Check
 
@@ -58,7 +58,6 @@ README.md                                     # Root version/claims that must re
 rh-sre/README.md
 rh-developer/README.md
 ocp-admin/README.md
-rh-support-engineer/README.md
 rh-virt/README.md
 rh-ai-engineer/README.md
 rh-automation/README.md                       # Pack-level version and claims
@@ -92,7 +91,6 @@ scripts/
   - Missing required model frontmatter in any in-scope skill
   - Invalid model values (must be `inherit|sonnet|haiku`)
   - Inconsistent canonical version between marketplace module entry and policy-authoritative pack metadata
-  - Required pack registration/policy state undefined (including `rh-support-engineer`)
 - **High/Medium (warning-only initially, promotable later)**:
   - README claim mismatch (skill/agent/orchestration counts) where metadata can be corrected without runtime breakage
   - Style token drift and hardcoded visual values outside canonical token set
@@ -105,12 +103,6 @@ scripts/
 1. **Phase A**: Generate report + warnings, block only severe metadata violations.
 2. **Phase B**: Require zero high findings on changed scope.
 3. **Phase C**: Enable strict mode for full repository on main.
-
-## Rh-Support-Engineer Policy Branch
-
-- **Branch 1 - Register**: Add module registration in `marketplace/rh-agentic-collection.yml`, assign canonical version, and enforce parity like other packs.
-- **Branch 2 - Intentionally Excluded**: Keep unregistered, but require explicit policy note in audit output and repository docs declaring exclusion rationale and expected future state.
-- **Decision Rule**: If unregistered and no explicit policy note exists, classify as **blocking** due to ambiguous distribution state.
 
 ## Complexity Tracking
 

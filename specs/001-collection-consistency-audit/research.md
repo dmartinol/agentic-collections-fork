@@ -52,10 +52,9 @@
 - model metadata: skill counts, missing/invalid model declarations, policy compliance
 - claim-to-reality: README claim values vs discovered filesystem counts
 - style/icon mapping: plugin title/icon mappings, token usage references, hardcoded style evidence
-- policy state: inclusion/exclusion rationale, especially for `rh-support-engineer`
 
 **Rationale**:
-- Matrix rows provide a deterministic, comparable baseline across all seven packs.
+- Matrix rows provide a deterministic, comparable baseline across all in-scope packs.
 - Supports severity classification and CI policy decisions from one unified model.
 
 **Alternatives considered**:
@@ -90,18 +89,13 @@
 - Fail on all severities now: rejected due to likely broad initial breakage.
 - Report-only forever: rejected because no drift prevention.
 
-## Decision 7: Rh-Support-Engineer Policy Branch
+## Decision 7: Active-Scope Normalization
 
-**Decision**: Make `rh-support-engineer` state explicit through one of two policy branches:
-1. Register in marketplace and enforce full parity.
-2. Intentionally exclude with documented policy note and expected future state.
-
-If neither is true, classify as blocking ambiguity.
+**Decision**: Limit consistency-audit scope to active marketplace/repository packs and remove `rh-support-engineer` from audit coverage.
 
 **Rationale**:
-- Current repository patterns include references to `rh-support-engineer`, while docs generation excludes it in `scripts/generate_pack_data.py`.
-- Ambiguous inclusion creates repeated consistency conflicts.
+- Prevents recurring false-positive findings against a removed pack.
+- Keeps matrix and CI outputs focused on currently maintained collections.
 
 **Alternatives considered**:
-- Silent exclusion: rejected because hidden policy creates recurring drift.
-- Immediate forced registration: rejected because pack may intentionally be pre-release.
+- Keep policy-based exclusion branch: rejected because it adds maintenance overhead for an out-of-scope pack.

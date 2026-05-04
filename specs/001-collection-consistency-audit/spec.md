@@ -65,7 +65,7 @@ As a repository maintainer, I can apply a remediation plan and validation guardr
 
 ### Functional Requirements
 
-- **FR-001**: System MUST audit the following collections as one scope set: `rh-sre`, `rh-developer`, `ocp-admin`, `rh-support-engineer`, `rh-virt`, `rh-ai-engineer`, and `rh-automation`.
+- **FR-001**: System MUST audit the following collections as one scope set: `rh-sre`, `rh-developer`, `ocp-admin`, `rh-virt`, `rh-ai-engineer`, and `rh-automation`.
 - **FR-002**: System MUST compare collection version values across `marketplace/rh-agentic-collection.yml`, root `README.md`, each pack `README.md`, and any pack-level plugin metadata file when present.
 - **FR-003**: System MUST define and document a canonical source-of-truth policy for collection version values, including precedence when conflicts are detected.
 - **FR-004**: System MUST define and document handling rules for placeholder, missing, or non-listed packs (including packs that exist in repository but are absent from marketplace listing).

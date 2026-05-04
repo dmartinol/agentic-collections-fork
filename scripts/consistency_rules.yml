@@ -16,7 +16,6 @@ rules:
       - rh-sre/README.md
       - rh-developer/README.md
       - ocp-admin/README.md
-      - rh-support-engineer/README.md
       - rh-virt/README.md
       - rh-ai-engineer/README.md
       - rh-automation/README.md
@@ -62,11 +61,3 @@ rules:
     autofixable: false
     source_of_truth_files:
       - README.md
-  - rule_id: SCP-001
-    scope: pack
-    severity: blocking
-    check_method: manual-policy
-    autofixable: false
-    source_of_truth_files:
-      - README.md
-      - marketplace/rh-agentic-collection.yml
