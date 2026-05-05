@@ -3,6 +3,9 @@ name: Skill Security Scan
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - '**/skills/**'
+      - '**/mcps.json'
   workflow_dispatch:
     inputs:
       pr_number:
@@ -18,9 +21,14 @@ on:
           - 'true'
           - 'false'
 
+concurrency:
+  group: security-scan-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pull-requests: write
+  checks: read
 
 jobs:
   security-scan:
@@ -41,6 +49,51 @@ jobs:
           else
             echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Wait for prerequisite checks
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const requiredChecks = ['compliance-check', 'skill-linter'];
+            const sha = context.payload.pull_request.head.sha;
+            const maxWait = 300000; // 5 minutes
+            const interval = 15000; // 15 seconds
+            let elapsed = 0;
+
+            core.info(`Waiting for checks on ${sha}: ${requiredChecks.join(', ')}`);
+
+            while (elapsed < maxWait) {
+              const { data: { check_runs } } = await github.rest.checks.listForRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: sha,
+              });
+
+              const results = requiredChecks.map(name => {
+                const run = check_runs.find(r => r.name === name);
+                return { name, status: run?.status, conclusion: run?.conclusion };
+              });
+
+              const allCompleted = results.every(r => r.status === 'completed');
+              if (allCompleted) {
+                const failed = results.filter(r => r.conclusion !== 'success');
+                if (failed.length > 0) {
+                  const summary = failed.map(r => `${r.name}: ${r.conclusion}`).join(', ');
+                  core.setFailed(`Prerequisite checks failed (${summary}) — skipping security scan to save tokens`);
+                  return;
+                }
+                core.info('All prerequisite checks passed — proceeding with security scan');
+                return;
+              }
+
+              const pending = results.filter(r => r.status !== 'completed').map(r => r.name);
+              core.info(`Waiting for: ${pending.join(', ')} (${elapsed / 1000}s elapsed)`);
+              await new Promise(r => setTimeout(r, interval));
+              elapsed += interval;
+            }
+
+            core.setFailed('Timed out waiting for prerequisite checks — skipping security scan');
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
