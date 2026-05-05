@@ -180,11 +180,12 @@ jobs:
         with:
           script: |
             const fs = require('fs');
+            const marker = '<!-- skill-security-scan -->';
             const prNumber = ${{ steps.pr.outputs.number }};
             const scanResult = '${{ steps.scan.outputs.scan_result }}';
             const icon = scanResult === 'passed' ? '✅' : '❌';
 
-            let body = `## ${icon} Skill Security Scan\n\n`;
+            let body = `${marker}\n## ${icon} Skill Security Scan\n\n`;
 
             if (fs.existsSync('security-reports')) {
               const reports = fs.readdirSync('security-reports').filter(f => f.endsWith('.md'));
@@ -215,7 +216,7 @@ jobs:
             });
 
             const existing = comments.find(c =>
-              c.user.type === 'Bot' && c.body.includes('Skill Security Scan')
+              c.body.startsWith(marker)
             );
 
             if (existing) {
