@@ -9,8 +9,8 @@
         "--network=host",
         "--userns=keep-id:uid=65532,gid=65532",
         "-v", "${KUBECONFIG}:/kubeconfig:ro,Z",
-        "--entrypoint", "/app/kubernetes-mcp-server",
-        "quay.io/ecosystem-appeng/openshift-mcp-server:latest",
+        "--entrypoint", "/openshift-mcp-server",
+        "quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/openshift-mcp-server@sha256:2f52c860f91ab3c8a5129b727bdef0d620e733013f073b10355866c45eafd053",
         "--kubeconfig", "/kubeconfig",
         "--toolsets", "core,kubevirt"
       ],
