@@ -176,64 +176,65 @@ jobs:
 
       - name: Post scan summary
         if: steps.detect.outputs.changed == 'true' && always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const marker = '<!-- skill-security-scan -->';
-            const prNumber = ${{ steps.pr.outputs.number }};
-            const scanResult = '${{ steps.scan.outputs.scan_result }}';
-            const icon = scanResult === 'passed' ? '✅' : '❌';
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- skill-security-scan -->"
+          SCAN_RESULT="${{ steps.scan.outputs.scan_result }}"
+          ARTIFACT_URL="${{ steps.upload.outputs.artifact-url }}"
+          PR_NUMBER="${{ steps.pr.outputs.number }}"
 
-            let body = `${marker}\n## ${icon} Skill Security Scan\n\n`;
+          if [ "$SCAN_RESULT" = "passed" ]; then
+            ICON="✅"
+          else
+            ICON="❌"
+          fi
 
-            if (fs.existsSync('security-reports')) {
-              const reports = fs.readdirSync('security-reports').filter(f => f.endsWith('.md'));
-              if (reports.length === 0) {
-                body += 'No reports generated.\n';
-              } else {
-                for (const report of reports) {
-                  const pack = report.replace('security-report-', '').replace('.md', '');
-                  const content = fs.readFileSync(`security-reports/${report}`, 'utf8');
-                  body += `<details>\n<summary>📋 ${pack}</summary>\n\n${content}\n\n</details>\n\n`;
-                }
-              }
-            } else {
-              body += 'No reports generated.\n';
-            }
+          {
+            echo "$MARKER"
+            echo "## $ICON Skill Security Scan"
+            echo ""
 
-            const artifactUrl = '${{ steps.upload.outputs.artifact-url }}';
-            if (artifactUrl) {
-              body += `\n\n> 📦 [Download security reports](${artifactUrl}) | [Workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
-            } else {
-              body += `\n\n> [Workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
-            }
+            if [ -d "security-reports" ]; then
+              for report in security-reports/security-report-*.md; do
+                [ -f "$report" ] || continue
+                pack=$(basename "$report" .md | sed 's/^security-report-//')
+                echo "<details>"
+                echo "<summary>📋 $pack</summary>"
+                echo ""
+                cat "$report"
+                echo ""
+                echo "</details>"
+                echo ""
+              done
+            else
+              echo "No reports generated."
+            fi
 
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-            });
+            echo ""
+            if [ -n "$ARTIFACT_URL" ]; then
+              echo "> 📦 [Download security reports]($ARTIFACT_URL) | [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            else
+              echo "> [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            fi
+          } > /tmp/comment.md
 
-            const existing = comments.find(c =>
-              c.body.startsWith(marker)
-            );
+          EXISTING_COMMENT_ID=$(gh api --paginate \
+            "/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" \
+            | head -1)
 
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body,
-              });
-            }
+          if [ -n "$EXISTING_COMMENT_ID" ]; then
+            gh api \
+              --method PATCH \
+              "/repos/${{ github.repository }}/issues/comments/$EXISTING_COMMENT_ID" \
+              -f body="$(cat /tmp/comment.md)"
+          else
+            gh pr comment "$PR_NUMBER" \
+              --repo "${{ github.repository }}" \
+              --body-file /tmp/comment.md
+          fi
 
       - name: Check scan results
         if: steps.detect.outputs.changed == 'true'
