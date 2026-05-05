@@ -130,8 +130,21 @@ jobs:
             echo "$PACKS"
           fi
 
-      - name: Run security scan
+      - name: Check scanner credentials
         if: steps.detect.outputs.changed == 'true'
+        id: creds
+        env:
+          SKILL_SCANNER_LLM_API_KEY: ${{ secrets.SKILL_SCANNER_LLM_API_KEY }}
+        run: |
+          if [ -z "$SKILL_SCANNER_LLM_API_KEY" ]; then
+            echo "::warning::SKILL_SCANNER_LLM_API_KEY not available (expected for fork PRs). Skipping security scan."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run security scan
+        if: steps.detect.outputs.changed == 'true' && steps.creds.outputs.available == 'true'
         id: scan
         env:
           SKILL_SCANNER_LLM_API_KEY: ${{ secrets.SKILL_SCANNER_LLM_API_KEY }}
@@ -166,7 +179,7 @@ jobs:
 
       - name: Upload security reports
         id: upload
-        if: steps.detect.outputs.changed == 'true' && always()
+        if: steps.detect.outputs.changed == 'true' && steps.creds.outputs.available == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
           name: security-reports
@@ -175,7 +188,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Post scan summary
-        if: steps.detect.outputs.changed == 'true' && always()
+        if: steps.detect.outputs.changed == 'true' && steps.creds.outputs.available == 'true' && always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -237,7 +250,7 @@ jobs:
           fi
 
       - name: Check scan results
-        if: steps.detect.outputs.changed == 'true'
+        if: steps.detect.outputs.changed == 'true' && steps.creds.outputs.available == 'true'
         run: |
           if [ "${{ steps.scan.outputs.scan_result }}" = "failed" ]; then
             echo "❌ Security scan found MEDIUM or higher severity issues — blocking merge"
