@@ -117,21 +117,77 @@ jobs:
             PACKS=$(bash scripts/detect-changed-packs.sh || true)
           fi
 
-          if [ -z "$PACKS" ]; then
+          PACK_COUNT=$(echo "$PACKS" | grep -c . || true)
+
+          if [ -z "$PACKS" ] || [ "$PACK_COUNT" -eq 0 ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "packs=" >> $GITHUB_OUTPUT
+            echo "pack_count=0" >> $GITHUB_OUTPUT
             echo "No packs with changes detected — skipping security scan"
+          elif [ "$PACK_COUNT" -gt 1 ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "packs<<EOF" >> $GITHUB_OUTPUT
+            echo "$PACKS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "pack_count=$PACK_COUNT" >> $GITHUB_OUTPUT
+            echo "::warning::Multiple packs detected ($PACK_COUNT): $PACKS"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "packs<<EOF" >> $GITHUB_OUTPUT
             echo "$PACKS" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
-            echo "Changed packs detected:"
-            echo "$PACKS"
+            echo "pack_count=1" >> $GITHUB_OUTPUT
+            echo "Changed pack detected: $PACKS"
           fi
 
+      - name: Reject multi-pack PRs
+        if: steps.detect.outputs.changed == 'true' && steps.detect.outputs.pack_count != '1' && github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- skill-security-scan -->"
+          PR_NUMBER="${{ steps.pr.outputs.number }}"
+          PACKS="${{ steps.detect.outputs.packs }}"
+
+          PACK_LIST=""
+          while IFS= read -r pack; do
+            [ -z "$pack" ] && continue
+            PACK_LIST="${PACK_LIST}\n- \`${pack}\`"
+          done <<< "$PACKS"
+
+          {
+            echo "$MARKER"
+            echo "## ⚠️ Skill Security Scan — Skipped"
+            echo ""
+            echo "This PR contains changes in **multiple packs**:"
+            echo -e "$PACK_LIST"
+            echo ""
+            echo "To keep security scans fast and cost-effective, please limit each PR to **one pack only**."
+            echo "Split your changes into separate PRs (one per pack) and the security scan will run automatically."
+          } > /tmp/comment.md
+
+          EXISTING_COMMENT_ID=$(gh api --paginate \
+            "/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" \
+            | head -1)
+
+          if [ -n "$EXISTING_COMMENT_ID" ]; then
+            gh api \
+              --method PATCH \
+              "/repos/${{ github.repository }}/issues/comments/$EXISTING_COMMENT_ID" \
+              -f body="$(cat /tmp/comment.md)"
+          else
+            gh pr comment "$PR_NUMBER" \
+              --repo "${{ github.repository }}" \
+              --body-file /tmp/comment.md
+          fi
+
+          echo "❌ Multiple packs detected — aborting security scan"
+          exit 1
+
       - name: Check scanner credentials
-        if: steps.detect.outputs.changed == 'true'
+        if: steps.detect.outputs.changed == 'true' && steps.detect.outputs.pack_count == '1'
         id: creds
         env:
           SKILL_SCANNER_LLM_API_KEY: ${{ secrets.SKILL_SCANNER_LLM_API_KEY }}
@@ -144,7 +200,7 @@ jobs:
           fi
 
       - name: Run security scan
-        if: steps.detect.outputs.changed == 'true' && steps.creds.outputs.available == 'true'
+        if: steps.detect.outputs.pack_count == '1' && steps.creds.outputs.available == 'true'
         id: scan
         env:
           SKILL_SCANNER_LLM_API_KEY: ${{ secrets.SKILL_SCANNER_LLM_API_KEY }}
@@ -179,7 +235,7 @@ jobs:
 
       - name: Upload security reports
         id: upload
-        if: steps.detect.outputs.changed == 'true' && steps.creds.outputs.available == 'true' && always()
+        if: steps.detect.outputs.pack_count == '1' && steps.creds.outputs.available == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
           name: security-reports
@@ -188,7 +244,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Post scan summary
-        if: steps.detect.outputs.changed == 'true' && steps.creds.outputs.available == 'true' && always()
+        if: steps.detect.outputs.pack_count == '1' && steps.creds.outputs.available == 'true' && always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -250,7 +306,7 @@ jobs:
           fi
 
       - name: Check scan results
-        if: steps.detect.outputs.changed == 'true' && steps.creds.outputs.available == 'true'
+        if: steps.detect.outputs.pack_count == '1' && steps.creds.outputs.available == 'true'
         run: |
           if [ "${{ steps.scan.outputs.scan_result }}" = "failed" ]; then
             echo "❌ Security scan found MEDIUM or higher severity issues — blocking merge"
