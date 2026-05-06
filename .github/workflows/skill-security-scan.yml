@@ -170,12 +170,13 @@ jobs:
   # ---------------------------------------------------------------------------
   scan:
     needs: gate
-    # Run if: authorized via comment, OR called as reusable workflow, OR manual dispatch
+    # Run if: authorized via comment, OR called with inputs (workflow_call / workflow_dispatch).
+    # Note: github.event_name inherits the caller's event in workflow_call, so we detect
+    # reusable calls by checking whether inputs were provided.
     if: |
       always() && (
         (needs.gate.result == 'success' && needs.gate.outputs.authorized == 'true') ||
-        github.event_name == 'workflow_call' ||
-        github.event_name == 'workflow_dispatch'
+        inputs.pr_number != ''
       )
     runs-on: ubuntu-latest
     outputs:
@@ -186,22 +187,22 @@ jobs:
       - name: Resolve inputs
         id: inputs
         run: |
-          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+          if [ -n "${{ inputs.pr_number }}" ]; then
+            # workflow_call or workflow_dispatch — inputs are provided
+            echo "pr_number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
+            echo "head_sha=${{ inputs.head_sha }}" >> "$GITHUB_OUTPUT"
+            echo "scan_all=${{ inputs.scan_all }}" >> "$GITHUB_OUTPUT"
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              echo "standalone=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "standalone=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            # Direct issue_comment — inputs come from the gate job
             echo "pr_number=${{ needs.gate.outputs.pr_number }}" >> "$GITHUB_OUTPUT"
             echo "head_sha=${{ needs.gate.outputs.head_sha }}" >> "$GITHUB_OUTPUT"
             echo "scan_all=${{ needs.gate.outputs.scan_all }}" >> "$GITHUB_OUTPUT"
             echo "standalone=true" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "pr_number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
-            echo "head_sha=" >> "$GITHUB_OUTPUT"
-            echo "scan_all=${{ inputs.scan_all }}" >> "$GITHUB_OUTPUT"
-            echo "standalone=true" >> "$GITHUB_OUTPUT"
-          else
-            # workflow_call — inputs come from the calling workflow
-            echo "pr_number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
-            echo "head_sha=${{ inputs.head_sha }}" >> "$GITHUB_OUTPUT"
-            echo "scan_all=${{ inputs.scan_all }}" >> "$GITHUB_OUTPUT"
-            echo "standalone=false" >> "$GITHUB_OUTPUT"
           fi
 
       # Checkout the PR code to scan. For workflow_dispatch without a head_sha,
