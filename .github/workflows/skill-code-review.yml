@@ -33,7 +33,6 @@ on:
       skipped:
         description: "true if review was skipped (missing credentials)"
         value: ${{ jobs.review.outputs.skipped }}
-    secrets: inherit
 
   # Manual trigger from the Actions tab
   workflow_dispatch:

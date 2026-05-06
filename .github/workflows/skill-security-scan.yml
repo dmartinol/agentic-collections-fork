@@ -38,7 +38,6 @@ on:
       scan_result:
         description: "passed or failed"
         value: ${{ jobs.scan.outputs.scan_result }}
-    secrets: inherit
 
   # Manual trigger from the Actions tab
   workflow_dispatch:
