@@ -238,6 +238,8 @@ Execute when user requests events, troubleshoots errors, or needs installation l
 
 ### Reference Documentation
 - [troubleshooting.md](../../docs/troubleshooting.md) - Cluster status and error diagnosis
+- [PVC Capacity Planning](../../docs/pvc-capacity-planning.md) - Consult when cluster storage details show high PVC usage or approaching capacity
+- [Database Connection Management](../../docs/database-connection-management.md) - Consult when cluster workloads include PostgreSQL with high connection usage
 - **[Documentation Index](../../docs/INDEX.md)** - Complete guide to all ocp-admin documentation (consult for topics not explicitly referenced above)
 
 ## Example Usage
