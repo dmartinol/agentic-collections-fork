@@ -220,6 +220,8 @@ Confirm: yes/no
 
 If user says "no" or wants to reconsider, do not proceed.
 
+**Batch operations**: When the user requests actions on multiple VMs, process each VM individually through the full workflow (Step 1-3) with separate confirmation for each. Never use a single bulk confirmation for multiple VMs.
+
 **Why**: start (consumes resources), stop (interrupts services), restart (brief downtime). User should verify correct VM and understand impact.
 
 ## Security Considerations
@@ -282,7 +284,7 @@ Impact: Running after stop+start. Brief interruption. Monitor app logs.
 ```
 User: "Start web-server in namespace vms"
 Agent: [vm-lifecycle-manager skill]
-       [vm_lifecycle(action="start")]
+       [Checks VM status via resources_get — already Running]
 ## ℹ️ VM Already Running
 VM: `web-server` | Namespace: `vms` | Status: Running
 Result: No action taken - VM already in desired state.
@@ -293,16 +295,18 @@ To restart: "Restart VM web-server in namespace vms"
 
 ```
 User: "Stop VMs web-01, web-02, web-03 in namespace production"
-Agent: [vm-lifecycle-manager skill - batch mode]
-## Batch Lifecycle Operation
-Stopping 3 VMs in 'production': web-01, web-02, web-03
-Impact: All 3 VMs will shut down, services interrupted.
+Agent: [vm-lifecycle-manager skill — processes each VM individually with full workflow]
+
+## VM Lifecycle Operation
+| VM Name | `web-01` | Namespace | `production` | Action | `stop` | graceful shutdown |
 Confirm: yes/no
 User: "yes"
-Agent: [Executes vm_lifecycle for each VM sequentially]
-## ✓ Batch Stop Successful
-- web-01: Stopped
-- web-02: Stopped
-- web-03: Stopped
-All VMs stopped. Resources freed.
+Agent: [vm_lifecycle(namespace="production", name="web-01", action="stop")]
+✓ web-01: Stopped
+
+## VM Lifecycle Operation
+| VM Name | `web-02` | Namespace | `production` | Action | `stop` | graceful shutdown |
+Confirm: yes/no
+User: "yes"
+[...repeats for each VM with individual confirmation...]
 ```
