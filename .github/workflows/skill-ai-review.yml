@@ -1,0 +1,268 @@
+# Skill AI Review Workflow (Orchestrator)
+#
+# Combines security scan + Gemini code review into a single unified report.
+# Calls skill-security-scan.yml and skill-code-review.yml as reusable workflows.
+#
+# Trigger methods:
+#   1. PR comment: Maintainer comments "/skill-ai-review" or "/skill-ai-review-all"
+#
+# Security model:
+#   - issue_comment runs from main branch (fork code never executes with secrets)
+#   - Only maintainers listed in MAINTAINERS file can trigger via PR comments
+#   - Secrets are inherited by reusable workflows, never exposed to PR code
+
+name: Skill AI Review
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+# ---------------------------------------------------------------------------
+# Gate job: validates the /skill-ai-review command and authorizes the user.
+# ---------------------------------------------------------------------------
+jobs:
+  gate:
+    if: >
+      github.event.issue.pull_request &&
+      (
+        contains(github.event.comment.body, '/skill-ai-review-all') ||
+        contains(github.event.comment.body, '/skill-ai-review')
+      )
+    runs-on: ubuntu-latest
+    outputs:
+      authorized: ${{ steps.auth.outputs.authorized }}
+      command: ${{ steps.parse.outputs.command }}
+      pr_number: ${{ steps.pr.outputs.number }}
+      head_sha: ${{ steps.pr.outputs.head_sha }}
+
+    steps:
+      - name: Parse command
+        id: parse
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          if echo "$COMMENT" | grep -q '/skill-ai-review-all'; then
+            echo "command=skill-ai-review-all" >> "$GITHUB_OUTPUT"
+            echo "scan_all=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "command=skill-ai-review" >> "$GITHUB_OUTPUT"
+            echo "scan_all=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Checkout only the MAINTAINERS file from main — never from the PR branch
+      - name: Checkout MAINTAINERS from main
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: MAINTAINERS
+          sparse-checkout-cone-mode: false
+
+      # Verify the comment author is in the MAINTAINERS file
+      - name: Check authorization
+        id: auth
+        env:
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+        run: |
+          if ! [ -f MAINTAINERS ]; then
+            echo "::error::MAINTAINERS file not found in default branch"
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if grep -v '^#' MAINTAINERS | grep -v '^$' | grep -qx "$COMMENT_AUTHOR"; then
+            echo "authorized=true" >> "$GITHUB_OUTPUT"
+            echo "✅ $COMMENT_AUTHOR is authorized"
+          else
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+            echo "❌ $COMMENT_AUTHOR is not in MAINTAINERS"
+          fi
+
+      - name: Reject unauthorized user
+        if: steps.auth.outputs.authorized == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST \
+            "/repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" \
+            -f content="-1"
+
+          gh pr comment "${{ github.event.issue.number }}" \
+            --repo "${{ github.repository }}" \
+            --body "❌ @${{ github.event.comment.user.login }} is not authorized to trigger AI reviews. Only maintainers listed in \`MAINTAINERS\` can use \`/skill-ai-review\` commands."
+
+      - name: React with eyes
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST \
+            "/repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" \
+            -f content="eyes"
+
+      - name: Get PR info
+        if: steps.auth.outputs.authorized == 'true'
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER="${{ github.event.issue.number }}"
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+          HEAD_SHA=$(gh api "/repos/${{ github.repository }}/pulls/$PR_NUMBER" --jq '.head.sha')
+          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "PR #$PR_NUMBER — HEAD: $HEAD_SHA"
+
+  # ---------------------------------------------------------------------------
+  # Security scan: calls the reusable skill-security-scan workflow.
+  # Runs in parallel with the Gemini code review.
+  # ---------------------------------------------------------------------------
+  security-scan:
+    needs: gate
+    if: needs.gate.outputs.authorized == 'true'
+    uses: ./.github/workflows/skill-security-scan.yml
+    with:
+      pr_number: ${{ fromJSON(needs.gate.outputs.pr_number) }}
+      head_sha: ${{ needs.gate.outputs.head_sha }}
+      scan_all: ${{ needs.gate.outputs.command == 'skill-ai-review-all' }}
+    secrets: inherit
+
+  # ---------------------------------------------------------------------------
+  # Gemini code review: calls the reusable skill-code-review workflow.
+  # Runs in parallel with the security scan.
+  # ---------------------------------------------------------------------------
+  code-review:
+    needs: gate
+    if: needs.gate.outputs.authorized == 'true'
+    uses: ./.github/workflows/skill-code-review.yml
+    with:
+      pr_number: ${{ fromJSON(needs.gate.outputs.pr_number) }}
+      head_sha: ${{ needs.gate.outputs.head_sha }}
+    secrets: inherit
+
+  # ---------------------------------------------------------------------------
+  # Report job: downloads artifacts from both workflows and posts a unified
+  # PR comment combining security scan results and Gemini code review.
+  # ---------------------------------------------------------------------------
+  report:
+    needs: [gate, security-scan, code-review]
+    if: always() && needs.gate.outputs.authorized == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download security reports
+        uses: actions/download-artifact@v4
+        with:
+          name: security-reports
+          path: security-reports/
+        continue-on-error: true
+
+      - name: Download Gemini review
+        uses: actions/download-artifact@v4
+        with:
+          name: gemini-review
+          path: gemini-review/
+        continue-on-error: true
+
+      - name: Compose unified PR comment
+        env:
+          COMMAND: ${{ needs.gate.outputs.command }}
+          SCAN_RESULT: ${{ needs.security-scan.outputs.scan_result }}
+          REVIEW_SKIPPED: ${{ needs.code-review.outputs.skipped }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- skill-ai-review -->"
+
+          if [ "$SCAN_RESULT" = "failed" ]; then
+            ICON="❌"
+          else
+            ICON="✅"
+          fi
+
+          {
+            echo "$MARKER"
+            echo "## $ICON Skill AI Review Results"
+            echo ""
+            echo "Triggered by @$COMMENT_AUTHOR via \`/$COMMAND\`"
+            echo ""
+
+            # Security Scan section
+            echo "### Security Scan"
+            echo ""
+            if [ -d "security-reports" ] && ls security-reports/security-report-*.md 1>/dev/null 2>&1; then
+              for report in security-reports/security-report-*.md; do
+                [ -f "$report" ] || continue
+                pack=$(basename "$report" .md | sed 's/^security-report-//')
+                echo "<details>"
+                echo "<summary>📋 $pack</summary>"
+                echo ""
+                cat "$report"
+                echo ""
+                echo "</details>"
+                echo ""
+              done
+            else
+              echo "No security reports generated (no packs with skills detected)."
+              echo ""
+            fi
+
+            # Gemini Code Review section
+            echo "### Gemini Code Review"
+            echo ""
+            if [ -f "gemini-review/review.md" ]; then
+              cat gemini-review/review.md
+            elif [ "$REVIEW_SKIPPED" = "true" ]; then
+              echo "⚠️ Skipped — \`GEMINI_API_KEY\` secret is not configured."
+            else
+              echo "⚠️ No review generated."
+            fi
+
+            echo ""
+            echo "---"
+            echo "*Automated review by Skill AI Review | Rules: CLAUDE.md, SKILL_DESIGN_PRINCIPLES.md*"
+            echo ""
+            echo "> [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) | Triggered by \`/$COMMAND\`"
+          } > /tmp/comment.md
+
+      # Post or update the unified PR comment using a unique marker
+      - name: Post or update PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.gate.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- skill-ai-review -->"
+
+          EXISTING_COMMENT_ID=$(gh api --paginate \
+            "/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" \
+            | head -1)
+
+          if [ -n "$EXISTING_COMMENT_ID" ]; then
+            gh api --method PATCH \
+              "/repos/${{ github.repository }}/issues/comments/$EXISTING_COMMENT_ID" \
+              -f body="$(cat /tmp/comment.md)"
+          else
+            gh pr comment "$PR_NUMBER" \
+              --repo "${{ github.repository }}" \
+              --body-file /tmp/comment.md
+          fi
+
+      # React to the original comment with the final result
+      - name: React to original comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SCAN_RESULT: ${{ needs.security-scan.outputs.scan_result }}
+        run: |
+          if [ "$SCAN_RESULT" = "failed" ]; then
+            REACTION="-1"
+          else
+            REACTION="+1"
+          fi
+
+          gh api --method POST \
+            "/repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" \
+            -f content="$REACTION"

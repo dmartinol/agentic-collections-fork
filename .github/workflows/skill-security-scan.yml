@@ -1,15 +1,50 @@
+# Skill Security Scan Workflow
+#
+# Scans skills for security vulnerabilities using cisco-ai-skill-scanner with
+# LLM-powered analysis. Detects prompt injection, data exfiltration, social
+# engineering, and other AI agent security risks.
+#
+# Trigger methods:
+#   1. PR comment:       Maintainer comments "/skill-security-scan" or "/skill-security-scan-all"
+#   2. Reusable call:    Called by skill-ai-review.yml via workflow_call
+#   3. Manual dispatch:  Triggered from Actions tab with PR number
+#
+# Security model:
+#   - issue_comment runs from main branch (fork code never executes with secrets)
+#   - Only maintainers listed in MAINTAINERS file can trigger via PR comments
+#   - workflow_call trusts the calling workflow (skill-ai-review.yml) for auth
+#   - Secrets are never exposed to PR code — only used by the scanner binary
+
 name: Skill Security Scan
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - '**/skills/**'
-      - '**/mcps.json'
+  # Maintainer triggers scan by commenting on a PR
+  issue_comment:
+    types: [created]
+
+  # Called as reusable workflow by skill-ai-review.yml
+  workflow_call:
+    inputs:
+      pr_number:
+        type: number
+        required: true
+      head_sha:
+        type: string
+        required: true
+      scan_all:
+        type: boolean
+        default: false
+    outputs:
+      scan_result:
+        description: "passed or failed"
+        value: ${{ jobs.scan.outputs.scan_result }}
+    secrets: inherit
+
+  # Manual trigger from the Actions tab
   workflow_dispatch:
     inputs:
       pr_number:
-        description: 'PR number to review'
+        description: 'PR number to scan'
         required: true
         type: number
       scan_all:
@@ -21,79 +56,162 @@ on:
           - 'true'
           - 'false'
 
-concurrency:
-  group: security-scan-${{ github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
   pull-requests: write
-  checks: read
 
+# ---------------------------------------------------------------------------
+# Gate job: validates the /skill-security-scan command and authorizes the user.
+# Only runs for issue_comment events — workflow_call and workflow_dispatch
+# are already authorized by definition.
+# ---------------------------------------------------------------------------
 jobs:
-  security-scan:
-    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
+  gate:
+    if: >
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      (
+        contains(github.event.comment.body, '/skill-security-scan-all') ||
+        contains(github.event.comment.body, '/skill-security-scan')
+      ) &&
+      !contains(github.event.comment.body, '/skill-ai-review')
     runs-on: ubuntu-latest
+    outputs:
+      authorized: ${{ steps.auth.outputs.authorized }}
+      pr_number: ${{ steps.pr.outputs.number }}
+      head_sha: ${{ steps.pr.outputs.head_sha }}
+      scan_all: ${{ steps.parse.outputs.scan_all }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Resolve PR number
-        id: pr
+      # Determine if the user wants to scan all packs or just changed ones
+      - name: Parse command
+        id: parse
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
+          COMMENT="${{ github.event.comment.body }}"
+          if echo "$COMMENT" | grep -q '/skill-security-scan-all'; then
+            echo "scan_all=true" >> "$GITHUB_OUTPUT"
           else
-            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+            echo "scan_all=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Wait for prerequisite checks
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+      # Checkout only the MAINTAINERS file from main — never from the PR branch,
+      # so a fork cannot add itself to the authorized list
+      - name: Checkout MAINTAINERS from main
+        uses: actions/checkout@v4
         with:
-          script: |
-            const requiredChecks = ['compliance-check', 'skill-linter'];
-            const sha = context.payload.pull_request.head.sha;
-            const maxWait = 300000; // 5 minutes
-            const interval = 15000; // 15 seconds
-            let elapsed = 0;
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: MAINTAINERS
+          sparse-checkout-cone-mode: false
 
-            core.info(`Waiting for checks on ${sha}: ${requiredChecks.join(', ')}`);
+      # Verify the comment author is in the MAINTAINERS file
+      - name: Check authorization
+        id: auth
+        env:
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+        run: |
+          if ! [ -f MAINTAINERS ]; then
+            echo "::error::MAINTAINERS file not found in default branch"
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
-            while (elapsed < maxWait) {
-              const { data: { check_runs } } = await github.rest.checks.listForRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: sha,
-              });
+          # Strip comments and blank lines, then match exact username
+          if grep -v '^#' MAINTAINERS | grep -v '^$' | grep -qx "$COMMENT_AUTHOR"; then
+            echo "authorized=true" >> "$GITHUB_OUTPUT"
+            echo "✅ $COMMENT_AUTHOR is authorized"
+          else
+            echo "authorized=false" >> "$GITHUB_OUTPUT"
+            echo "❌ $COMMENT_AUTHOR is not in MAINTAINERS"
+          fi
 
-              const results = requiredChecks.map(name => {
-                const run = check_runs.find(r => r.name === name);
-                return { name, status: run?.status, conclusion: run?.conclusion };
-              });
+      # Notify unauthorized users with a thumbs-down and a comment
+      - name: Reject unauthorized user
+        if: steps.auth.outputs.authorized == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST \
+            "/repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" \
+            -f content="-1"
 
-              const allCompleted = results.every(r => r.status === 'completed');
-              if (allCompleted) {
-                const failed = results.filter(r => r.conclusion !== 'success');
-                if (failed.length > 0) {
-                  const summary = failed.map(r => `${r.name}: ${r.conclusion}`).join(', ');
-                  core.setFailed(`Prerequisite checks failed (${summary}) — skipping security scan to save tokens`);
-                  return;
-                }
-                core.info('All prerequisite checks passed — proceeding with security scan');
-                return;
-              }
+          gh pr comment "${{ github.event.issue.number }}" \
+            --repo "${{ github.repository }}" \
+            --body "❌ @${{ github.event.comment.user.login }} is not authorized to trigger security scans. Only maintainers listed in \`MAINTAINERS\` can use \`/skill-security-scan\` commands."
 
-              const pending = results.filter(r => r.status !== 'completed').map(r => r.name);
-              core.info(`Waiting for: ${pending.join(', ')} (${elapsed / 1000}s elapsed)`);
-              await new Promise(r => setTimeout(r, interval));
-              elapsed += interval;
-            }
+      # Acknowledge the command with an eyes reaction
+      - name: React with eyes
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST \
+            "/repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" \
+            -f content="eyes"
 
-            core.setFailed('Timed out waiting for prerequisite checks — skipping security scan');
+      # Resolve the PR number and HEAD SHA for downstream jobs
+      - name: Get PR info
+        if: steps.auth.outputs.authorized == 'true'
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER="${{ github.event.issue.number }}"
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+          HEAD_SHA=$(gh api "/repos/${{ github.repository }}/pulls/$PR_NUMBER" --jq '.head.sha')
+          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "PR #$PR_NUMBER — HEAD: $HEAD_SHA"
+
+  # ---------------------------------------------------------------------------
+  # Scan job: runs the security scanner against skill packs.
+  # Input sources (in priority order):
+  #   1. workflow_call inputs (from skill-ai-review.yml orchestrator)
+  #   2. gate job outputs (from /skill-security-scan comment)
+  #   3. workflow_dispatch inputs (from manual trigger)
+  # ---------------------------------------------------------------------------
+  scan:
+    needs: gate
+    # Run if: authorized via comment, OR called as reusable workflow, OR manual dispatch
+    if: |
+      always() && (
+        (needs.gate.result == 'success' && needs.gate.outputs.authorized == 'true') ||
+        github.event_name == 'workflow_call' ||
+        github.event_name == 'workflow_dispatch'
+      )
+    runs-on: ubuntu-latest
+    outputs:
+      scan_result: ${{ steps.scan.outputs.scan_result }}
+
+    steps:
+      # Resolve inputs from whichever trigger fired
+      - name: Resolve inputs
+        id: inputs
+        run: |
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            echo "pr_number=${{ needs.gate.outputs.pr_number }}" >> "$GITHUB_OUTPUT"
+            echo "head_sha=${{ needs.gate.outputs.head_sha }}" >> "$GITHUB_OUTPUT"
+            echo "scan_all=${{ needs.gate.outputs.scan_all }}" >> "$GITHUB_OUTPUT"
+            echo "standalone=true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pr_number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
+            echo "head_sha=" >> "$GITHUB_OUTPUT"
+            echo "scan_all=${{ inputs.scan_all }}" >> "$GITHUB_OUTPUT"
+            echo "standalone=true" >> "$GITHUB_OUTPUT"
+          else
+            # workflow_call — inputs come from the calling workflow
+            echo "pr_number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
+            echo "head_sha=${{ inputs.head_sha }}" >> "$GITHUB_OUTPUT"
+            echo "scan_all=${{ inputs.scan_all }}" >> "$GITHUB_OUTPUT"
+            echo "standalone=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Checkout the PR code to scan. For workflow_dispatch without a head_sha,
+      # fall back to the default branch checkout (scan-all use case).
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.inputs.outputs.head_sha || '' }}
+          fetch-depth: 0
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
@@ -108,99 +226,62 @@ jobs:
       - name: Install skill-scanner
         run: uv pip install --system 'cisco-ai-skill-scanner[google]'
 
-      - name: Detect changed packs
+      # Detect which packs to scan. Uses GitHub API (not PR scripts) for safety.
+      # /skill-security-scan     → only packs with changed files
+      # /skill-security-scan-all → all packs in the repo
+      - name: Detect packs to scan
         id: detect
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.scan_all }}" = "true" ]; then
-            PACKS=$(find . -maxdepth 2 -name skills -type d | sed 's|^\./||;s|/skills$||' | sort)
-          else
-            PACKS=$(bash scripts/detect-changed-packs.sh || true)
-          fi
-
-          PACK_COUNT=$(echo "$PACKS" | grep -c . || true)
-
-          if [ -z "$PACKS" ] || [ "$PACK_COUNT" -eq 0 ]; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "packs=" >> $GITHUB_OUTPUT
-            echo "pack_count=0" >> $GITHUB_OUTPUT
-            echo "No packs with changes detected — skipping security scan"
-          elif [ "$PACK_COUNT" -gt 1 ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "packs<<EOF" >> $GITHUB_OUTPUT
-            echo "$PACKS" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-            echo "pack_count=$PACK_COUNT" >> $GITHUB_OUTPUT
-            echo "::warning::Multiple packs detected ($PACK_COUNT): $PACKS"
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "packs<<EOF" >> $GITHUB_OUTPUT
-            echo "$PACKS" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-            echo "pack_count=1" >> $GITHUB_OUTPUT
-            echo "Changed pack detected: $PACKS"
-          fi
-
-      - name: Reject multi-pack PRs
-        if: steps.detect.outputs.changed == 'true' && steps.detect.outputs.pack_count != '1' && github.event_name != 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
+          SCAN_ALL: ${{ steps.inputs.outputs.scan_all }}
+          PR_NUMBER: ${{ steps.inputs.outputs.pr_number }}
         run: |
-          set -euo pipefail
-          MARKER="<!-- skill-security-scan -->"
-          PR_NUMBER="${{ steps.pr.outputs.number }}"
-          PACKS="${{ steps.detect.outputs.packs }}"
-
-          PACK_LIST=""
-          while IFS= read -r pack; do
-            [ -z "$pack" ] && continue
-            PACK_LIST="${PACK_LIST}\n- \`${pack}\`"
-          done <<< "$PACKS"
-
-          {
-            echo "$MARKER"
-            echo "## ⚠️ Skill Security Scan — Skipped"
-            echo ""
-            echo "This PR contains changes in **multiple packs**:"
-            echo -e "$PACK_LIST"
-            echo ""
-            echo "To keep security scans fast and cost-effective, please limit each PR to **one pack only**."
-            echo "Split your changes into separate PRs (one per pack) and the security scan will run automatically."
-          } > /tmp/comment.md
-
-          EXISTING_COMMENT_ID=$(gh api --paginate \
-            "/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
-            --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" \
-            | head -1)
-
-          if [ -n "$EXISTING_COMMENT_ID" ]; then
-            gh api \
-              --method PATCH \
-              "/repos/${{ github.repository }}/issues/comments/$EXISTING_COMMENT_ID" \
-              -f body="$(cat /tmp/comment.md)"
+          if [ "$SCAN_ALL" = "true" ]; then
+            PACKS=$(find . -maxdepth 2 -name skills -type d | sed 's|^\./||;s|/skills$||' | sort)
           else
-            gh pr comment "$PR_NUMBER" \
-              --repo "${{ github.repository }}" \
-              --body-file /tmp/comment.md
+            # Fetch changed files via API — safe, doesn't depend on PR code
+            gh api "/repos/${{ github.repository }}/pulls/$PR_NUMBER/files" \
+              --paginate --jq '.[].filename' > /tmp/changed_files.txt
+
+            PACKS=$(grep -v '^\.' /tmp/changed_files.txt \
+              | cut -d'/' -f1 \
+              | sort -u \
+              | while read -r dir; do
+                  if [ -d "$dir/skills" ]; then
+                    echo "$dir"
+                  fi
+                done)
           fi
 
-          echo "❌ Multiple packs detected — aborting security scan"
-          exit 1
+          if [ -z "$PACKS" ]; then
+            echo "packs=" >> "$GITHUB_OUTPUT"
+            echo "pack_count=0" >> "$GITHUB_OUTPUT"
+            echo "No packs to scan"
+          else
+            PACK_COUNT=$(echo "$PACKS" | grep -c . || true)
+            echo "packs<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$PACKS" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+            echo "pack_count=$PACK_COUNT" >> "$GITHUB_OUTPUT"
+            echo "Packs to scan ($PACK_COUNT): $PACKS"
+          fi
 
       - name: Check scanner credentials
-        if: steps.detect.outputs.changed == 'true' && steps.detect.outputs.pack_count == '1'
+        if: steps.detect.outputs.pack_count != '0'
         id: creds
         env:
           SKILL_SCANNER_LLM_API_KEY: ${{ secrets.SKILL_SCANNER_LLM_API_KEY }}
         run: |
           if [ -z "$SKILL_SCANNER_LLM_API_KEY" ]; then
-            echo "::warning::SKILL_SCANNER_LLM_API_KEY not available (expected for fork PRs). Skipping security scan."
+            echo "::error::SKILL_SCANNER_LLM_API_KEY secret is not configured"
             echo "available=false" >> "$GITHUB_OUTPUT"
           else
             echo "available=true" >> "$GITHUB_OUTPUT"
           fi
 
+      # Run the scanner against each pack sequentially
       - name: Run security scan
-        if: steps.detect.outputs.pack_count == '1' && steps.creds.outputs.available == 'true'
+        if: steps.detect.outputs.pack_count != '0' && steps.creds.outputs.available == 'true'
         id: scan
         env:
           SKILL_SCANNER_LLM_API_KEY: ${{ secrets.SKILL_SCANNER_LLM_API_KEY }}
@@ -228,14 +309,13 @@ jobs:
           done <<< "${{ steps.detect.outputs.packs }}"
 
           if [ "$SCAN_FAILED" = "true" ]; then
-            echo "scan_result=failed" >> $GITHUB_OUTPUT
+            echo "scan_result=failed" >> "$GITHUB_OUTPUT"
           else
-            echo "scan_result=passed" >> $GITHUB_OUTPUT
+            echo "scan_result=passed" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Upload security reports
-        id: upload
-        if: steps.detect.outputs.pack_count == '1' && steps.creds.outputs.available == 'true' && always()
+        if: steps.detect.outputs.pack_count != '0' && steps.creds.outputs.available == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
           name: security-reports
@@ -243,16 +323,21 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
 
+      # Post a standalone PR comment only when triggered directly (not via workflow_call).
+      # When called by skill-ai-review.yml, the orchestrator posts the unified comment.
       - name: Post scan summary
-        if: steps.detect.outputs.pack_count == '1' && steps.creds.outputs.available == 'true' && always()
+        if: >
+          steps.inputs.outputs.standalone == 'true' &&
+          steps.detect.outputs.pack_count != '0' &&
+          steps.creds.outputs.available == 'true' &&
+          always()
         env:
           GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.inputs.outputs.pr_number }}
         run: |
           set -euo pipefail
           MARKER="<!-- skill-security-scan -->"
           SCAN_RESULT="${{ steps.scan.outputs.scan_result }}"
-          ARTIFACT_URL="${{ steps.upload.outputs.artifact-url }}"
-          PR_NUMBER="${{ steps.pr.outputs.number }}"
 
           if [ "$SCAN_RESULT" = "passed" ]; then
             ICON="✅"
@@ -282,11 +367,7 @@ jobs:
             fi
 
             echo ""
-            if [ -n "$ARTIFACT_URL" ]; then
-              echo "> 📦 [Download security reports]($ARTIFACT_URL) | [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            else
-              echo "> [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            fi
+            echo "> [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           } > /tmp/comment.md
 
           EXISTING_COMMENT_ID=$(gh api --paginate \
@@ -295,22 +376,11 @@ jobs:
             | head -1)
 
           if [ -n "$EXISTING_COMMENT_ID" ]; then
-            gh api \
-              --method PATCH \
+            gh api --method PATCH \
               "/repos/${{ github.repository }}/issues/comments/$EXISTING_COMMENT_ID" \
               -f body="$(cat /tmp/comment.md)"
           else
             gh pr comment "$PR_NUMBER" \
               --repo "${{ github.repository }}" \
               --body-file /tmp/comment.md
-          fi
-
-      - name: Check scan results
-        if: steps.detect.outputs.pack_count == '1' && steps.creds.outputs.available == 'true'
-        run: |
-          if [ "${{ steps.scan.outputs.scan_result }}" = "failed" ]; then
-            echo "❌ Security scan found MEDIUM or higher severity issues — blocking merge"
-            exit 1
-          else
-            echo "✅ Security scan passed — no MEDIUM or higher severity issues found"
           fi
