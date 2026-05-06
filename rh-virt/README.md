@@ -38,45 +38,14 @@ oc get virtualmachines -A
 kubectl get vms -A
 ```
 
-### Building the MCP Server Container Image
+### MCP Server Container Image
 
-The OpenShift MCP server is not published to public registries, so you need to build it locally before using this plugin.
+This pack uses the [OpenShift MCP Server](https://github.com/openshift/openshift-mcp-server) container image from `quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/openshift-mcp-server`, pinned by SHA256 digest for supply chain security. No local build is required — the image is pulled automatically on first use.
 
-**Prerequisites**:
-- Git
-- Podman (or Docker)
-
-**Build Steps**:
-
-1. Clone the openshift-mcp-server repository:
-   ```bash
-   git clone https://github.com/openshift/openshift-mcp-server.git
-   cd openshift-mcp-server
-   ```
-
-2. Build the container image using Podman:
-   ```bash
-   podman build -t localhost/openshift-mcp-server:latest -f Dockerfile .
-   ```
-
-   Or using Docker:
-   ```bash
-   docker build -t localhost/openshift-mcp-server:latest -f Dockerfile .
-   ```
-
-3. Verify the image was built successfully:
-   ```bash
-   podman images localhost/openshift-mcp-server:latest
-   podman tag localhost/openshift-mcp-server:latest quay.io/ecosystem-appeng/openshift-mcp-server:latest
-   ```
-
-   Expected output:
-   ```
-   REPOSITORY                                            TAG         IMAGE ID      CREATED        SIZE
-   quay.io/ecosystem-appeng/openshift-mcp-server:latest  latest      <image-id>    <timestamp>    ~192 MB
-   ```
-
-**Note**: The build process takes several minutes as it compiles the Go binary and downloads dependencies. The final image size is approximately 192 MB.
+To verify the image integrity:
+```bash
+podman inspect --format='{{.Digest}}' quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/openshift-mcp-server@sha256:2f52c860f91ab3c8a5129b727bdef0d620e733013f073b10355866c45eafd053
+```
 
 ### Installation (Lola)
 
@@ -214,6 +183,7 @@ The pack integrates with the OpenShift MCP server (configured in `mcps.json`), w
 Provides access to both Kubernetes core operations and KubeVirt virtual machine management through the Model Context Protocol.
 
 **Repository**: https://github.com/openshift/openshift-mcp-server
+**Image**: `quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/openshift-mcp-server` (pinned by SHA256 digest)
 
 **Enabled Toolsets**: `core` and `kubevirt` (via `--toolsets core,kubevirt`)
 
@@ -251,8 +221,8 @@ The server provides two toolsets enabled via `--toolsets core,kubevirt`:
         "--network=host",
         "--userns=keep-id:uid=65532,gid=65532",
         "-v", "${KUBECONFIG}:/kubeconfig:ro,Z",
-        "--entrypoint", "/app/kubernetes-mcp-server",
-        "quay.io/ecosystem-appeng/openshift-mcp-server:latest",
+        "--entrypoint", "/openshift-mcp-server",
+        "quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/openshift-mcp-server@sha256:2f52c860f91ab3c8a5129b727bdef0d620e733013f073b10355866c45eafd053",
         "--kubeconfig", "/kubeconfig",
         "--toolsets", "core,kubevirt"
       ],
@@ -273,7 +243,7 @@ The server provides two toolsets enabled via `--toolsets core,kubevirt`:
 **Configuration Details**:
 - `--userns=keep-id:uid=65532,gid=65532` - Maps container user namespace for rootless Podman security
 - `,Z` flag on volume mount - Applies SELinux context label for container access to kubeconfig
-- `--entrypoint /app/kubernetes-mcp-server` - Specifies the MCP server binary to execute
+- `--entrypoint /openshift-mcp-server` - Specifies the MCP server binary to execute
 - `--kubeconfig /kubeconfig` - Path to kubeconfig inside the container
 - `--toolsets core,kubevirt` - Enables both core Kubernetes and KubeVirt-specific tool collections
 - `--network=host` - Required for accessing local/remote Kubernetes clusters
@@ -406,44 +376,13 @@ Agent: "✓ Workaround Applied Successfully
 
 ## Configuration
 
-MCP server is configured in `mcps.json`:
-
-```json
-{
-  "mcpServers": {
-    "openshift-virtualization": {
-      "command": "podman",
-      "args": [
-        "run",
-        "--rm",
-        "-i",
-        "--network=host",
-        "--userns=keep-id:uid=65532,gid=65532",
-        "-v", "${KUBECONFIG}:/kubeconfig:ro,Z",
-        "--entrypoint", "/app/kubernetes-mcp-server",
-        "quay.io/ecosystem-appeng/openshift-mcp-server:latest",
-        "--kubeconfig", "/kubeconfig",
-        "--toolsets", "core,kubevirt"
-      ],
-      "env": {
-        "KUBECONFIG": "${KUBECONFIG}"
-      },
-      "description": "Red Hat Openshift MCP server for interacting with Openshift Container Platform clusters and its operators",
-      "security": {
-        "isolation": "container",
-        "network": "local",
-        "credentials": "env-only"
-      }
-    }
-  }
-}
-```
+MCP server is configured in `mcps.json` (see [MCP Server Integration](#mcp-server-integration) for full configuration and available tools).
 
 **Key Configuration Notes**:
-- Uses Podman to run locally-built container image `quay.io/ecosystem-appeng/openshift-mcp-server:latest`
+- Uses the `quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/openshift-mcp-server` image pinned by SHA256 digest
 - `--userns=keep-id:uid=65532,gid=65532` - Enables rootless container security with user namespace mapping
 - Mounts `KUBECONFIG` as read-only volume inside container with `,Z` for SELinux labeling
-- `--entrypoint /app/kubernetes-mcp-server` - Specifies the MCP server binary
+- `--entrypoint /openshift-mcp-server` - Specifies the MCP server binary
 - `--toolsets core,kubevirt` - Enables both core Kubernetes and KubeVirt-specific tools
 - Uses `--network=host` for cluster access (required for local/remote clusters)
 - Requires OpenShift Virtualization operator installed on the cluster

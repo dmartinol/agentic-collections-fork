@@ -13,6 +13,7 @@ description: |
   - "How are my clusters doing?"
   - "Include all clusters including non-OpenShift" (override default filter)
   NOT for single-cluster deep-dives or troubleshooting specific pods.
+license: Apache-2.0
 model: inherit
 color: cyan
 metadata:
@@ -60,14 +61,14 @@ This skill uses `openshift-administration` MCP server exclusively. This server p
 
 **Multi-Cluster Setup**: For large-scale deployments using service account tokens instead of interactive `oc login`, see [multi-cluster-auth.md](../../docs/multi-cluster-auth.md) and the [build-kubeconfig.py](../../scripts/cluster-report/build-kubeconfig.py) helper script.
 
-**Helper Scripts** (Python 3, stdlib only — treat as black boxes):
+**Helper Scripts** (Python 3, stdlib only — auditable, do not reimplement):
 - [`assemble.py`](../../scripts/cluster-report/assemble.py) — resolves `$file` references into complete raw data JSON
 - [`aggregate.py`](../../scripts/cluster-report/aggregate.py) — aggregates raw data into structured report JSON
 
-**CRITICAL Script Rules**:
-- **NEVER** read the source code of `aggregate.py` or `assemble.py`
-- **NEVER** write ad-hoc Python to parse or transform MCP output
-- **NEVER** manually reconstruct data already available in MCP output
+**Script Usage Rules**:
+- Invoke scripts via the documented pipeline (Step 3) — do NOT reimplement their logic inline
+- Do NOT write ad-hoc Python to parse or transform MCP output — the scripts handle all parsing
+- You MAY read the scripts for debugging if the pipeline returns errors
 
 **Verification**:
 1. Check `openshift-administration` in `mcps.json`
@@ -211,6 +212,7 @@ For each selected cluster, pass `context=<context-name>` to every tool call. Col
 #### Persist MCP Output to Files
 
 For each MCP tool call, **immediately save the output to a file** under `/tmp/cluster-report/`.
+Files are created with default permissions restricted by the `chmod 700` on the parent directory.
 This ensures data is available for the assembly pipeline regardless of output size.
 
 **Naming convention**: `/tmp/cluster-report/<context-short>-<field>.txt`
@@ -218,7 +220,7 @@ This ensures data is available for the assembly pipeline regardless of output si
 Use a sanitized short name for the context (e.g., `prod-us`, `dev-eu`). Create the directory first:
 
 ```bash
-mkdir -p /tmp/cluster-report
+mkdir -p /tmp/cluster-report && chmod 700 /tmp/cluster-report
 ```
 
 **How to save**: After each MCP tool call, use Bash to write the output to disk. `$file` references
@@ -324,7 +326,15 @@ Render the structured JSON output as markdown using this template:
 [Render each item from the `attention` array]
 ```
 
-### Step 5: Offer Next Steps
+### Step 5: Cleanup
+
+After rendering the report, remove temporary files:
+
+```bash
+rm -rf /tmp/cluster-report /tmp/cluster-report-manifest.json
+```
+
+### Step 6: Offer Next Steps
 
 ```markdown
 ## Next Steps
