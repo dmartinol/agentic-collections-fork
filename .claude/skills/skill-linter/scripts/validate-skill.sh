@@ -145,9 +145,23 @@ if [ "$DESC_LEN" -gt 1024 ]; then
 fi
 pass "Description valid ($DESC_LEN chars)"
 
-# 7. Validate optional fields if present
+# 7. Validate license field
+LICENSE=$(echo "$FRONTMATTER" | grep '^license:' | sed 's/^license:[[:space:]]*//' | tr -d '"' | tr -d "'" || true)
 
-# Check compatibility (if present, max 500 chars)
+if [ -z "$LICENSE" ]; then
+  fail "Missing required field: license (must be 'Apache-2.0')"
+  exit 4
+fi
+
+if [ "$LICENSE" != "Apache-2.0" ]; then
+  fail "License must be 'Apache-2.0' (got '$LICENSE')"
+  exit 4
+fi
+pass "License: $LICENSE"
+
+# 8. Validate optional fields if present
+
+# 8a. Check compatibility (if present, max 500 chars)
 COMPAT=$(echo "$FRONTMATTER" | grep '^compatibility:' | sed 's/^compatibility:[[:space:]]*//' || true)
 if [ -n "$COMPAT" ]; then
   COMPAT_LEN=${#COMPAT}
