@@ -303,22 +303,9 @@ Display with explanation: `## 📋 VMs with label 'app=web'` + list/table using 
 - [Accessing VMs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html-single/virtualization/index#virt/virtual_machines/virt-accessing-vm-consoles.html)
 - [VM Status Conditions](https://kubevirt.io/user-guide/virtual_machines/vm_status_conditions/)
 
-## Critical: Human-in-the-Loop Requirements
+## Human-in-the-Loop Requirements
 
-**Not applicable** - This skill performs read-only operations and does not modify any cluster resources. No user confirmation required.
-
-**Read-only operations:**
-- Listing VirtualMachines across namespaces or in specific namespaces
-- Retrieving VM details, status, and resource configurations
-- Displaying VM health conditions and resource usage
-- Filtering VMs by labels or field selectors
-- Viewing VM network, storage, and node placement information
-
-**No modifications performed:**
-- ✓ Does not change VM state (start/stop/restart)
-- ✓ Does not modify VM configuration
-- ✓ Does not delete VMs or resources
-- ✓ Does not consume cluster resources
+This skill is **read-only** — no user confirmation is required. It does not change VM state, modify configuration, delete resources, or consume cluster capacity.
 
 ## Security Considerations
 
