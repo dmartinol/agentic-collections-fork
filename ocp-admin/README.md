@@ -1,6 +1,6 @@
-# OpenShift Administration Agentic Pack
+# Agentic skill pack for Red Hat OpenShift administration
 
-Administration and management tools for OpenShift Container Platform. This pack provides automation capabilities for cluster lifecycle management, multi-cluster operations, workload orchestration, and security policies.
+Administration and management tools for OpenShift Container Platform including cluster lifecycle management, multi-cluster operations, workload orchestration, and security policies
 
 **Persona**: OpenShift Administrator
 **Marketplaces**: Claude Code, Cursor
@@ -707,9 +707,9 @@ See main repository [README.md](../README.md) for:
 
 ## References
 
-- [OpenShift Container Platform Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18)
-- [Assisted Installer Documentation](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform/)
-- [Assisted Service MCP Server](https://github.com/openshift-assisted/assisted-service-mcp)
-- [OpenShift MCP Server](https://github.com/openshift/openshift-mcp-server)
-- [MCP Protocol Specification](https://modelcontextprotocol.io/)
-- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections)
+- [Agentic skill pack for Red Hat OpenShift administration repository](https://github.com/RHEcosystemAppEng/agentic-collections/tree/main/ocp-admin) - Documentation and details for this skill pack
+- [OpenShift Container Platform documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18) - Documentation for Red Hat OpenShift Container Platform
+- [Assisted Installer documentation](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform) - Documentation for Red Hat OpenShift Container Platform Assisted Installer
+- [Assisted Service MCP Server](https://github.com/openshift-assisted/assisted-service-mcp) - Documentation for Assisted Service MCP Server
+- [OpenShift MCP Server](https://github.com/openshift/openshift-mcp-server) - Documentation and details for the OpenShift MCP Server
+- [MCP Protocol Specification](https://modelcontextprotocol.io)

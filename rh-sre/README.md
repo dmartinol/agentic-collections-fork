@@ -17,7 +17,6 @@ The rh-sre collection is a reference implementation demonstrating the full agent
 
 The agentic collection transforms raw MCP tools into a reliable, safe, and user-friendly SRE automation platform. Skills provide guardrails, encode expertise, and eliminate common pitfalls, while orchestration skills coordinate complex workflows that would otherwise require dozens of manual tool invocations. While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP servers) directly, the agentic collection provides critical advantages that significantly improve reliability, safety, and user experience.
 
-
 ### Reliability & Error Prevention
 
 **Precise Parameter Specification**
