@@ -171,14 +171,14 @@ Delete operation cancelled.
 
 ---
 
-**Proceed with snapshot deletion? This action cannot be undone. (yes/no)**
+**Type the snapshot name `<snapshot-name>` to confirm deletion (cannot be undone):** _____
 ```
 
-**Wait for user confirmation.**
+**Wait for user typed confirmation.**
 
 **Handle response:**
-- If "yes" → Proceed to Step 5 (execute deletion)
-- If "no", "cancel", or anything else → Cancel operation
+- If input matches snapshot name exactly (case-sensitive) → Proceed to Step 5
+- If mismatch → Report: `❌ Confirmation failed. You typed: <input>. Expected: <snapshot-name>. Cancelled.` **STOP workflow.**
 
 **On cancellation:**
 ```markdown
@@ -368,11 +368,12 @@ Would you like help troubleshooting this error?
    - Show snapshot details (VM, age, size)
    - Confirm snapshot won't be needed for recovery
    - List other available snapshots for the VM
-   - Ask: "Proceed with snapshot deletion? (yes/no)"
-   - Wait for explicit "yes"
+   - **Require typed confirmation**: user must type the exact snapshot name to confirm
+   - Accept only exact match (case-sensitive) — mismatch cancels the operation
 
 2. **Never Auto-Execute**
-   - **NEVER delete without user confirmation**
+   - **NEVER delete without typed confirmation**
+   - **NEVER accept a simple "yes" — require the snapshot name**
    - **ALWAYS show what will be lost before deletion**
 
 **Why This Matters:**
@@ -383,7 +384,7 @@ Would you like help troubleshooting this error?
 ## Security Considerations
 
 - **RBAC Enforcement**: Requires delete permissions for VirtualMachineSnapshot resources
-- **User Confirmation**: Always requires explicit "yes" before deletion
+- **Typed Confirmation**: Requires exact snapshot name to confirm deletion — prevents accidental "yes"
 - **Last Snapshot Warning**: Warns users when deleting the only snapshot for a VM
 - **Namespace Isolation**: Snapshots scoped to namespace boundaries
 - **Audit Trail**: Deletions logged in Kubernetes API audit logs
@@ -421,9 +422,9 @@ Impact of Deletion:
 Available snapshots for VM `database-01`:
 - `database-01-pre-upgrade` (created 2024-01-15 10:30)
 
-Proceed with snapshot deletion? This action cannot be undone. (yes/no)
+Type the snapshot name `database-01-daily-backup` to confirm deletion (cannot be undone): _____
 
-User: "yes"
+User: "database-01-daily-backup"
 
 Agent: [Step 5: Deletes snapshot]
 
