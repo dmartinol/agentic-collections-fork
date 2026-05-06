@@ -1,6 +1,6 @@
-# Red Hat SRE Agentic Collection
+# Agentic skill pack for Site Reliability Engineers
 
-Site Reliability Engineering tools and automation for managing Red Hat platforms and infrastructure. This pack provides comprehensive capabilities for SRE tasks including vulnerability management, fleet inventory, system monitoring, and operational excellence.
+Agentic tools and automation for managing Red Hat platforms and infrastructure. This pack provides comprehensive capabilities for SRE tasks including vulnerability management, fleet inventory, system monitoring, and operational excellence
 
 **Persona**: Site Reliability Engineer
 **Marketplaces**: Claude Code, Cursor
@@ -15,9 +15,10 @@ The rh-sre collection is a reference implementation demonstrating the full agent
 
 ## Why Use This Agentic Collection Instead of Raw MCP Tools?
 
-While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP servers) directly, the agentic collection provides critical advantages that significantly improve reliability, safety, and user experience:
+The agentic collection transforms raw MCP tools into a reliable, safe, and user-friendly SRE automation platform. Skills provide guardrails, encode expertise, and eliminate common pitfalls, while orchestration skills coordinate complex workflows that would otherwise require dozens of manual tool invocations. While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP servers) directly, the agentic collection provides critical advantages that significantly improve reliability, safety, and user experience.
 
-### 🎯 **Reliability & Error Prevention**
+
+### Reliability & Error Prevention
 
 **Precise Parameter Specification**
 - Skills encode exact parameter formats, types, and valid values for each MCP tool
@@ -31,7 +32,7 @@ While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP server
 - Session-scoped validation caching prevents redundant checks
 - Example: `mcp-lightspeed-validator` checks configuration, credentials, and connectivity before any CVE operations
 
-### 🔒 **Safety & Governance**
+### Safety & Governance
 
 **Human-in-the-Loop Enforcement**
 - Critical operations (playbook execution, system changes) require explicit user confirmation
@@ -44,7 +45,7 @@ While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP server
 - Security validation: Skills refuse to echo credential values even during debugging
 - Container isolation with SELinux labeling for all MCP server operations
 
-### 📋 **Consistency & Best Practices**
+### Consistency & Best Practices
 
 **Single Opinionated Workflow**
 - Each skill follows Red Hat-validated patterns for every execution
@@ -58,7 +59,7 @@ While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP server
 - Enables audit trails for compliance and post-mortems
 - Example: "I consulted [cve-remediation-templates.md] to understand playbook patterns for this CVE type"
 
-### 🚀 **Productivity & Usability**
+### Productivity & Usability
 
 **Natural Language Discovery**
 - No need to memorize tool names, parameters, or MCP server namespaces
@@ -78,7 +79,7 @@ While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP server
 - Only relevant docs enter context (e.g., kernel CVE loads kernel-specific remediation templates)
 - 85% reduction in navigation overhead compared to manual doc searching
 
-### 🛠️ **Error Handling & Troubleshooting**
+### Error Handling & Troubleshooting
 
 **Actionable Error Messages**
 - Skills provide specific troubleshooting steps when operations fail
@@ -91,7 +92,7 @@ While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP server
 - Clear prerequisites prevent "tool not found" errors
 - Setup instructions included inline when dependencies missing
 
-### 🎨 **Consistent User Interface**
+### Consistent User Interface
 
 **Standardized Output Formatting**
 - All skills follow common template structure for results presentation
@@ -105,7 +106,7 @@ While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP server
 - Links to official documentation and references
 - Example: CVSS score 7.5 → Skill adds "Important severity", "15 production systems affected", "Remediate within 7 days"
 
-### 📊 **Domain Expertise Encoding**
+### Domain Expertise Encoding
 
 **Red Hat Best Practices**
 - Skills embed Red Hat-validated operational patterns
@@ -118,9 +119,6 @@ While you could use the underlying MCP servers (`lightspeed-mcp`, AAP MCP server
 - Batch size optimization, parallel execution strategies
 - Staging-first testing recommendations for production changes
 
----
-
-**Bottom Line**: The agentic collection transforms raw MCP tools into a reliable, safe, and user-friendly SRE automation platform. Skills provide guardrails, encode expertise, and eliminate common pitfalls, while orchestration skills coordinate complex workflows that would otherwise require dozens of manual tool invocations.
 
 ## Quick Start
 
