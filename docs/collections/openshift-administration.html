@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.css?v=34">
+    <link rel="stylesheet" href="../styles.css?v=63">
 </head>
 <body>
     <div class="site-brand-accent" aria-hidden="true"></div>
@@ -83,7 +83,7 @@ OpenShift, and kubeconfig-backed fleet health reporting. Use CLAUDE.md intent ro
 </code></pre></div></details></div><div class="collection-prose collection-mcp-after-install"><h3>MCP configuration</h3>
 <p>Servers are defined in <strong><code>mcps.json</code></strong> at the pack root: Assisted Installer / OCM (<code>OFFLINE_TOKEN</code>) and read-only OpenShift API (<code>KUBECONFIG</code>). Use <strong><code>${VAR}</code></strong> placeholders only; never print token or kubeconfig contents in chat output.</p>
 <p><strong>Linux vs macOS:</strong> OpenShift MCP <code>podman</code> args may include user-namespace flags for <code>KUBECONFIG</code> mounts; adjust per the pack <strong>README</strong> if Podman runs in a VM.</p></div></div>
-                    <div id="tab-skills" class="collection-tab-panel" role="tabpanel"><h2>Skills</h2><div class="collection-prose"><p>The pack provides three skills for cluster lifecycle and fleet visibility on OpenShift, using Assisted Installer and OCM APIs<br />
+                    <div id="tab-skills" class="collection-tab-panel" role="tabpanel"><h2>Skills</h2><div class="collection-eval-summary"><div class="collection-eval-summary-icon" aria-hidden="true">📊</div><div class="collection-eval-summary-body"><div class="collection-eval-summary-title">Evaluation coverage: 0 of 3 skills evaluated (0.0%)</div><div class="collection-eval-summary-note muted">No evaluations were executed for this pack yet.</div></div><div class="collection-eval-summary-meta"><span>Last evaluated:</span> N/A</div></div><div class="collection-prose"><p>The pack provides three skills for cluster lifecycle and fleet visibility on OpenShift, using Assisted Installer and OCM APIs<br />
 where applicable and read-only cluster APIs for consolidated reports.</p></div><h3>Skills</h3><ol class="collection-skill-list"><li>
 <div><code>/cluster-creator</code> - End-to-end OpenShift cluster creation using Red Hat Assisted Installer (SNO and HA; bare metal, vSphere, OCI, Nutanix).</div>
 <div class="collection-prose collection-prose-tight"><p>Create and install OpenShift clusters through Assisted Installer with validation, host networking, and progress monitoring.<br />
@@ -135,6 +135,6 @@ where applicable and read-only cluster APIs for consolidated reports.</p></div><
         <div class="modal-content" id="mcp-details"></div>
     </div>
 
-    <script src="../app.js?v=34"></script>
+    <script src="../app.js?v=63"></script>
 </body>
 </html>

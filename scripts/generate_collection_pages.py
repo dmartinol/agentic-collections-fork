@@ -10,11 +10,11 @@ from __future__ import annotations
 
 import html
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
 import markdown
-
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -71,7 +71,251 @@ def split_deploy_into_sections(deploy_text: str) -> tuple[str, list[tuple[str, s
     return pre_content, [(platform, content.strip()) for platform, content in matches]
 
 
-def _render_skills_list(skills: List[Dict[str, Any]], pack_name: str) -> str:
+def format_relative_age(iso_value: str) -> str:
+    try:
+        dt = datetime.fromisoformat(str(iso_value).replace("Z", "+00:00"))
+        delta_seconds = max(
+            0, int((datetime.now(timezone.utc) - dt.astimezone(timezone.utc)).total_seconds())
+        )
+    except ValueError:
+        return str(iso_value)
+    minutes = delta_seconds // 60
+    hours = minutes // 60
+    days = hours // 24
+    if days > 0:
+        return f"{days}d ago"
+    if hours > 0:
+        return f"{hours}h ago"
+    if minutes > 0:
+        return f"{minutes}m ago"
+    return f"{delta_seconds}s ago"
+
+
+def _render_eval_skills_banner(es: Dict[str, Any]) -> str:
+    """Pack-level eval summary for the Skills tab (HTML-safe)."""
+    n = int(es.get("evaluated_count") or 0)
+    total = int(es.get("catalog_skill_count") or 0)
+    if total <= 0:
+        return ""
+    coverage_pct = (n / total * 100.0) if total > 0 else 0.0
+    latest = html.escape(str(es.get("latest_generated_at") or "N/A"))
+    title = f"Evaluation coverage: {n} of {total} skills evaluated ({coverage_pct:.1f}%)"
+    if n <= 0:
+        note_cls = "muted"
+        note = "No evaluations were executed for this pack yet."
+    else:
+        trials = int(es.get("total_trials_treatment") or 0)
+        confidence = str(es.get("confidence_level") or "LOW").upper()
+        if confidence == "LOW":
+            note_cls = "warn"
+            note = f"Low confidence - based on {trials} trial{'s' if trials != 1 else ''}. More evaluations needed for stronger results."
+        elif confidence == "MEDIUM":
+            note_cls = "warn"
+            note = f"Moderate confidence - based on {trials} trial{'s' if trials != 1 else ''}."
+        else:
+            note_cls = "ok"
+            note = f"High confidence - based on {trials} trial{'s' if trials != 1 else ''}."
+    return (
+        '<div class="collection-eval-summary">'
+        '<div class="collection-eval-summary-icon" aria-hidden="true">📊</div>'
+        '<div class="collection-eval-summary-body">'
+        f'<div class="collection-eval-summary-title">{html.escape(title)}</div>'
+        f'<div class="collection-eval-summary-note {note_cls}">{html.escape(note)}</div>'
+        '</div>'
+        f'<div class="collection-eval-summary-meta"><span>Last evaluated:</span> {latest}</div>'
+        "</div>"
+    )
+
+
+def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
+    """Detailed per-skill evaluation card with trust/evidence focus."""
+    rec = str(ev.get("recommendation") or "unknown").strip().lower()
+    rec_label = "PASS" if rec == "pass" else ("FAIL" if rec else "UNKNOWN")
+    rec_cls = "pass" if rec == "pass" else ("fail" if rec else "unknown")
+
+    def _metric(val: Any, digits: int = 2) -> str:
+        return f"{float(val):.{digits}f}" if isinstance(val, (int, float)) else "N/A"
+
+    nt = int(ev.get("n_trials_treatment") or 0)
+    nc = int(ev.get("n_trials_control") or 0)
+    np_t = int(ev.get("n_passed_treatment") or 0)
+    np_c = int(ev.get("n_passed_control") or 0)
+    nf_t = int(ev.get("n_failed_treatment") or 0)
+    nf_c = int(ev.get("n_failed_control") or 0)
+    pr_t = ev.get("pass_rate_treatment")
+    if not isinstance(pr_t, (int, float)) and nt > 0:
+        pr_t = np_t / nt
+    pass_rate_label = (
+        f"{int(round(float(pr_t) * 100))}%"
+        if isinstance(pr_t, (int, float))
+        else ("100%" if rec == "pass" else ("0%" if rec == "fail" else "N/A"))
+    )
+
+    conf_label = str(ev.get("confidence_level") or "LOW")
+    conf_cls = conf_label.lower()
+    conf_sub = f"n={min(nt, nc)}"
+    has_failures = bool(ev.get("has_failures"))
+    failed_trials = int(ev.get("failed_trials") or 0)
+    trial_name = html.escape(str(ev.get("latest_trial_name") or "N/A"))
+    trial_reward = _metric(ev.get("latest_trial_reward"))
+    trial_pass = ev.get("latest_trial_passed")
+    trial_status = "PASS" if trial_pass is True else ("FAIL" if trial_pass is False else "N/A")
+
+    mean_t_raw = ev.get("mean_reward_treatment")
+    mean_c_raw = ev.get("mean_reward_control")
+    mean_t = _metric(mean_t_raw, 2)
+    mean_c = _metric(mean_c_raw, 2)
+    uplift = _metric(ev.get("mean_reward_gap"))
+
+    max_mean = max(
+        float(mean_t_raw) if isinstance(mean_t_raw, (int, float)) else 0.0,
+        float(mean_c_raw) if isinstance(mean_c_raw, (int, float)) else 0.0,
+        0.0001,
+    )
+    width_t = (
+        f"{(float(mean_t_raw) / max_mean) * 100:.1f}%"
+        if isinstance(mean_t_raw, (int, float))
+        else "0%"
+    )
+    width_c = (
+        f"{(float(mean_c_raw) / max_mean) * 100:.1f}%"
+        if isinstance(mean_c_raw, (int, float))
+        else "0%"
+    )
+
+    coverage_total = int(ev.get("catalog_skill_count") or 0)
+    coverage_pct = (nt / coverage_total * 100.0) if coverage_total > 0 else 0.0
+    coverage_label = f"{nt} / {coverage_total if coverage_total else 'N/A'}"
+    coverage_sub = f"scenarios tested ({coverage_pct:.1f}%)"
+
+    fisher = ev.get("fisher_p_value")
+    significance_text = (
+        "Low (insufficient data)"
+        if min(nt, nc) < 5
+        else (
+            "High (statistically significant)"
+            if isinstance(fisher, (int, float)) and float(fisher) < 0.05
+            else "Moderate (not statistically significant)"
+        )
+    )
+
+    raw_generated = ev.get("generated_at")
+    freshness = (
+        format_relative_age(raw_generated)
+        if isinstance(raw_generated, str) and raw_generated.strip()
+        else "N/A"
+    )
+    freshness_state = "stale" if "d ago" in freshness and not freshness.startswith("0") else "recent"
+
+    json_url = str(ev.get("report_json_url") or "").strip()
+    md_url = str(ev.get("report_md_url") or "").strip()
+    report_dir_url = str(ev.get("report_dir_url") or "").strip()
+    has_md = bool(ev.get("has_report_md")) and md_url
+    generated = html.escape(str(ev.get("generated_at") or "N/A"))
+    pipeline = html.escape(str(ev.get("pipeline_run_id") or "N/A"))
+    commit_sha = html.escape(str(ev.get("commit_sha") or "N/A"))
+    commit_short = commit_sha[:8] if commit_sha != "N/A" else "N/A"
+    llm = html.escape(str(ev.get("llm") or "N/A"))
+    related_pr = str(ev.get("related_pr") or "").strip()
+    pr_match = re.search(r"/pull/(\d+)(?:/|$)", related_pr)
+    related_pr_label = f"#{pr_match.group(1)}" if pr_match else ("Open PR" if related_pr else "N/A")
+    pass_icon_html = '<span class="skill-pass-icon">✓</span>' if rec_cls == "pass" else ""
+    commit_source = str(ev.get("commit_sha") or "").strip()
+    commit_short_raw = commit_source[:8] if commit_source else "N/A"
+    commit_href = (
+        f"https://github.com/RHEcosystemAppEng/skill-submissions/commit/{html.escape(commit_source, quote=True)}"
+        if commit_source
+        else ""
+    )
+    commit_html = (
+        f'<a class="collection-inline-link" href="{commit_href}" target="_blank" rel="noopener noreferrer">{html.escape(commit_short_raw)} 🔗</a>'
+        if commit_href
+        else html.escape(commit_short_raw)
+    )
+    related_pr_html = (
+        f'<a class="collection-inline-link" href="{html.escape(related_pr, quote=True)}" target="_blank" rel="noopener noreferrer">{html.escape(related_pr_label)} 🔗</a>'
+        if related_pr
+        else "N/A"
+    )
+
+    parts = [
+        '<div class="skill-eval-card">',
+        '<div class="skill-eval-header-grid">',
+        '<div class="skill-eval-header-main">',
+        '<div class="skill-eval-card-header"><strong>Evaluation summary</strong></div>',
+        f'<span class="skill-eval-head-badges"><span class="skill-eval-head-badge status {rec_cls}">'
+        f'{pass_icon_html}<span>{rec_label}</span></span>'
+        f'<span class="skill-eval-head-badge confidence {conf_cls}">{conf_label} confidence</span></span>',
+        f'<div class="skill-eval-inline-signals">{html.escape(str(ev.get("coverage_status") or "PARTIAL").lower())} coverage · {html.escape(conf_label.lower())} confidence ({html.escape(conf_sub)})</div>',
+        '</div>',
+        '<div class="skill-eval-top-meta">',
+        '<span class="skill-eval-meta-item">'
+        '<svg class="skill-eval-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M8 2v4"></path><path d="M16 2v4"></path><path d="M3 10h18"></path><path d="M5 6h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path>'
+        '</svg>'
+        f'<span>Last evaluated: {html.escape(freshness)} ({freshness_state})</span>'
+        '</span>',
+        '<span class="skill-eval-meta-item">'
+        '<svg class="skill-eval-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        '<path d="M4 6h16"></path><path d="M6 12h12"></path><path d="M8 18h8"></path><circle cx="12" cy="12" r="9"></circle>'
+        '</svg>'
+        f'<span>Model: {llm}</span>'
+        '</span>',
+        '</div>',
+        '</div>',
+    ]
+    if has_failures:
+        parts.append(f'<div class="skill-eval-inline-signals warn">⚠ {failed_trials} failed trial{"s" if failed_trials != 1 else ""}</div>')
+
+    parts.extend(
+        [
+            '<div class="skill-eval-kpis">',
+            f'<div class="skill-eval-kpi"><p class="kpi-label">Coverage</p><p class="kpi-value">{coverage_label}</p><p class="kpi-sub">{coverage_sub}</p></div>',
+            f'<div class="skill-eval-kpi"><p class="kpi-label">Pass rate (treatment)</p><p class="kpi-value">{pass_rate_label}</p><p class="kpi-sub">{np_t} pass · {nf_t} fail</p></div>',
+            f'<div class="skill-eval-kpi"><p class="kpi-label">Reward (treatment)</p><p class="kpi-value">{mean_t}</p><p class="kpi-sub">mean reward</p></div>',
+            f'<div class="skill-eval-kpi"><p class="kpi-label">Improvement vs baseline</p><p class="kpi-value">+{float(ev.get("mean_reward_gap") or 0) * 100:.1f}%</p><p class="kpi-sub">(+{uplift} reward)</p></div>',
+            f'<div class="skill-eval-kpi"><p class="kpi-label">Statistical significance</p><p class="kpi-value">{html.escape(significance_text.split(" ")[0])}</p><p class="kpi-sub">{html.escape(significance_text.replace(significance_text.split(" ")[0] + " ", ""))}</p></div>',
+            '</div>',
+            '<div class="skill-eval-lower-grid">',
+            '<div class="skill-eval-compare-card"><p class="group-title">Comparison (mean reward)</p>'
+            f'<div class="bar-row"><span>Treatment</span><div class="bar"><i style="width:{width_t}"></i></div><em>{mean_t}</em></div>'
+            f'<div class="bar-row"><span>Baseline (control)</span><div class="bar"><i class="control" style="width:{width_c}"></i></div><em>{mean_c}</em></div>'
+            '</div>',
+            '<div class="skill-eval-group"><p class="group-title">Experiment</p><ul class="group-list">'
+            f'<li>Trials: {nt}/{nc} (treatment/control)</li>'
+            f'<li>Treatment: {np_t} pass / {nf_t} fail</li>'
+            f'<li>Control: {np_c} pass / {nf_c} fail</li>'
+            f'<li>Statistical significance: {html.escape(significance_text.lower())}</li>'
+            '</ul></div>',
+            '<div class="skill-eval-evidence-preview"><div class="evidence-title">✓ Latest verified execution</div>'
+            f'<div class="evidence-line">{trial_status} - reward {trial_reward} - {html.escape(freshness)}</div>'
+            f'<div class="evidence-line">{trial_name}</div>',
+            f'<a class="collection-inline-link" href="{html.escape(md_url or json_url, quote=True)}" target="_blank" rel="noopener noreferrer">View execution details</a>',
+            (
+                f'<a class="collection-inline-link" href="{html.escape(json_url, quote=True)}" target="_blank" rel="noopener noreferrer">Raw report (JSON)</a>'
+                if json_url
+                else ""
+            ),
+            '</div>',
+            '</div>',
+            '<div class="skill-eval-repro"><strong>Reproducibility</strong>'
+            '<div class="skill-eval-repro-labels">'
+            '<span>Pipeline</span><span>Commit</span><span>Generated</span><span>Related PR</span>'
+            '</div>'
+            '<div class="skill-eval-repro-values">'
+            f'<span>{pipeline}</span>'
+            f'<span>{commit_html}</span>'
+            f'<span>{generated}</span>'
+            f"<span>{related_pr_html}</span>"
+            '</div>'
+            '</div>',
+        ]
+    )
+    parts.extend(["</div>"])
+    return "".join(parts)
+
+
+def _render_skills_list(skills: List[Dict[str, Any]], pack_name: str, list_tag: str | None = None) -> str:
     items: List[str] = []
     for skill in skills:
         if not isinstance(skill, dict):
@@ -80,12 +324,19 @@ def _render_skills_list(skills: List[Dict[str, Any]], pack_name: str) -> str:
         desc = html.escape(str(skill.get("description", "")))
         summary = md_to_html(skill.get("summary_markdown", ""))
         skill_path = f"https://github.com/RHEcosystemAppEng/agentic-collections/blob/main/{pack_name}/skills/{name}/SKILL.md"
+        heading = f"<div><code>/{html.escape(name)}</code> - {desc}"
+        if list_tag:
+            heading += f' <span class="skill-kind-badge">{html.escape(list_tag)}</span>'
+        heading += "</div>"
         block = [
             "<li>",
-            f"<div><code>/{html.escape(name)}</code> - {desc}</div>",
+            heading,
         ]
         if summary:
             block.append(f"<div class=\"collection-prose collection-prose-tight\">{summary}</div>")
+        ev = skill.get("evaluation") if isinstance(skill.get("evaluation"), dict) else None
+        if ev:
+            block.append(_render_skill_evaluation_block(ev))
         block.append(
             f"<a class=\"collection-inline-link\" href=\"{skill_path}\" target=\"_blank\" rel=\"noopener noreferrer\">"
             "View SKILL.md on GitHub -></a>"
@@ -274,13 +525,16 @@ def render_collection_page(pack: Dict[str, Any], mcp_data: List[Dict[str, Any]])
     # Skills tab
     contents = collection.get("contents") or {}
     skills_parts = ["<h2>Skills</h2>"]
+    esum = pack.get("evaluation_summary") or {}
+    if int(esum.get("catalog_skill_count") or 0) > 0:
+        skills_parts.append(_render_eval_skills_banner(esum))
     if contents.get("description"):
         skills_parts.append(f"<div class=\"collection-prose\">{md_to_html(contents.get('description'))}</div>")
     orchestration = contents.get("orchestration_skills") or []
     skills = contents.get("skills") or []
     if orchestration:
         skills_parts.append(f"<h3>{'Orchestration Skill' if len(orchestration) == 1 else 'Orchestration Skills'}</h3>")
-        skills_parts.append(_render_skills_list(orchestration, pack["name"]))
+        skills_parts.append(_render_skills_list(orchestration, pack["name"], "Orchestration skill"))
     if skills:
         skills_parts.append(f"<h3>{'Basic Skills' if orchestration else 'Skills'}</h3>")
         skills_parts.append(_render_skills_list(skills, pack["name"]))
@@ -324,7 +578,7 @@ def render_collection_page(pack: Dict[str, Any], mcp_data: List[Dict[str, Any]])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.css?v=34">
+    <link rel="stylesheet" href="../styles.css?v=63">
 </head>
 <body>
     <div class="site-brand-accent" aria-hidden="true"></div>
@@ -371,7 +625,7 @@ def render_collection_page(pack: Dict[str, Any], mcp_data: List[Dict[str, Any]])
         <div class="modal-content" id="mcp-details"></div>
     </div>
 
-    <script src="../app.js?v=34"></script>
+    <script src="../app.js?v=63"></script>
 </body>
 </html>
 """

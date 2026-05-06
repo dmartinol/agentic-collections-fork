@@ -1,0 +1,75 @@
+{
+  "submission_name": "rh-sre-playbook-generator",
+  "provenance": {
+    "generated_at": "2026-05-05T21:26:24.096837Z",
+    "commit_sha": "32a38c2af9cb7d857ead73ea44f0cb1affdfe197",
+    "pipeline_run_id": "abevalflow-zdg2x",
+    "treatment_image_ref": "image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-sre-playbook-generator@sha256:3233a8c38ebc066542d730f336f99ba2df16c95c87752b5885c4cffc51206406",
+    "control_image_ref": "image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-sre-playbook-generator@sha256:9b6ec4c7cf97285b642146a7f1079dcc85be6249dabf02210bba1023958f2b00",
+    "harbor_fork_revision": "main"
+  },
+  "summary": {
+    "related_pr": "https://github.com/RHEcosystemAppEng/skill-submissions/pull/13",
+    "llm": "Claude Sonnet 4.6 (vertex_ai)",
+    "treatment": {
+      "n_trials": 3,
+      "n_passed": 3,
+      "n_failed": 0,
+      "n_errors": 0,
+      "pass_rate": 1.0,
+      "mean_reward": 0.9523666666666667,
+      "median_reward": 1.0,
+      "std_reward": 0.08250335346719753
+    },
+    "control": {
+      "n_trials": 3,
+      "n_passed": 3,
+      "n_failed": 0,
+      "n_errors": 0,
+      "pass_rate": 1.0,
+      "mean_reward": 0.8571333333333334,
+      "median_reward": 0.8571,
+      "std_reward": 0.14285000291681246
+    },
+    "mean_reward_gap": 0.09523333333333328,
+    "ttest_p_value": 0.38683199325149104,
+    "fisher_p_value": 1.0,
+    "recommendation": "pass"
+  },
+  "trials": {
+    "treatment": [
+      {
+        "trial_name": "rh-sre-playbook-generator__9VAiEdr",
+        "reward": 1.0,
+        "passed": true
+      },
+      {
+        "trial_name": "rh-sre-playbook-generator__EwjdgDy",
+        "reward": 1.0,
+        "passed": true
+      },
+      {
+        "trial_name": "rh-sre-playbook-generator__rYC89Ft",
+        "reward": 0.8571,
+        "passed": true
+      }
+    ],
+    "control": [
+      {
+        "trial_name": "rh-sre-playbook-generator__73KvcsC",
+        "reward": 0.7143,
+        "passed": true
+      },
+      {
+        "trial_name": "rh-sre-playbook-generator__fYvSJJw",
+        "reward": 1.0,
+        "passed": true
+      },
+      {
+        "trial_name": "rh-sre-playbook-generator__tPLrczd",
+        "reward": 0.8571,
+        "passed": true
+      }
+    ]
+  }
+}

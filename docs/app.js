@@ -140,22 +140,137 @@ function renderPacks(packs) {
 /**
  * Create a pack card (XSS-safe)
  */
+function formatRelativeAge(isoString) {
+    if (!isoString) return 'N/A';
+    const dt = new Date(isoString);
+    if (Number.isNaN(dt.getTime())) return String(isoString);
+    const deltaMs = Date.now() - dt.getTime();
+    const future = deltaMs < 0;
+    const s = Math.abs(Math.floor(deltaMs / 1000));
+    const m = Math.floor(s / 60);
+    const h = Math.floor(m / 60);
+    const d = Math.floor(h / 24);
+    const w = Math.floor(d / 7);
+    const mon = Math.floor(d / 30);
+    const y = Math.floor(d / 365);
+    let unit = 's';
+    let value = s;
+    if (y > 0) { unit = 'y'; value = y; }
+    else if (mon > 0) { unit = 'mo'; value = mon; }
+    else if (w > 0) { unit = 'w'; value = w; }
+    else if (d > 0) { unit = 'd'; value = d; }
+    else if (h > 0) { unit = 'h'; value = h; }
+    else if (m > 0) { unit = 'm'; value = m; }
+    const suffix = future ? 'from now' : 'ago';
+    return `${value}${unit} ${suffix}`;
+}
+
+function formatMetric(value, digits = 2) {
+    return typeof value === 'number' && Number.isFinite(value) ? value.toFixed(digits) : 'N/A';
+}
+
 function createPackCard(pack) {
+    const NS_SVG = 'http://www.w3.org/2000/svg';
+    const makeSvg = () => {
+        const svg = document.createElementNS(NS_SVG, 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        svg.setAttribute('stroke-linecap', 'round');
+        svg.setAttribute('stroke-linejoin', 'round');
+        svg.classList.add('pack-icon-svg');
+        return svg;
+    };
+    const path = (svg, d) => {
+        const p = document.createElementNS(NS_SVG, 'path');
+        p.setAttribute('d', d);
+        svg.appendChild(p);
+    };
+    const line = (svg, x1, y1, x2, y2) => {
+        const l = document.createElementNS(NS_SVG, 'line');
+        l.setAttribute('x1', String(x1));
+        l.setAttribute('y1', String(y1));
+        l.setAttribute('x2', String(x2));
+        l.setAttribute('y2', String(y2));
+        svg.appendChild(l);
+    };
+    const circle = (svg, cx, cy, r) => {
+        const c = document.createElementNS(NS_SVG, 'circle');
+        c.setAttribute('cx', String(cx));
+        c.setAttribute('cy', String(cy));
+        c.setAttribute('r', String(r));
+        svg.appendChild(c);
+    };
+    const rect = (svg, x, y, w, h, rx = 0) => {
+        const r = document.createElementNS(NS_SVG, 'rect');
+        r.setAttribute('x', String(x));
+        r.setAttribute('y', String(y));
+        r.setAttribute('width', String(w));
+        r.setAttribute('height', String(h));
+        if (rx) r.setAttribute('rx', String(rx));
+        svg.appendChild(r);
+    };
+    const createPackIcon = (kind) => {
+        const svg = makeSvg();
+        if (kind === 'skills') {
+            path(svg, 'M9 18L3 12l6-6');
+            path(svg, 'M15 6l6 6-6 6');
+        } else if (kind === 'agents') {
+            rect(svg, 7, 8, 10, 9, 2);
+            line(svg, 12, 4, 12, 8);
+            circle(svg, 10, 12, 1);
+            circle(svg, 14, 12, 1);
+        } else if (kind === 'docs' || kind === 'report') {
+            path(svg, 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z');
+            path(svg, 'M14 2v6h6');
+        } else if (kind === 'mcp') {
+            circle(svg, 18, 5, 2);
+            circle(svg, 6, 12, 2);
+            circle(svg, 18, 19, 2);
+            line(svg, 8, 12, 16, 6);
+            line(svg, 8, 12, 16, 18);
+        } else if (kind === 'evaluation') {
+            path(svg, 'M3 3v18h18');
+            path(svg, 'm7 13 3-3 3 2 4-4');
+        }
+        return svg;
+    };
+
     const div = document.createElement('div');
     div.className = 'card pack-card';
 
+    const es = pack.evaluation_summary && typeof pack.evaluation_summary === 'object'
+        ? pack.evaluation_summary
+        : null;
+    const coveragePctValue = es && es.catalog_skill_count > 0
+        ? (typeof es.coverage_pct === 'number'
+            ? es.coverage_pct
+            : (es.evaluated_count / es.catalog_skill_count) * 100)
+        : 0;
+    const verifiedCountValue = es
+        ? Number(es.verified_execution_count ?? es.total_trials_treatment ?? 0)
+        : 0;
+    const requiresMoreEval = es
+        ? Boolean(
+            es.requires_more_evaluation ??
+            (coveragePctValue < 50 || verifiedCountValue < 5)
+        )
+        : false;
+
+    // Header row (title + eval badge)
+    const headerRow = document.createElement('div');
+    headerRow.className = 'pack-card-header';
+
     // Pack name with icon
     const h3 = document.createElement('h3');
-    h3.style.display = 'flex';
-    h3.style.alignItems = 'center';
-    h3.style.gap = '0.5rem';
+    h3.className = 'pack-card-title';
     
     // Custom icon (if available)
     if (pack.icon) {
         const customIcon = document.createElement('span');
         customIcon.className = 'card-icon';
         customIcon.textContent = pack.icon;
-        customIcon.style.fontSize = '1.2rem';
         h3.appendChild(customIcon);
     }
     
@@ -163,60 +278,184 @@ function createPackCard(pack) {
     titleText.textContent = pack.plugin.title || pack.plugin.name || pack.name;
     h3.appendChild(titleText);
     
-    div.appendChild(h3);
+    headerRow.appendChild(h3);
 
-    // Owner subtitle
-    const owner = document.createElement('p');
-    owner.className = 'pack-owner';
-    owner.textContent = 'By Red Hat';
-    owner.style.color = 'var(--text-muted)';
-    owner.style.fontSize = '0.85rem';
-    owner.style.marginTop = '0.25rem';
-    div.appendChild(owner);
+    const badges = document.createElement('div');
+    badges.className = 'pack-card-badges';
+    if (es && es.catalog_skill_count > 0) {
+        const badge = document.createElement('span');
+        badge.className = 'pack-eval-badge';
+        if (es.evaluated_count === 0) {
+            badge.classList.add('is-none');
+            badge.textContent = 'NOT EVALUATED';
+        } else if (es.failed_count === 0) {
+            badge.classList.add('is-pass');
+            badge.textContent = 'PASS';
+        } else if (es.passed_count === 0) {
+            badge.classList.add('is-fail');
+            badge.textContent = 'FAIL';
+        } else {
+            badge.classList.add('is-mixed');
+            badge.textContent = 'MIXED';
+        }
+        badges.appendChild(badge);
+    }
+    if (badges.childNodes.length > 0) {
+        headerRow.appendChild(badges);
+    }
+    div.appendChild(headerRow);
 
-    // Version
-    const version = document.createElement('p');
-    version.className = 'version';
-    version.textContent = `v${pack.plugin.version || '0.0.0'}`;
-    div.appendChild(version);
+    const meta = document.createElement('p');
+    meta.className = 'pack-meta';
+    meta.textContent = `By Red Hat · v${pack.plugin.version || '0.0.0'}`;
+    div.appendChild(meta);
 
-    // Description
+    // Description (prefer collection catalog metadata over plugin fallback text)
     const desc = document.createElement('p');
     desc.className = 'description';
-    desc.textContent = pack.plugin.description || 'No description available';
+    const collectionDescription = pack.collection?.description || pack.collection?.contents?.description || '';
+    const pluginDescription = String(pack.plugin?.description || '').trim();
+    const genericPluginDescription = `${pack.name} agentic collection`;
+    const safePluginDescription = pluginDescription.toLowerCase() === genericPluginDescription.toLowerCase()
+        ? ''
+        : pluginDescription;
+    desc.textContent = String(collectionDescription || safePluginDescription || 'No description available').trim();
     div.appendChild(desc);
 
-    // Stats
-    const stats = document.createElement('div');
-    stats.className = 'stats';
+    // Entity stats chips
+    const chips = document.createElement('div');
+    chips.className = 'pack-stat-chips';
+    const addChip = (iconKind, label) => {
+        const chip = document.createElement('span');
+        chip.className = 'pack-stat-chip';
+        const iconNode = document.createElement('span');
+        iconNode.className = 'pack-stat-chip-icon';
+        iconNode.appendChild(createPackIcon(iconKind));
+        const labelNode = document.createElement('span');
+        labelNode.className = 'pack-stat-chip-label';
+        labelNode.textContent = label;
+        chip.appendChild(iconNode);
+        chip.appendChild(labelNode);
+        chips.appendChild(chip);
+    };
 
-    const skillSpan = document.createElement('span');
-    skillSpan.textContent = `${pack.skills.length} skill${pack.skills.length !== 1 ? 's' : ''}`;
-    stats.appendChild(skillSpan);
-
-    const agentSpan = document.createElement('span');
-    agentSpan.textContent = `${pack.agents.length} agent${pack.agents.length !== 1 ? 's' : ''}`;
-    stats.appendChild(agentSpan);
+    addChip('skills', `${pack.skills.length} skill${pack.skills.length !== 1 ? 's' : ''}`);
+    addChip('agents', `${pack.agents.length} agent${pack.agents.length !== 1 ? 's' : ''}`);
 
     // Add docs count (count sources, not doc files)
     const docsCount = (pack.docs || []).reduce((sum, doc) => {
         return sum + (doc.sources?.length || 0);
     }, 0);
-    if (docsCount > 0) {
-        const docsSpan = document.createElement('span');
-        docsSpan.textContent = `${docsCount} doc${docsCount !== 1 ? 's' : ''}`;
-        stats.appendChild(docsSpan);
-    }
+    addChip('docs', `${docsCount} doc${docsCount !== 1 ? 's' : ''}`);
 
     // Add MCP count (count MCP servers for this pack - both Official and Community)
     const mcpCount = [...allMCPServers, ...allCommunityMCPServers].filter(server => server.pack === pack.name).length;
-    if (mcpCount > 0) {
-        const mcpSpan = document.createElement('span');
-        mcpSpan.textContent = `${mcpCount} MCP`;
-        stats.appendChild(mcpSpan);
-    }
+    addChip('mcp', `${mcpCount} MCP`);
+    div.appendChild(chips);
 
-    div.appendChild(stats);
+    if (es && es.catalog_skill_count > 0) {
+        const divider = document.createElement('div');
+        divider.className = 'pack-eval-divider';
+        div.appendChild(divider);
+
+        const evidenceLine = document.createElement('p');
+        evidenceLine.className = 'pack-eval-evidence';
+        evidenceLine.textContent = `✔ ${verifiedCountValue} verified execution${verifiedCountValue === 1 ? '' : 's'}`;
+        div.appendChild(evidenceLine);
+
+        if (verifiedCountValue > 0) {
+            const metricGrid = document.createElement('div');
+            metricGrid.className = 'pack-eval-metrics';
+            const evalBlock = document.createElement('div');
+            evalBlock.className = 'pack-eval-metric pack-eval-metric-main';
+            const evalLabel = document.createElement('p');
+            evalLabel.className = 'metric-label';
+            evalLabel.textContent = 'Evaluation';
+            const evalValueWrap = document.createElement('div');
+            evalValueWrap.className = 'pack-eval-main-value';
+            const evalIcon = document.createElement('span');
+            evalIcon.className = 'pack-eval-main-icon';
+            evalIcon.appendChild(createPackIcon('evaluation'));
+            const evalValue = document.createElement('p');
+            evalValue.className = 'metric-value';
+            evalValue.textContent = `${verifiedCountValue} verified execution${verifiedCountValue === 1 ? '' : 's'}`;
+            evalValueWrap.appendChild(evalIcon);
+            evalValueWrap.appendChild(evalValue);
+            const evalSub = document.createElement('p');
+            evalSub.className = 'metric-sub';
+            evalSub.textContent = `Coverage: ${coveragePctValue.toFixed(1)}% (${es.evaluated_count}/${es.catalog_skill_count} skills)`;
+            evalBlock.appendChild(evalLabel);
+            evalBlock.appendChild(evalValueWrap);
+            evalBlock.appendChild(evalSub);
+            metricGrid.appendChild(evalBlock);
+
+            const passRate = typeof es.pass_rate === 'number' ? `${Math.round(es.pass_rate * 100)}%` : 'N/A';
+            const metricData = [
+                {
+                    label: 'Pass rate',
+                    value: passRate,
+                    sub: `${es.passed_count || 0} pass · ${es.failed_count || 0} fail`,
+                },
+                {
+                    label: 'Last evaluated',
+                    value: formatRelativeAge(es.latest_generated_at),
+                    sub: es.latest_pipeline_run_id ? `Run: ${es.latest_pipeline_run_id}` : 'Run: N/A',
+                }
+            ];
+            metricData.forEach(item => {
+                const block = document.createElement('div');
+                block.className = 'pack-eval-metric';
+                const label = document.createElement('p');
+                label.className = 'metric-label';
+                label.textContent = item.label;
+                const value = document.createElement('p');
+                value.className = 'metric-value';
+                value.textContent = item.value;
+                const sub = document.createElement('p');
+                sub.className = 'metric-sub';
+                sub.textContent = item.sub;
+                block.appendChild(label);
+                block.appendChild(value);
+                block.appendChild(sub);
+                metricGrid.appendChild(block);
+            });
+            div.appendChild(metricGrid);
+
+            if (requiresMoreEval) {
+                const hint = document.createElement('p');
+                hint.className = 'pack-eval-hint';
+                hint.textContent = '⚠ Low confidence - run more evaluations';
+                div.appendChild(hint);
+            }
+
+            const footer = document.createElement('div');
+            footer.className = 'pack-eval-footer';
+            const latestReport = es.latest_report_md_url || es.latest_report_json_url;
+            if (latestReport) {
+                const reportLink = document.createElement('a');
+                reportLink.className = 'pack-eval-link';
+                reportLink.href = String(latestReport);
+                reportLink.target = '_blank';
+                reportLink.rel = 'noopener noreferrer';
+                const reportIcon = document.createElement('span');
+                reportIcon.className = 'pack-eval-link-icon';
+                reportIcon.appendChild(createPackIcon('report'));
+                const reportText = document.createElement('span');
+                reportText.textContent = 'View latest report';
+                reportLink.appendChild(reportIcon);
+                reportLink.appendChild(reportText);
+                reportLink.addEventListener('click', (event) => event.stopPropagation());
+                footer.appendChild(reportLink);
+            }
+            if (es.latest_pipeline_run_id) {
+                const pipe = document.createElement('p');
+                pipe.className = 'pack-eval-pipeline';
+                pipe.textContent = `Pipeline ${es.latest_pipeline_run_id}`;
+                footer.appendChild(pipe);
+            }
+            div.appendChild(footer);
+        }
+    }
 
     // Entire card click should open static collection page.
     const collectionId = (pack.collection && pack.collection.id) || pack.plugin?.name || pack.name;
@@ -1614,7 +1853,315 @@ function setupStaticCollectionPage() {
     }
 }
 
-function appendSkillListOl(container, skills, blob, packName) {
+/**
+ * ABEval detailed card for a skill (uses structured fields from data.json).
+ */
+function appendSkillEvalBlock(li, skill) {
+    const ev = skill.evaluation;
+    if (!ev || typeof ev !== 'object') return;
+
+    const card = document.createElement('div');
+    card.className = 'skill-eval-card';
+
+    const headerGrid = document.createElement('div');
+    headerGrid.className = 'skill-eval-header-grid';
+    const headerMain = document.createElement('div');
+    headerMain.className = 'skill-eval-header-main';
+    const header = document.createElement('div');
+    header.className = 'skill-eval-card-header';
+    header.textContent = 'Evaluation summary';
+    headerMain.appendChild(header);
+
+    const rec = String(ev.recommendation || 'unknown').toLowerCase();
+    const statusLabel = rec === 'pass' ? 'PASS' : (rec === 'fail' ? 'FAIL' : 'UNKNOWN');
+    const statusClass = rec === 'pass' ? 'pass' : (rec === 'fail' ? 'fail' : 'unknown');
+    const confidenceBase = Math.min(
+        Number(ev.n_trials_treatment || 0),
+        Number(ev.n_trials_control || 0)
+    );
+    const confText = String(ev.confidence_level || 'LOW');
+    const confClass = confText.toLowerCase();
+    const hasFailures = Boolean(ev.has_failures);
+    const failedTrials = Number(ev.failed_trials || 0);
+    const freshnessAge = formatRelativeAge(ev.generated_at);
+    const generatedAt = new Date(ev.generated_at || '');
+    const ageDays = Number.isNaN(generatedAt.getTime())
+        ? null
+        : Math.floor((Date.now() - generatedAt.getTime()) / (1000 * 60 * 60 * 24));
+    const freshnessState = ageDays != null && ageDays >= 7 ? 'stale' : 'recent';
+    const fisher = typeof ev.fisher_p_value === 'number' ? ev.fisher_p_value : null;
+    const significanceText = confidenceBase < 5
+        ? 'Low (insufficient data)'
+        : (fisher != null && fisher < 0.05
+            ? 'High (statistically significant)'
+            : 'Moderate (not statistically significant)');
+
+    let prT = typeof ev.pass_rate_treatment === 'number' ? ev.pass_rate_treatment : null;
+    if (prT == null && typeof ev.n_passed_treatment === 'number' && Number(ev.n_trials_treatment) > 0) {
+        prT = ev.n_passed_treatment / Number(ev.n_trials_treatment);
+    }
+    let prC = typeof ev.pass_rate_control === 'number' ? ev.pass_rate_control : null;
+    if (prC == null && typeof ev.n_passed_control === 'number' && Number(ev.n_trials_control) > 0) {
+        prC = ev.n_passed_control / Number(ev.n_trials_control);
+    }
+    const pT = prT != null ? `${Math.round(prT * 100)}%` : 'N/A';
+    const passRateLabel = pT !== 'N/A' ? pT : (rec === 'pass' ? '100%' : (rec === 'fail' ? '0%' : 'N/A'));
+    const meanTreatment = typeof ev.mean_reward_treatment === 'number' ? ev.mean_reward_treatment : null;
+    const meanControl = typeof ev.mean_reward_control === 'number' ? ev.mean_reward_control : null;
+    const maxMean = Math.max(meanTreatment || 0, meanControl || 0, 0.0001);
+    const widthT = meanTreatment != null ? `${Math.max(0, (meanTreatment / maxMean) * 100)}%` : '0%';
+    const widthC = meanControl != null ? `${Math.max(0, (meanControl / maxMean) * 100)}%` : '0%';
+    const coverageCount = Number(ev.n_trials_treatment || 0);
+    const coverageTotal = Number(ev.catalog_skill_count || 0);
+    const coveragePct = coverageTotal > 0 ? ((coverageCount / coverageTotal) * 100).toFixed(1) : '0.0';
+
+    const headBadges = document.createElement('span');
+    headBadges.className = 'skill-eval-head-badges';
+    const statusBadge = document.createElement('span');
+    statusBadge.className = `skill-eval-head-badge status ${statusClass}`;
+    const confBadge = document.createElement('span');
+    confBadge.className = `skill-eval-head-badge confidence ${confClass}`;
+    confBadge.textContent = `${confText} confidence`;
+    if (statusClass === 'pass') {
+        const passIcon = document.createElement('span');
+        passIcon.className = 'skill-pass-icon';
+        passIcon.textContent = '✓';
+        statusBadge.appendChild(passIcon);
+    }
+    const statusText = document.createElement('span');
+    statusText.textContent = statusLabel;
+    statusBadge.appendChild(statusText);
+    headBadges.appendChild(statusBadge);
+    headBadges.appendChild(confBadge);
+    headerMain.appendChild(headBadges);
+    const signals = document.createElement('div');
+    signals.className = 'skill-eval-inline-signals';
+    signals.textContent = `${String(ev.coverage_status || '').toLowerCase() || 'partial'} coverage · ${confText.toLowerCase()} confidence (n=${confidenceBase || 0})`;
+    headerMain.appendChild(signals);
+    headerGrid.appendChild(headerMain);
+
+    const metaIcon = (kind) => {
+        const NS = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        svg.setAttribute('stroke-linecap', 'round');
+        svg.setAttribute('stroke-linejoin', 'round');
+        svg.classList.add('skill-eval-meta-icon');
+        const addPath = (d) => {
+            const p = document.createElementNS(NS, 'path');
+            p.setAttribute('d', d);
+            svg.appendChild(p);
+        };
+        const addCircle = (cx, cy, r) => {
+            const c = document.createElementNS(NS, 'circle');
+            c.setAttribute('cx', String(cx));
+            c.setAttribute('cy', String(cy));
+            c.setAttribute('r', String(r));
+            svg.appendChild(c);
+        };
+        if (kind === 'calendar') {
+            addPath('M8 2v4');
+            addPath('M16 2v4');
+            addPath('M3 10h18');
+            addPath('M5 6h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z');
+        } else {
+            addPath('M4 6h16');
+            addPath('M6 12h12');
+            addPath('M8 18h8');
+            addCircle(12, 12, 9);
+        }
+        return svg;
+    };
+    const topMeta = document.createElement('div');
+    topMeta.className = 'skill-eval-top-meta';
+    const evalMeta = document.createElement('span');
+    evalMeta.className = 'skill-eval-meta-item';
+    evalMeta.appendChild(metaIcon('calendar'));
+    const evalMetaText = document.createElement('span');
+    evalMetaText.textContent = `Last evaluated: ${freshnessAge} (${freshnessState})`;
+    evalMeta.appendChild(evalMetaText);
+    const modelMeta = document.createElement('span');
+    modelMeta.className = 'skill-eval-meta-item';
+    modelMeta.appendChild(metaIcon('model'));
+    const modelMetaText = document.createElement('span');
+    modelMetaText.textContent = `Model: ${ev.llm || 'N/A'}`;
+    modelMeta.appendChild(modelMetaText);
+    topMeta.appendChild(evalMeta);
+    topMeta.appendChild(modelMeta);
+    headerGrid.appendChild(topMeta);
+    card.appendChild(headerGrid);
+
+    if (hasFailures) {
+        const failures = document.createElement('div');
+        failures.className = 'skill-eval-inline-signals warn';
+        failures.textContent = `⚠ ${failedTrials} failed trial${failedTrials === 1 ? '' : 's'}`;
+        card.appendChild(failures);
+    }
+    const kpis = document.createElement('div');
+    kpis.className = 'skill-eval-kpis';
+    const kpiItems = [
+        { label: 'Coverage', value: `${coverageCount} / ${coverageTotal || 'N/A'}`, sub: `scenarios tested (${coveragePct}%)` },
+        { label: 'Pass rate (treatment)', value: passRateLabel, sub: `${Number(ev.n_passed_treatment || 0)} pass · ${Number(ev.n_failed_treatment || 0)} fail` },
+        { label: 'Reward (treatment)', value: formatMetric(meanTreatment, 2), sub: 'mean reward' },
+        { label: 'Improvement vs baseline', value: `${(Number(ev.mean_reward_gap || 0) * 100).toFixed(1)}%`, sub: `(+${formatMetric(ev.mean_reward_gap, 2)} reward)` },
+        { label: 'Statistical significance', value: significanceText.split(' ')[0], sub: significanceText.slice(significanceText.indexOf('(') > -1 ? significanceText.indexOf('(') : significanceText.length).replace(/[()]/g, '') || 'interpreted' }
+    ];
+    kpiItems.forEach((item) => {
+        const box = document.createElement('div');
+        box.className = 'skill-eval-kpi';
+        const l = document.createElement('p');
+        l.className = 'kpi-label';
+        l.textContent = item.label;
+        const v = document.createElement('p');
+        v.className = 'kpi-value';
+        v.textContent = item.value;
+        const s = document.createElement('p');
+        s.className = 'kpi-sub';
+        s.textContent = item.sub;
+        box.appendChild(l);
+        box.appendChild(v);
+        box.appendChild(s);
+        kpis.appendChild(box);
+    });
+    card.appendChild(kpis);
+
+    const lower = document.createElement('div');
+    lower.className = 'skill-eval-lower-grid';
+    const compare = document.createElement('div');
+    compare.className = 'skill-eval-compare-card';
+    const cmpTitle = document.createElement('p');
+    cmpTitle.className = 'group-title';
+    cmpTitle.textContent = 'Comparison (mean reward)';
+    compare.appendChild(cmpTitle);
+    const mkRow = (name, width, value, control = false) => {
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        const n = document.createElement('span');
+        n.textContent = name;
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        const fill = document.createElement('i');
+        if (control) fill.className = 'control';
+        fill.style.width = width;
+        bar.appendChild(fill);
+        const em = document.createElement('em');
+        em.textContent = formatMetric(value, 2);
+        row.appendChild(n);
+        row.appendChild(bar);
+        row.appendChild(em);
+        return row;
+    };
+    compare.appendChild(mkRow('Treatment', widthT, meanTreatment, false));
+    compare.appendChild(mkRow('Baseline (control)', widthC, meanControl, true));
+    lower.appendChild(compare);
+
+    const experiment = document.createElement('div');
+    experiment.className = 'skill-eval-group';
+    const expTitle = document.createElement('p');
+    expTitle.className = 'group-title';
+    expTitle.textContent = 'Experiment';
+    experiment.appendChild(expTitle);
+    const expList = document.createElement('ul');
+    expList.className = 'group-list';
+    [
+        `Trials: ${ev.n_trials_treatment ?? 'N/A'}/${ev.n_trials_control ?? 'N/A'} (treatment/control)`,
+        `Treatment: ${Number(ev.n_passed_treatment || 0)} pass / ${Number(ev.n_failed_treatment || 0)} fail`,
+        `Control: ${Number(ev.n_passed_control || 0)} pass / ${Number(ev.n_failed_control || 0)} fail`,
+        `Statistical significance: ${significanceText.toLowerCase()}`
+    ].forEach((txt) => {
+        const liItem = document.createElement('li');
+        liItem.textContent = txt;
+        expList.appendChild(liItem);
+    });
+    experiment.appendChild(expList);
+    lower.appendChild(experiment);
+
+    const trialPreview = document.createElement('div');
+    trialPreview.className = 'skill-eval-evidence-preview';
+    const previewTitle = document.createElement('div');
+    previewTitle.className = 'evidence-title';
+    previewTitle.textContent = '✓ Latest verified execution';
+    const previewLineOne = document.createElement('div');
+    previewLineOne.className = 'evidence-line';
+    const trialState = ev.latest_trial_passed === true ? 'PASS' : (ev.latest_trial_passed === false ? 'FAIL' : 'N/A');
+    previewLineOne.textContent = `${trialState} - reward ${formatMetric(ev.latest_trial_reward, 2)} - ${freshnessAge}`;
+    const previewLineTwo = document.createElement('div');
+    previewLineTwo.className = 'evidence-line';
+    previewLineTwo.textContent = String(ev.latest_trial_name || 'N/A');
+    trialPreview.appendChild(previewTitle);
+    trialPreview.appendChild(previewLineOne);
+    trialPreview.appendChild(previewLineTwo);
+    const detailsLink = document.createElement('a');
+    detailsLink.className = 'collection-inline-link';
+    detailsLink.href = String(ev.report_md_url || ev.report_json_url || '#');
+    detailsLink.target = '_blank';
+    detailsLink.rel = 'noopener noreferrer';
+    detailsLink.textContent = 'View execution details';
+    trialPreview.appendChild(detailsLink);
+    if (ev.report_json_url) {
+        const rawLink = document.createElement('a');
+        rawLink.className = 'collection-inline-link';
+        rawLink.href = String(ev.report_json_url);
+        rawLink.target = '_blank';
+        rawLink.rel = 'noopener noreferrer';
+        rawLink.textContent = 'Raw report (JSON)';
+        trialPreview.appendChild(rawLink);
+    }
+    lower.appendChild(trialPreview);
+    card.appendChild(lower);
+
+    const repro = document.createElement('div');
+    repro.className = 'skill-eval-repro';
+    const reproTitle = document.createElement('strong');
+    reproTitle.textContent = 'Reproducibility';
+    const reproLabels = document.createElement('div');
+    reproLabels.className = 'skill-eval-repro-labels';
+    ['Pipeline', 'Commit', 'Generated', 'Related PR'].forEach((lbl) => {
+        const label = document.createElement('span');
+        label.textContent = lbl;
+        reproLabels.appendChild(label);
+    });
+    const reproValues = document.createElement('div');
+    reproValues.className = 'skill-eval-repro-values';
+    const makeValue = (text, href = '') => {
+        const cell = document.createElement('span');
+        if (href) {
+            const link = document.createElement('a');
+            link.className = 'collection-inline-link';
+            link.href = href;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = `${text} 🔗`;
+            cell.appendChild(link);
+        } else {
+            cell.textContent = text;
+        }
+        return cell;
+    };
+    const commitSha = String(ev.commit_sha || '').trim();
+    const commitShort = commitSha ? commitSha.slice(0, 8) : 'N/A';
+    const commitHref = commitSha
+        ? `https://github.com/RHEcosystemAppEng/agentic-collections/commit/${commitSha}`
+        : '';
+    const prUrl = String(ev.related_pr || '').trim();
+    const prMatch = prUrl.match(/\/pull\/(\d+)(?:\/|$)/);
+    const prLabel = prMatch ? `#${prMatch[1]}` : (prUrl ? 'Open PR' : 'N/A');
+    reproValues.appendChild(makeValue(String(ev.pipeline_run_id || 'N/A')));
+    reproValues.appendChild(makeValue(commitShort, commitHref));
+    reproValues.appendChild(makeValue(String(ev.generated_at || 'N/A')));
+    reproValues.appendChild(makeValue(prLabel, prUrl));
+    repro.appendChild(reproTitle);
+    repro.appendChild(reproLabels);
+    repro.appendChild(reproValues);
+    card.appendChild(repro);
+
+    li.appendChild(card);
+}
+
+function appendSkillListOl(container, skills, blob, packName, listTag = null) {
     const ol = document.createElement('ol');
     ol.className = 'collection-skill-list';
     skills.forEach(skill => {
@@ -1625,6 +2172,13 @@ function appendSkillListOl(container, skills, blob, packName) {
         code.textContent = `/${skill.name || ''}`;
         head.appendChild(code);
         head.appendChild(document.createTextNode(` — ${skill.description || ''}`));
+        if (listTag) {
+            const badge = document.createElement('span');
+            badge.className = 'skill-kind-badge';
+            badge.textContent = String(listTag);
+            head.appendChild(document.createTextNode(' '));
+            head.appendChild(badge);
+        }
         li.appendChild(head);
         if (skill.summary_markdown) {
             const sm = document.createElement('div');
@@ -1632,6 +2186,7 @@ function appendSkillListOl(container, skills, blob, packName) {
             sm.appendChild(createExpandableText(String(skill.summary_markdown), 500));
             li.appendChild(sm);
         }
+        appendSkillEvalBlock(li, skill);
         if (blob && skill.name) {
             const gh = document.createElement('a');
             gh.href = `${blob}/${packName}/skills/${encodeURIComponent(skill.name)}/SKILL.md`;
@@ -1647,6 +2202,24 @@ function appendSkillListOl(container, skills, blob, packName) {
 }
 
 function buildCollectionOverviewPanel(panel, pack, c, blob) {
+    const eso = pack.evaluation_summary;
+    if (eso && typeof eso === 'object' && eso.catalog_skill_count > 0) {
+        const evBanner = document.createElement('p');
+        evBanner.className = 'collection-eval-banner';
+        let bt = `ABEval: ${eso.coverage_label || `${eso.evaluated_count}/${eso.catalog_skill_count} skills evaluated`}`;
+        if (eso.passed_count != null) {
+            bt += ` — ${eso.passed_count} pass`;
+        }
+        if (eso.median_uplift != null && typeof eso.median_uplift === 'number') {
+            bt += ` — median uplift ${eso.median_uplift.toFixed(2)}`;
+        }
+        if (eso.latest_generated_at) {
+            bt += ` — latest ${eso.latest_generated_at}`;
+        }
+        evBanner.textContent = bt;
+        panel.appendChild(evBanner);
+    }
+
     if (c.summary) {
         collectionTabHeading(panel, 'Overview');
         const wrap = document.createElement('div');
@@ -1725,6 +2298,54 @@ function buildCollectionOverviewPanel(panel, pack, c, blob) {
 function buildCollectionSkillsPanel(panel, pack, c, blob) {
     const contents = c.contents || {};
     collectionTabHeading(panel, 'Skills');
+    const ess = pack.evaluation_summary;
+    if (ess && typeof ess === 'object' && ess.catalog_skill_count > 0) {
+        const ban = document.createElement('div');
+        ban.className = 'collection-eval-summary';
+        const icon = document.createElement('div');
+        icon.className = 'collection-eval-summary-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = '📊';
+        ban.appendChild(icon);
+
+        const body = document.createElement('div');
+        body.className = 'collection-eval-summary-body';
+        const title = document.createElement('div');
+        title.className = 'collection-eval-summary-title';
+        const n = Number(ess.evaluated_count || 0);
+        const total = Number(ess.catalog_skill_count || 0);
+        const coveragePct = total > 0 ? ((n / total) * 100) : 0;
+        title.textContent = `Evaluation coverage: ${n} of ${total} skills evaluated (${coveragePct.toFixed(1)}%)`;
+        body.appendChild(title);
+        const note = document.createElement('div');
+        note.className = 'collection-eval-summary-note';
+        if (n <= 0) {
+            note.classList.add('muted');
+            note.textContent = 'No evaluations were executed for this pack yet.';
+        } else {
+            const trials = Number(ess.total_trials_treatment || 0);
+            const confidence = String(ess.confidence_level || 'LOW').toUpperCase();
+            if (confidence === 'LOW') {
+                note.classList.add('warn');
+                note.textContent = `Low confidence - based on ${trials} trial${trials === 1 ? '' : 's'}. More evaluations needed for stronger results.`;
+            } else if (confidence === 'MEDIUM') {
+                note.classList.add('warn');
+                note.textContent = `Moderate confidence - based on ${trials} trial${trials === 1 ? '' : 's'}.`;
+            } else {
+                note.classList.add('ok');
+                note.textContent = `High confidence - based on ${trials} trial${trials === 1 ? '' : 's'}.`;
+            }
+        }
+        body.appendChild(note);
+        ban.appendChild(body);
+
+        const meta = document.createElement('div');
+        meta.className = 'collection-eval-summary-meta';
+        meta.textContent = `Last evaluated: ${ess.latest_generated_at || 'N/A'}`;
+        ban.appendChild(meta);
+
+        panel.appendChild(ban);
+    }
     if (contents.description) {
         const w = document.createElement('div');
         w.className = 'collection-prose';
@@ -1737,7 +2358,7 @@ function buildCollectionSkillsPanel(panel, pack, c, blob) {
         const h3 = document.createElement('h3');
         h3.textContent = orch.length === 1 ? 'Orchestration Skill' : 'Orchestration Skills';
         panel.appendChild(h3);
-        appendSkillListOl(panel, orch, blob, pack.name);
+        appendSkillListOl(panel, orch, blob, pack.name, 'Orchestration skill');
     }
 
     const skills = contents.skills || [];
@@ -1745,7 +2366,7 @@ function buildCollectionSkillsPanel(panel, pack, c, blob) {
         const h3 = document.createElement('h3');
         h3.textContent = orch.length ? 'Basic Skills' : 'Skills';
         panel.appendChild(h3);
-        appendSkillListOl(panel, skills, blob, pack.name);
+        appendSkillListOl(panel, skills, blob, pack.name, null);
     }
 
     const guide = contents.skills_decision_guide || [];
