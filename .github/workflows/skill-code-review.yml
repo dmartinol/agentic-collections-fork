@@ -4,37 +4,19 @@
 # rules (CLAUDE.md, SKILL_DESIGN_PRINCIPLES.md, pack-level CLAUDE.md).
 #
 # Trigger methods:
-#   1. PR comment:       Maintainer comments "/skill-code-review" or "/skill-code-review-all"
-#   2. Reusable call:    Called by skill-ai-review.yml via workflow_call
-#   3. Manual dispatch:  Triggered from Actions tab with PR number
+#   1. PR comment:       Maintainer comments "/skill-code-review"
+#   2. Manual dispatch:  Triggered from Actions tab or `gh workflow run`
 #
 # Security model:
 #   - issue_comment runs from main branch (fork code never executes with secrets)
 #   - Only maintainers listed in MAINTAINERS file can trigger via PR comments
-#   - workflow_call trusts the calling workflow (skill-ai-review.yml) for auth
 
 name: Skill Code Review
 
 on:
-  # Maintainer triggers review by commenting on a PR
   issue_comment:
     types: [created]
 
-  # Called as reusable workflow by skill-ai-review.yml
-  workflow_call:
-    inputs:
-      pr_number:
-        type: number
-        required: true
-      head_sha:
-        type: string
-        required: true
-    outputs:
-      skipped:
-        description: "true if review was skipped (missing credentials)"
-        value: ${{ jobs.review.outputs.skipped }}
-
-  # Manual trigger from the Actions tab
   workflow_dispatch:
     inputs:
       pr_number:
@@ -46,6 +28,10 @@ permissions:
   contents: read
   pull-requests: write
 
+concurrency:
+  group: skill-code-review-${{ github.event.issue.number || inputs.pr_number }}
+  cancel-in-progress: true
+
 # ---------------------------------------------------------------------------
 # Gate job: validates the /skill-code-review command and authorizes the user.
 # Only runs for issue_comment events.
@@ -55,11 +41,7 @@ jobs:
     if: >
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request &&
-      (
-        contains(github.event.comment.body, '/skill-code-review-all') ||
-        contains(github.event.comment.body, '/skill-code-review')
-      ) &&
-      !contains(github.event.comment.body, '/skill-ai-review')
+      contains(github.event.comment.body, '/skill-code-review')
     runs-on: ubuntu-latest
     outputs:
       authorized: ${{ steps.auth.outputs.authorized }}
@@ -75,7 +57,6 @@ jobs:
           sparse-checkout: MAINTAINERS
           sparse-checkout-cone-mode: false
 
-      # Verify the comment author is in the MAINTAINERS file
       - name: Check authorization
         id: auth
         env:
@@ -106,7 +87,7 @@ jobs:
 
           gh pr comment "${{ github.event.issue.number }}" \
             --repo "${{ github.repository }}" \
-            --body "❌ @${{ github.event.comment.user.login }} is not authorized to trigger code reviews. Only maintainers listed in \`MAINTAINERS\` can use \`/skill-code-review\` commands."
+            --body "❌ @${{ github.event.comment.user.login }} is not authorized to trigger code reviews. Only maintainers listed in \`MAINTAINERS\` can use \`/skill-code-review\`."
 
       - name: React with eyes
         if: steps.auth.outputs.authorized == 'true'
@@ -135,36 +116,22 @@ jobs:
   # ---------------------------------------------------------------------------
   review:
     needs: gate
-    # Note: github.event_name inherits the caller's event in workflow_call, so we detect
-    # reusable calls by checking whether inputs were provided.
     if: |
       always() && (
         (needs.gate.result == 'success' && needs.gate.outputs.authorized == 'true') ||
-        inputs.pr_number != ''
+        github.event_name == 'workflow_dispatch'
       )
     runs-on: ubuntu-latest
-    outputs:
-      skipped: ${{ steps.gemini.outputs.skipped }}
 
     steps:
-      # Resolve inputs from whichever trigger fired
       - name: Resolve inputs
         id: inputs
         run: |
-          if [ -n "${{ inputs.pr_number }}" ]; then
-            # workflow_call or workflow_dispatch — inputs are provided
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "pr_number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
-            echo "head_sha=${{ inputs.head_sha }}" >> "$GITHUB_OUTPUT"
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-              echo "standalone=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "standalone=false" >> "$GITHUB_OUTPUT"
-            fi
           else
-            # Direct issue_comment — inputs come from the gate job
             echo "pr_number=${{ needs.gate.outputs.pr_number }}" >> "$GITHUB_OUTPUT"
             echo "head_sha=${{ needs.gate.outputs.head_sha }}" >> "$GITHUB_OUTPUT"
-            echo "standalone=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout PR head
@@ -173,7 +140,6 @@ jobs:
           ref: ${{ steps.inputs.outputs.head_sha || '' }}
           fetch-depth: 1
 
-      # Fetch the PR diff via GitHub API (safe — doesn't execute PR code)
       - name: Get PR diff
         id: diff
         env:
@@ -188,7 +154,6 @@ jobs:
           DIFF_SIZE=$(wc -c < /tmp/pr.diff)
           echo "diff_size=$DIFF_SIZE" >> "$GITHUB_OUTPUT"
 
-          # Truncate large diffs to stay within LLM context limits
           if [ "$DIFF_SIZE" -gt 200000 ]; then
             head -c 200000 /tmp/pr.diff > /tmp/pr_truncated.diff
             echo "truncated=true" >> "$GITHUB_OUTPUT"
@@ -201,7 +166,6 @@ jobs:
         if: steps.diff.outputs.diff_size == '0'
         run: echo "No diff found, skipping review."
 
-      # Build review context from project rules and pack-specific CLAUDE.md files
       - name: Build review context
         if: steps.diff.outputs.diff_size != '0'
         run: |
@@ -214,7 +178,6 @@ jobs:
             cat SKILL_DESIGN_PRINCIPLES.md 2>/dev/null || echo "(not found)"
           } > /tmp/project_rules.txt
 
-          # Include pack-level rules for any packs touched by the PR
           CHANGED_PACKS=$(grep -oP '^diff --git a/([^/]+)/' /tmp/pr.diff | sort -u | sed 's|diff --git a/||;s|/||')
           for pack in $CHANGED_PACKS; do
             if [ -f "$pack/CLAUDE.md" ]; then
@@ -245,12 +208,13 @@ jobs:
             cat /tmp/project_rules_truncated.txt
           } > /tmp/system_full.txt
 
-      # Call the Gemini API for code review
+      # Call the Gemini API with retry for transient errors
       - name: Review with Gemini
         id: gemini
         if: steps.diff.outputs.diff_size != '0'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CODE_REVIEW_LLM_MODEL: ${{ vars.CODE_REVIEW_LLM_MODEL }}
         run: |
           set -euo pipefail
           if [ -z "$GEMINI_API_KEY" ]; then
@@ -259,7 +223,8 @@ jobs:
             exit 0
           fi
 
-          echo "skipped=false" >> "$GITHUB_OUTPUT"
+          MODEL="${CODE_REVIEW_LLM_MODEL:-gemini-3.1-pro-preview}"
+          echo "Using model: $MODEL"
 
           jq -n \
             --rawfile system /tmp/system_full.txt \
@@ -279,59 +244,81 @@ jobs:
               }
             }' > /tmp/request.json
 
-          HTTP_CODE=$(curl -s -o /tmp/response.json -w "%{http_code}" -X POST \
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent" \
-            -H "Content-Type: application/json" \
-            -H "x-goog-api-key: ${GEMINI_API_KEY}" \
-            -d @/tmp/request.json)
+          MAX_ATTEMPTS=5
+          RETRY_DELAY=60
+          TRANSIENT_CODES="429 500 502 503 504"
 
-          if [ "$HTTP_CODE" -ne 200 ]; then
-            echo "::error::Gemini API returned HTTP $HTTP_CODE"
-            jq '{error: .error, status: .status}' /tmp/response.json
+          for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            HTTP_CODE=$(curl -s -o /tmp/response.json -w "%{http_code}" -X POST \
+              "https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent" \
+              -H "Content-Type: application/json" \
+              -H "x-goog-api-key: ${GEMINI_API_KEY}" \
+              -d @/tmp/request.json)
+
+            if [ "$HTTP_CODE" -eq 200 ]; then
+              break
+            fi
+
+            if echo "$TRANSIENT_CODES" | grep -qw "$HTTP_CODE"; then
+              if [ "$attempt" -lt "$MAX_ATTEMPTS" ]; then
+                echo "::warning::Gemini API returned HTTP $HTTP_CODE (attempt $attempt/$MAX_ATTEMPTS), retrying in ${RETRY_DELAY}s..."
+                sleep $RETRY_DELAY
+                continue
+              fi
+            fi
+
+            echo "::error::Gemini API returned HTTP $HTTP_CODE after $attempt attempt(s)"
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+            echo "skipped=false" >> "$GITHUB_OUTPUT"
             exit 1
-          fi
+          done
 
           REVIEW=$(jq -r '.candidates[0].content.parts[0].text // empty' /tmp/response.json)
 
           if [ -z "$REVIEW" ]; then
             echo "::error::Gemini returned empty review"
-            jq '{promptFeedback: .promptFeedback, finishReason: .candidates[0].finishReason}' /tmp/response.json
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+            echo "skipped=false" >> "$GITHUB_OUTPUT"
             exit 1
           fi
 
           echo "$REVIEW" > /tmp/review.md
+          echo "failed=false" >> "$GITHUB_OUTPUT"
+          echo "skipped=false" >> "$GITHUB_OUTPUT"
 
-      # Upload review as artifact for the orchestrator to download
-      - name: Upload review
-        if: steps.diff.outputs.diff_size != '0' && steps.gemini.outputs.skipped != 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: gemini-review
-          path: /tmp/review.md
-          retention-days: 7
-
-      # Post a standalone PR comment only when triggered directly (not via workflow_call).
-      # When called by skill-ai-review.yml, the orchestrator posts the unified comment.
       - name: Post or update review comment
-        if: >
-          steps.inputs.outputs.standalone == 'true' &&
-          steps.diff.outputs.diff_size != '0' &&
-          steps.gemini.outputs.skipped != 'true'
+        if: steps.diff.outputs.diff_size != '0' && always()
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ steps.inputs.outputs.pr_number }}
+          GEMINI_SKIPPED: ${{ steps.gemini.outputs.skipped }}
+          GEMINI_FAILED: ${{ steps.gemini.outputs.failed }}
         run: |
           set -euo pipefail
           MARKER="<!-- gemini-code-review -->"
+          WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
           {
             echo "$MARKER"
             echo "## Gemini Code Review"
             echo ""
-            cat /tmp/review.md
+
+            if [ -f "/tmp/review.md" ]; then
+              echo "<details>"
+              echo "<summary>📝 Review details</summary>"
+              echo ""
+              cat /tmp/review.md
+              echo ""
+              echo "</details>"
+            elif [ "$GEMINI_SKIPPED" = "true" ]; then
+              echo "⚠️ Skipped — \`GEMINI_API_KEY\` secret is not configured."
+            else
+              echo "⚠️ Code review unavailable — check the [workflow run]($WORKFLOW_URL) for details."
+            fi
+
             echo ""
             echo "---"
-            echo "*Automated review by Gemini | Rules: CLAUDE.md, SKILL_DESIGN_PRINCIPLES.md*"
+            echo "> [Workflow run]($WORKFLOW_URL)"
           } > /tmp/comment.md
 
           EXISTING_COMMENT_ID=$(gh api --paginate \
