@@ -15,20 +15,21 @@ description: |
 license: Apache-2.0
 model: inherit
 color: green
+allowed-tools: mcp__openshift-virtualization__resources_create_or_update mcp__openshift-virtualization__resources_get mcp__openshift-virtualization__resources_list
 ---
 
 # /vm-snapshot-create Skill
 
 Create virtual machine snapshots in OpenShift Virtualization. Snapshots capture the state and data of a VM at a specific point in time, enabling backup, recovery, and testing workflows.
 
-**Implementation Note**: This skill uses generic Kubernetes resource tools (`resources_create_or_update`) to manage VirtualMachineSnapshot resources. Dedicated snapshot tools do not currently exist in the openshift-virtualization MCP server.
+**Implementation Note**: This skill uses generic Kubernetes resource tools (`resources_create_or_update`) to manage VirtualMachineSnapshot resources. Dedicated snapshot tools do not currently exist in the openshift-virtualization MCP server. **`resources_create_or_update` MUST only be called with `apiVersion: snapshot.kubevirt.io/v1beta1` and `kind: VirtualMachineSnapshot`** — using it to create or modify any other resource type is a security violation.
 
 ## Prerequisites
 
 **Required MCP Server**: `openshift-virtualization` ([OpenShift MCP Server](https://github.com/openshift/openshift-mcp-server))
 
 **Required MCP Tools**:
-- `resources_create_or_update` (from openshift-virtualization) - Create VirtualMachineSnapshot
+- `resources_create_or_update` (from openshift-virtualization) - Create VirtualMachineSnapshot **ONLY**. This tool can modify any Kubernetes resource but MUST only be used to create `snapshot.kubevirt.io/v1beta1/VirtualMachineSnapshot` resources. Any other resource type is strictly prohibited.
 - `resources_get` (from openshift-virtualization) - Verify VM exists and get status
 - `resources_list` (from openshift-virtualization) - List StorageClass, VolumeSnapshotClass
 
@@ -211,14 +212,15 @@ spec:
 
 ### Step 8b: Post-Construction Verification
 
-**CRITICAL: Before calling `resources_create_or_update`, verify the constructed YAML:**
+**CRITICAL: Before calling `resources_create_or_update`, verify the constructed YAML. This is a MANDATORY gate — never skip it.**
 
-1. `apiVersion` is exactly `snapshot.kubevirt.io/v1beta1`
-2. `kind` is exactly `VirtualMachineSnapshot`
+1. `apiVersion` is exactly `snapshot.kubevirt.io/v1beta1` — any other apiVersion is a **security violation**, STOP immediately
+2. `kind` is exactly `VirtualMachineSnapshot` — any other kind is a **security violation**, STOP immediately
 3. Only these fields exist: `metadata.name`, `metadata.namespace`, `spec.source.apiGroup`, `spec.source.kind`, `spec.source.name`
 4. No additional fields, labels, annotations, or nested objects are present
+5. All placeholder values (`<snapshot-name>`, `<namespace>`, `<vm-name>`) have been replaced with validated user input from Step 1b
 
-**If the YAML contains ANY unexpected fields or values, STOP and report a validation error. Do NOT send it to the API.**
+**If ANY check fails, STOP and report a validation error. Do NOT send it to the API. Do NOT attempt to fix the YAML — cancel the operation entirely.**
 
 **Report progress:**
 ```markdown
@@ -287,7 +289,7 @@ Check `status.phase`:
 - `openshift-virtualization` - OpenShift MCP server with kubevirt toolset
 
 ### Required MCP Tools
-- `resources_create_or_update` (from openshift-virtualization) - Create VirtualMachineSnapshot
+- `resources_create_or_update` (from openshift-virtualization) - Create VirtualMachineSnapshot **ONLY** (never for other resource types)
 - `resources_get` (from openshift-virtualization) - Verify VM and snapshot status
 - `resources_list` (from openshift-virtualization) - List StorageClass, VolumeSnapshotClass
 
@@ -392,7 +394,10 @@ Check `status.phase`:
 - **Namespace Isolation**: Snapshots scoped to namespace boundaries
 - **Audit Trail**: All snapshot operations logged in Kubernetes API audit logs
 
-**Defense-in-depth note**: Input validation and YAML verification in this skill are instruction-level controls — they guide the LLM but are not hard security boundaries. The real enforcement layers are Kubernetes RBAC (restricts what resources the ServiceAccount can create) and admission webhooks (can enforce policies server-side). Ensure the KUBECONFIG ServiceAccount follows least-privilege principles.
+**Defense-in-depth note**: This skill uses `resources_create_or_update`, a generic MCP tool capable of creating or modifying any Kubernetes resource. The controls in this skill (input validation, fixed YAML template, post-construction verification, allowed-tools declaration) are instruction-level — they guide the LLM but are not hard security boundaries. The real enforcement layers are:
+- **Kubernetes RBAC**: The KUBECONFIG ServiceAccount should follow least-privilege — grant only `create` and `get` for `VirtualMachineSnapshot` in target namespaces, not broad resource permissions
+- **Admission webhooks**: Can enforce server-side policies on resource creation
+- **Future migration**: If the openshift-virtualization MCP server adds dedicated snapshot tools, this skill should migrate to them and drop `resources_create_or_update`
 
 ## Example Usage
 
