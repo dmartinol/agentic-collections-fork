@@ -213,7 +213,12 @@ jobs:
             echo "### Gemini Code Review"
             echo ""
             if [ -f "gemini-review/review.md" ]; then
+              echo "<details>"
+              echo "<summary>📝 Review details</summary>"
+              echo ""
               cat gemini-review/review.md
+              echo ""
+              echo "</details>"
             elif [ "$REVIEW_SKIPPED" = "true" ]; then
               echo "⚠️ Skipped — \`GEMINI_API_KEY\` secret is not configured."
             else
