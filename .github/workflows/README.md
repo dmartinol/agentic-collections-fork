@@ -285,19 +285,24 @@ The workflow will fail if:
 - Only one deployment runs at a time (group: "pages")
 - New deployments cancel in-progress ones
 
-### 4. `security-scan.yml` - Skill Security Scan
+### 4. `skill-security-scan.yml` - Skill Security Scan
 
 **Purpose**: Scans skills for security vulnerabilities using [cisco-ai-skill-scanner](https://github.com/cisco-ai-defense/skill-scanner) with LLM-powered analysis. Detects prompt injection, data exfiltration, social engineering, and other AI agent security risks.
 
-**Triggers**:
-- **Pull requests** → Scans changed packs only (when `**/skills/**` or `**/mcps.json` change)
-- **Manual dispatch** → Scan specific PR or all packs
-- **Excludes**: Draft pull requests
+**Trigger methods**:
 
-**Cost optimization**:
-- **Path filters**: Only triggers when skill files or MCP configs change
-- **Concurrency**: Cancels in-progress scans when new commits are pushed
-- **Prerequisite gate**: Waits for `compliance-check` and `skill-linter` to pass before running — if either fails, the scan is skipped to save LLM tokens
+| Method | How | Who |
+|--------|-----|-----|
+| **PR comment** | Comment `/skill-security-scan` on a PR | Maintainers only (see `MAINTAINERS` file) |
+| **Manual dispatch** | Actions tab → Run workflow, or `gh workflow run` | Repo collaborators |
+
+Both `/skill-security-scan` and `/skill-code-review` can be written in **a single PR comment** — each workflow triggers independently.
+
+**Authorization**:
+- Only GitHub users listed in the `MAINTAINERS` file (on the default branch) can trigger via PR comment
+- Unauthorized users receive a 👎 reaction and a rejection message
+- Authorized users receive a 👀 reaction while the scan runs
+- The `MAINTAINERS` file is always read from the default branch, preventing forks from self-authorizing
 
 **What it checks**:
 - YAML/manifest injection risks
@@ -309,10 +314,14 @@ The workflow will fail if:
 - Missing metadata (license, provenance)
 
 **Behavior**:
-- **MEDIUM or higher findings** → ❌ Workflow fails, blocks PR merge
-- **LOW/INFO only** → ✅ Workflow passes
+- Detects packs with changed files in the PR and scans only those
+- **MEDIUM or higher findings** → ❌ Scan fails
+- **LOW/INFO only** → ✅ Scan passes
 - Posts scan summary as PR comment with collapsible report per pack
+- Updates the same comment on re-runs (idempotent)
 - Uploads detailed reports as workflow artifacts (30-day retention)
+
+**Concurrency**: Only one scan runs per PR at a time. New triggers cancel in-progress scans.
 
 **How to run locally**:
 ```bash
@@ -321,7 +330,7 @@ uv pip install --system 'cisco-ai-skill-scanner[google]'
 
 # Set credentials
 export SKILL_SCANNER_LLM_API_KEY=<your-api-key>
-export SKILL_SCANNER_LLM_MODEL=gemini/gemini-2.5-pro  # or openai/gpt-5
+export SKILL_SCANNER_LLM_MODEL=gemini/gemini-2.5-pro
 
 # Scan a single pack
 skill-scanner scan-all rh-virt/skills \
@@ -332,40 +341,73 @@ skill-scanner scan-all rh-virt/skills \
   --output security-report.md
 ```
 
-**Manual workflow dispatch**:
-1. Go to Actions → Skill Security Scan
-2. Click "Run workflow"
-3. Provide:
-   - **PR number** (required) — PR to post results to
-   - **Scan all packs** — `true` for full scan, `false` for changed packs only
+**Manual dispatch via CLI**:
+```bash
+gh workflow run skill-security-scan.yml -f pr_number=42
+```
 
 **Secrets required**:
-- `SKILL_SCANNER_LLM_API_KEY` — API key for LLM provider
-- `SKILL_SCANNER_LLM_MODEL` — Model identifier (e.g., `gemini/gemini-2.5-pro`)
+- `SKILL_SCANNER_LLM_API_KEY` — API key for the LLM provider used by the scanner
+- `SKILL_SCANNER_LLM_MODEL` — Model identifier (e.g., `gemini/gemini-2.5-pro`). Stored as a secret
 
 **Performance**:
 - ~10-15 minutes per pack (depends on number of skills and LLM response time)
 - Uses `uv` instead of `pip` for faster dependency installation with caching
 
 **Related files**:
-- `scripts/detect-changed-packs.sh` - Detects packs with changed files in PRs
 - Security reports uploaded as workflow artifacts
+- `MAINTAINERS` — authorized users list
+- `.github/workflows/skill-security-scan.yml` — workflow definition
 
-### 5. `gemini-code-review.yml` - Gemini Code Review
+### 5. `skill-code-review.yml` - Skill Code Review
 
-**Purpose**: Automated code review using Google Gemini, validating PRs against project rules (CLAUDE.md, SKILL_DESIGN_PRINCIPLES.md).
+**Purpose**: Automated code review using Google Gemini, validating PR diffs against project rules (`CLAUDE.md`, `SKILL_DESIGN_PRINCIPLES.md`, and pack-level `CLAUDE.md` files).
 
-**Triggers**:
-- **Pull requests** (opened, synchronize, reopened)
-- **Manual dispatch** with PR number
+**Trigger methods**:
+
+| Method | How | Who |
+|--------|-----|-----|
+| **PR comment** | Comment `/skill-code-review` on a PR | Maintainers only (see `MAINTAINERS` file) |
+| **Manual dispatch** | Actions tab → Run workflow, or `gh workflow run` | Repo collaborators |
+
+Both `/skill-code-review` and `/skill-security-scan` can be written in **a single PR comment** — each workflow triggers independently.
+
+**Authorization**: Same model as security scan — only users in `MAINTAINERS` (default branch) can trigger via PR comment. See section 4 for details.
 
 **What it does**:
-- Fetches PR diff and project rules
-- Sends to Gemini for review
-- Posts review as PR comment (updates existing comment on re-runs)
+1. Fetches the PR diff (truncated to 200KB if larger)
+2. Collects project rules: root `CLAUDE.md`, `SKILL_DESIGN_PRINCIPLES.md`, and pack-level `CLAUDE.md` for changed packs
+3. Sends diff + rules to Gemini with the review prompt (`.github/gemini-review-prompt.md`)
+4. Posts review as a collapsible PR comment (updates the same comment on re-runs)
+
+**Retry behavior**:
+- Transient Gemini API errors (HTTP 429, 500, 502, 503, 504) are retried automatically
+- Up to **5 attempts** with **60-second delays** between each
+- Non-transient errors fail immediately
+- All error details are logged in the workflow run (not exposed in PR comments)
+
+**Error handling**:
+- If the API key is missing: comment shows `⚠️ Skipped — GEMINI_API_KEY secret is not configured.`
+- If Gemini fails after retries: comment shows `⚠️ Code review unavailable — check the workflow run for details.`
+- Technical error details (HTTP codes, response bodies) are **never** posted to the PR — they stay in workflow logs only
+
+**Concurrency**: Only one review runs per PR at a time. New triggers cancel in-progress reviews.
+
+**How to run via CLI**:
+```bash
+gh workflow run skill-code-review.yml -f pr_number=42
+```
 
 **Secrets required**:
 - `GEMINI_API_KEY` — Google Gemini API key
+
+**Variables** (repository-level):
+- `CODE_REVIEW_LLM_MODEL` — Gemini model to use (default: `gemini-3.1-pro-preview` if not set)
+
+**Related files**:
+- `.github/gemini-review-prompt.md` — system instruction for the review
+- `MAINTAINERS` — authorized users list
+- `.github/workflows/skill-code-review.yml` — workflow definition
 
 ## Adding New Workflows
 
@@ -440,5 +482,5 @@ This README should be updated when:
 - New validation levels are introduced
 - Troubleshooting patterns emerge
 
-**Last Updated**: 2026-05-05
-**Workflows Count**: 5 (skill-spec-report.yml, compliance-check.yml, deploy-pages.yml, security-scan.yml, gemini-code-review.yml)
+**Last Updated**: 2026-05-06
+**Workflows Count**: 5 (skill-spec-report.yml, compliance-check.yml, deploy-pages.yml, skill-security-scan.yml, skill-code-review.yml)
