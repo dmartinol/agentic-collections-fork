@@ -1,2 +1,0 @@
-"""Consistency audit library package."""
-

@@ -1,2 +1,0 @@
-"""Consistency audit check modules."""
-

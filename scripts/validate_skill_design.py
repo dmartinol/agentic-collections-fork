@@ -394,28 +394,21 @@ def check_frontmatter_fields(
     frontmatter: dict | None,
     result: ValidationResult,
 ) -> None:
-    """Check required frontmatter fields and policy-constrained values."""
+    """Check required frontmatter fields (name, description). Model is optional."""
     if not frontmatter:
         result.errors.append("Missing or invalid YAML frontmatter")
         return
 
-    required = ["name", "description", "model", "color"]
+    required = ["name", "description"]
     for field_name in required:
         if field_name not in frontmatter:
             result.errors.append(f"Frontmatter missing required field: {field_name}")
 
-    if "model" in frontmatter:
-        valid_models = {"inherit", "sonnet", "haiku"}
-        if str(frontmatter["model"]).strip().lower() not in valid_models:
-            result.errors.append(
-                f"Frontmatter 'model' must be one of: {', '.join(sorted(valid_models))}"
-            )
-
     if "color" in frontmatter:
         valid_colors = {"red", "blue", "green", "yellow", "cyan", "magenta"}
-        if str(frontmatter["color"]).strip().lower() not in valid_colors:
-            result.errors.append(
-                f"Frontmatter 'color' must be one of: {', '.join(sorted(valid_colors))}"
+        if frontmatter["color"].lower() not in valid_colors:
+            result.warnings.append(
+                f"Frontmatter 'color' should be one of: {', '.join(sorted(valid_colors))}"
             )
 
     if "metadata" in frontmatter:
