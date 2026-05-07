@@ -83,8 +83,7 @@ Create virtual machines in OpenShift Virtualization using the `vm_create` tool f
 **Optional (use defaults):** OS (fedora), Size (medium), Storage (30Gi), Performance (u1), Autostart (false)
 
 **Gather cluster info:**
-- Detect current namespace: `kubectl config view --minify -o jsonpath='{..namespace}' || echo "default"`
-- List namespaces: `namespaces_list` (from openshift-virtualization)
+- List namespaces: `namespaces_list` (from openshift-virtualization) — ask user to select if not provided
 - List StorageClasses: `resources_list` with apiVersion="storage.k8s.io/v1", kind="StorageClass"
 - Identify default SC: annotation `storageclass.kubernetes.io/is-default-class`="true"
 - Analyze SC: `.volumeBindingMode` (Immediate/WaitForFirstConsumer), provisioner (rbd/cephfs=RWX hint)
@@ -194,7 +193,7 @@ Confirm: yes/no/modify
 
 ### Recommended Solution
 <workaround-description>
-**Command**: `oc patch vm <name> -n <namespace> ...`
+**Action**: Update VM via `resources_create_or_update`
 **Impact**: <what-changes>
 **Options**: 1) Apply workaround, 2) Manual, 3) Cancel, 4) Ignore
 ⚠️ MCP limitation: vm_create doesn't support tolerations
@@ -203,7 +202,7 @@ Confirm: yes/no/modify
 **Wait for user decision.**
 
 **If user confirms:**
-1. Apply patch: `resources_create_or_update` (fetch, add tolerations, update) OR `oc patch`
+1. Apply patch: `resources_create_or_update` (fetch, add tolerations, update)
 2. Verify: `resources_get` → Check `.spec.template.spec.tolerations`
 3. **Restart VM**: `vm_lifecycle` (action="restart") to apply new spec
 4. Wait 15-20s, check status → Stopped → Provisioning → Running
@@ -241,7 +240,7 @@ Start: "Start VM <name>" | View: "Show VM <name>"
 **Error**: <error-message>
 
 **Common Causes**:
-- Namespace not exists → `oc create namespace <name>`
+- Namespace not exists → Create via `resources_create_or_update`
 - RBAC denied → Check ServiceAccount permissions
 - Resource constraints → Try smaller size
 - Invalid parameters → Verify OS, size, storage format
@@ -254,7 +253,7 @@ Troubleshooting: See Common Issues
 
 ### Issue 1: Namespace Not Found
 **Error**: "Namespace 'xyz' not found"
-**Solution**: List with `namespaces_list`, create with `resources_create_or_update` or `oc create namespace <name>`
+**Solution**: List with `namespaces_list`, create with `resources_create_or_update`
 
 ### Issue 2: Insufficient Permissions
 **Error**: "Forbidden: User cannot create VirtualMachines"
