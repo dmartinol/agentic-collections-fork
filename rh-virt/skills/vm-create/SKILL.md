@@ -330,7 +330,7 @@ Troubleshooting: See Common Issues
 - **RBAC**: Requires create VirtualMachines (kubevirt.io/v1) in namespace
 - **Namespace Isolation**: VMs in specified namespace only
 - **Storage Quotas**: Respects ResourceQuotas
-- **Image Security**: Uses official images from trusted registries
+- **Image Security**: Default OS options (fedora, ubuntu, rhel, centos-stream, debian, opensuse) use upstream container disk images. Custom images via the `workload` parameter are not validated — warn the user when a custom image URL is provided and confirm the source is trusted before proceeding
 - **KUBECONFIG**: Never exposed (presence only)
 - **Audit**: All ops logged via K8s audit
 
@@ -391,6 +391,6 @@ Agent: [Creates]
 
 ## Advanced Features
 
-**Custom Images**: `vm_create({"workload": "quay.io/containerdisks/fedora:latest", ...})`
+**Custom Images**: `vm_create({"workload": "quay.io/containerdisks/fedora:latest", ...})` — ⚠️ When a custom image URL is provided, warn the user that image provenance is not verified and confirm the source is trusted before creating the VM
 **Secondary Networks**: `vm_create({"networks": ["vlan-network"], ...})` or `{"networks": [{"name": "eth1", "networkName": "vlan"}], ...}`
 **Explicit Instance Type**: `vm_create({"instancetype": "u1.large", ...})`
