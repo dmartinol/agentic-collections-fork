@@ -1,6 +1,6 @@
-# Red Hat Openshift Virtualization (Kubevirt) Agentic Pack
+# Agentic skill pack for Red Hat OpenShift Virtualization (Kubevirt)
 
-OpenShift Virtualization management tools for administering virtual machines on OpenShift clusters. This pack provides automation capabilities for VM lifecycle management, provisioning, and inventory operations using KubeVirt.
+  Provides automation capabilities for VM lifecycle management, provisioning, and inventory operations on OpenShift clusters using KubeVirt.
 
 **Persona**: Virtualization Administrator, OpenShift Administrator
 **Marketplaces**: Claude Code, Cursor
@@ -503,8 +503,8 @@ See main repository [README.md](../README.md) for:
 
 ## References
 
+- [Agentic skill pack for Red Hat OpenShift administration repository](https://github.com/RHEcosystemAppEng/agentic-collections/tree/main/ocp-admin) - Documentation and details for this skill pack
 - [OpenShift Virtualization Documentation](https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html)
-- [KubeVirt User Guide](https://kubevirt.io/user-guide/)
-- [OpenShift MCP Server](https://github.com/openshift/openshift-mcp-server)
-- [MCP Protocol Specification](https://modelcontextprotocol.io/)
-- [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections)
+- [KubeVirt User Guide](https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html)
+- [OpenShift MCP Server](https://github.com/openshift/openshift-mcp-server) - Documentation and details for the OpenShift MCP Server
+- [MCP Protocol Specification](https://modelcontextprotocol.io)
