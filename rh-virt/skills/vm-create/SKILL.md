@@ -16,7 +16,6 @@ description: |
 license: Apache-2.0
 model: inherit
 color: green
-allowed-tools: mcp__openshift-virtualization__resources_get mcp__openshift-virtualization__resources_list mcp__openshift-virtualization__resources_create_or_update mcp__openshift-virtualization__namespaces_list mcp__openshift-virtualization__events_list mcp__openshift-virtualization__vm_create mcp__openshift-virtualization__vm_lifecycle
 ---
 
 # /vm-create Skill

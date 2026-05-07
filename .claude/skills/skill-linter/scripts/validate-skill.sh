@@ -158,7 +158,7 @@ if [ -n "$COMPAT" ]; then
   pass "Compatibility valid ($COMPAT_LEN chars)"
 fi
 
-# Check allowed-tools (required)
+# Check allowed-tools (optional)
 TOOLS=$(echo "$FRONTMATTER" | grep '^allowed-tools:' | sed 's/^allowed-tools:[[:space:]]*//' || true)
 if [ -z "$TOOLS" ]; then
   # Check for YAML multi-line array (allowed-tools:\n  - item)
@@ -166,11 +166,7 @@ if [ -z "$TOOLS" ]; then
     NEXT_LINE=$(echo "$FRONTMATTER" | grep -A1 '^allowed-tools:$' | sed -n '2p')
     if echo "$NEXT_LINE" | grep -qE '^[[:space:]]*-[[:space:]]'; then
       fail "allowed-tools must be space-delimited, not YAML array"
-    else
-      fail "Missing required field: allowed-tools (must list permitted tools)"
     fi
-  else
-    fail "Missing required field: allowed-tools (must list permitted tools)"
   fi
 else
   # FAIL if commas found (must be space-delimited)
