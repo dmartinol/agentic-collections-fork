@@ -165,7 +165,7 @@ Confirm: yes/no/modify
 **Status interpretation:**
 - Stopped/Halted → Success (VM created, not started)
 - Running → Success (if autostart=true)
-- Provisioning → Wait 5s, check again
+- Provisioning → Wait 5s, check again (max 3 retries, then report status as "still provisioning" and suggest the user check back later)
 - ErrorUnschedulable → Execute diagnostic workflow (Step 5a)
 - ErrorDataVolumeNotReady → Storage issue (see Common Issues)
 
