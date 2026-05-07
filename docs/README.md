@@ -39,19 +39,19 @@ To manually update the site:
 4. Commit the updated `docs/data.json` and any `.catalog/` files.
 5. Push to trigger GitHub Pages deployment.
 
-## Consistency Audit for Docs Metadata
+## Validation for Docs Metadata
 
 When changing docs presentation metadata (`styles.css`, `app.js`, `icons.json`, `plugins.json`, `mcp.json`):
 
 1. Prefer canonical tokens from `styles.css` and `style-tokens.json` over hardcoded values.
 2. Ensure every in-scope pack has icon/title mappings in `icons.json` and `plugins.json`.
-3. Run the audit checks:
+3. Run validation checks:
 
 ```bash
-make validate-consistency-audit
+make validate
 ```
 
-4. Review style/icon findings in `reports/consistency-audit.md` before merge.
+4. Review validation output before merge.
 
 ## Security
 

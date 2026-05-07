@@ -294,9 +294,9 @@ gitleaks protect --staged
 
 See [SECURITY.md](SECURITY.md) for details.
 
-## Consistency Audit Severity Guide
+## Validation Severity Guide
 
-Use the consistency audit outputs to prioritize fixes:
+Use validation outputs to prioritize fixes:
 
 - **blocking**: must be fixed before merge; CI fails.
 - **high**: warning in initial rollout; prioritize in same PR when practical.
@@ -305,10 +305,10 @@ Use the consistency audit outputs to prioritize fixes:
 
 Recommended remediation workflow:
 
-1. Run `make validate-consistency-audit`.
-2. Review `reports/consistency-audit.json` and `reports/consistency-audit.md`.
+1. Run `make validate`.
+2. Review the validator output and resolve reported issues.
 3. Fix all blocking findings first, then high findings related to changed files.
-4. Re-run `make validate-consistency-audit-ci` before opening or updating a PR.
+4. Re-run `make validate` before opening or updating a PR.
 
 ## Adding a New MCP Server
 
