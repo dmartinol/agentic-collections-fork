@@ -14,11 +14,7 @@ description: |
 model: inherit
 color: cyan
 license: Apache-2.0
-allowed-tools:
-  - resources_get
-  - resources_list
-  - events_list
-  - pod_list
+allowed-tools: resources_get resources_list events_list pod_list
 metadata:
   user_invocable: "true"
 ---
