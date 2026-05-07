@@ -15,6 +15,7 @@ description: |
 license: Apache-2.0
 model: inherit
 color: red
+allowed-tools: mcp__openshift-virtualization__resources_create_or_update mcp__openshift-virtualization__resources_get
 ---
 
 # /vm-snapshot-restore Skill
