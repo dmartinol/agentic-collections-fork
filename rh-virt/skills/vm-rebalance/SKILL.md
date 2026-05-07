@@ -89,19 +89,13 @@ Orchestrate VM migrations across OpenShift cluster nodes for load balancing, mai
 
 **For Manual Mode:**
 
-**Document Consultation** (REQUIRED - Execute FIRST):
-1. Read [REBALANCE_MANUAL.md](./REBALANCE_MANUAL.md) using Read tool
-2. Output: "I consulted [REBALANCE_MANUAL.md](rh-virt/skills/vm-rebalance/REBALANCE_MANUAL.md) to understand the manual migration workflow."
-3. **Then execute**: Follow workflow in REBALANCE_MANUAL.md
+Follow the workflow defined in [REBALANCE_MANUAL.md](rh-virt/skills/vm-rebalance/REBALANCE_MANUAL.md).
 
 ---
 
 **For Automatic Mode:**
 
-**Document Consultation** (REQUIRED - Execute FIRST):
-1. Read [REBALANCE_AUTOMATIC.md](./REBALANCE_AUTOMATIC.md) using Read tool
-2. Output: "I consulted [REBALANCE_AUTOMATIC.md](rh-virt/skills/vm-rebalance/REBALANCE_AUTOMATIC.md) to understand the automatic rebalancing workflow."
-3. **Then execute**: Follow workflow in REBALANCE_AUTOMATIC.md
+Follow the workflow defined in [REBALANCE_AUTOMATIC.md](rh-virt/skills/vm-rebalance/REBALANCE_AUTOMATIC.md).
 
 ## Common Validation Logic
 
@@ -133,7 +127,7 @@ Orchestrate VM migrations across OpenShift cluster nodes for load balancing, mai
 
 **Error for live migration**: If RWO → "Cannot live migrate. Use cold migration (brief downtime ~30-60s)."
 
-**Reference**: [references/live-migration-best-practices.md](./references/live-migration-best-practices.md)
+**Reference**: [references/live-migration-best-practices.md](rh-virt/skills/vm-rebalance/references/live-migration-best-practices.md)
 
 ### Validation 4: Verify Target Node Exists
 
@@ -143,7 +137,7 @@ Orchestrate VM migrations across OpenShift cluster nodes for load balancing, mai
 
 **Errors**: Not found → "Node doesn't exist" | Not Ready → "Choose different target" | Cordoned → "Uncordon or choose different target"
 
-**Reference**: [../../docs/troubleshooting/scheduling-errors.md](../../docs/troubleshooting/scheduling-errors.md)
+**Reference**: [rh-virt/docs/troubleshooting/scheduling-errors.md](rh-virt/docs/troubleshooting/scheduling-errors.md)
 
 ## Node Selection for Automatic Rebalancing
 
@@ -166,7 +160,7 @@ Filter where ALL true:
 
 **Cold Migration**: Brief downtime (~30-60s). Works with any storage. Stop VM → Update placement → Start on target.
 
-**Reference**: [references/live-migration-best-practices.md](./references/live-migration-best-practices.md)
+**Reference**: [references/live-migration-best-practices.md](rh-virt/skills/vm-rebalance/references/live-migration-best-practices.md)
 
 ## Common Plan Visualization
 
@@ -272,22 +266,22 @@ If any node's CPU or Memory percentage **exceeds 100%** after rebalancing:
 ### Error 1: Live Migration Fails - Storage Not RWX
 **Symptom**: "Cannot live migrate: PVC access mode is ReadWriteOnce"
 **Solution**: Use cold migration OR convert PVC to RWX
-**Reference**: [../../docs/troubleshooting/storage-errors.md](../../docs/troubleshooting/storage-errors.md)
+**Reference**: [rh-virt/docs/troubleshooting/storage-errors.md](rh-virt/docs/troubleshooting/storage-errors.md)
 
 ### Error 2: VM Stuck ErrorUnschedulable After Cold Migration
 **Symptom**: "VM cannot be scheduled: ErrorUnschedulable"
 **Solution**: Check node capacity (`nodes_top`), verify no blocking taints (`resources_get` Node), add tolerations, choose different target, remove nodeSelector
-**Reference**: [../../docs/troubleshooting/scheduling-errors.md](../../docs/troubleshooting/scheduling-errors.md)
+**Reference**: [rh-virt/docs/troubleshooting/scheduling-errors.md](rh-virt/docs/troubleshooting/scheduling-errors.md)
 
 ### Error 3: Live Migration Times Out
 **Symptom**: "Migration exceeded timeout: 150s per GiB"
 **Solution**: Retry migration, reduce VM workload, use cold migration, increase timeout in HyperConverged CR
-**Reference**: [references/performance-tuning.md](./references/performance-tuning.md)
+**Reference**: [references/performance-tuning.md](rh-virt/skills/vm-rebalance/references/performance-tuning.md)
 
 ### Error 4: Migration Rejected - Cluster Limit Reached
 **Symptom**: "Migration rejected: cluster limit reached (5 concurrent)"
 **Solution**: Wait for migrations to complete (`resources_list` VirtualMachineInstanceMigration), retry, migrate sequentially, increase limit
-**Reference**: [references/performance-tuning.md](./references/performance-tuning.md)
+**Reference**: [references/performance-tuning.md](rh-virt/skills/vm-rebalance/references/performance-tuning.md)
 
 ### Error 5: RBAC Permission Denied
 **Symptom**: "Forbidden: User cannot create VirtualMachineInstanceMigration"
@@ -296,13 +290,13 @@ If any node's CPU or Memory percentage **exceeds 100%** after rebalancing:
 ### Error 6: Network Saturation
 **Symptom**: Multiple migrations slow/fail, high network utilization
 **Solution**: Reduce concurrent migrations, set bandwidth limit, use dedicated migration network
-**Reference**: [references/performance-tuning.md](./references/performance-tuning.md)
+**Reference**: [references/performance-tuning.md](rh-virt/skills/vm-rebalance/references/performance-tuning.md)
 
 ### Error 7: Resource Version Conflict During Cold Migration
 **Symptom**: "Apply failed: conflict with 'kubernetes-mcp-server' using .spec.runStrategy"
 **Solution**: After `vm_lifecycle` stop, re-read VM using `resources_get` before updating nodeAffinity (gets fresh resourceVersion)
 **Workflow**: Stop → Wait → Re-read → Update nodeAffinity → Start
-**Reference**: [REBALANCE_MANUAL.md - Sub-step 4b.2.5](./REBALANCE_MANUAL.md)
+**Reference**: [REBALANCE_MANUAL.md - Sub-step 4b.2.5](rh-virt/skills/vm-rebalance/REBALANCE_MANUAL.md)
 
 ## Dependencies
 
@@ -321,20 +315,20 @@ If any node's CPU or Memory percentage **exceeds 100%** after rebalancing:
 ### Reference Documentation
 
 **Skill Strategy Files**:
-- [REBALANCE_MANUAL.md](./REBALANCE_MANUAL.md) - User-driven migration
-- [REBALANCE_AUTOMATIC.md](./REBALANCE_AUTOMATIC.md) - AI-driven rebalancing
+- [REBALANCE_MANUAL.md](rh-virt/skills/vm-rebalance/REBALANCE_MANUAL.md) - User-driven migration
+- [REBALANCE_AUTOMATIC.md](rh-virt/skills/vm-rebalance/REBALANCE_AUTOMATIC.md) - AI-driven rebalancing
 
 **Performance and Best Practices**:
-- [references/live-migration-best-practices.md](./references/live-migration-best-practices.md) - Configuration, requirements, networks
-- [references/performance-tuning.md](./references/performance-tuning.md) - Right-sizing, overcommit, bandwidth
-- [references/anti-patterns.md](./references/anti-patterns.md) - Common mistakes
-- [references/production-considerations.md](./references/production-considerations.md) - HA, capacity, security
+- [references/live-migration-best-practices.md](rh-virt/skills/vm-rebalance/references/live-migration-best-practices.md) - Configuration, requirements, networks
+- [references/performance-tuning.md](rh-virt/skills/vm-rebalance/references/performance-tuning.md) - Right-sizing, overcommit, bandwidth
+- [references/anti-patterns.md](rh-virt/skills/vm-rebalance/references/anti-patterns.md) - Common mistakes
+- [references/production-considerations.md](rh-virt/skills/vm-rebalance/references/production-considerations.md) - HA, capacity, security
 
 **Troubleshooting**:
-- [../../docs/troubleshooting/INDEX.md](../../docs/troubleshooting/INDEX.md) - Master index
-- [../../docs/troubleshooting/scheduling-errors.md](../../docs/troubleshooting/scheduling-errors.md) - ErrorUnschedulable, taints
-- [../../docs/troubleshooting/storage-errors.md](../../docs/troubleshooting/storage-errors.md) - PVC access modes
-- [../../docs/troubleshooting/lifecycle-errors.md](../../docs/troubleshooting/lifecycle-errors.md) - VM start/stop
+- [rh-virt/docs/troubleshooting/INDEX.md](rh-virt/docs/troubleshooting/INDEX.md) - Master index
+- [rh-virt/docs/troubleshooting/scheduling-errors.md](rh-virt/docs/troubleshooting/scheduling-errors.md) - ErrorUnschedulable, taints
+- [rh-virt/docs/troubleshooting/storage-errors.md](rh-virt/docs/troubleshooting/storage-errors.md) - PVC access modes
+- [rh-virt/docs/troubleshooting/lifecycle-errors.md](rh-virt/docs/troubleshooting/lifecycle-errors.md) - VM start/stop
 
 **Official Documentation**:
 - [OpenShift Virt - Live Migration](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html-single/virtualization/index#virt-live-migration)
