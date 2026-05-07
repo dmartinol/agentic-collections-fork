@@ -1,9 +1,20 @@
 ---
 name: incident-triage
 description: |
-  Structured incident investigation for OpenShift using the Five Whys methodology, investigation guardrails, Prometheus metric analysis, and adversarial due diligence. Orchestrates multi-resource diagnosis across Deployments, ReplicaSets, Pods, Services, and cluster resources to trace from observed symptoms to root cause. Use this skill for complex incidents that span multiple resources or when existing debug skills have not resolved the issue. Triggers on /incident-triage command or phrases like "investigate this incident", "triage this alert", "root cause analysis", "why is this failing", "five whys", "what caused this outage".
+  Structured incident investigation for OpenShift using the Five Whys methodology, investigation guardrails, Prometheus metric analysis, and adversarial due diligence. Orchestrates multi-resource diagnosis across Deployments, ReplicaSets, Pods, Services, and cluster resources to trace from observed symptoms to root cause.
+
+  Use when:
+  - "investigate this incident"
+  - "triage this alert"
+  - "root cause analysis"
+  - "what caused this outage"
+  - User mentions "five whys", "incident", "triage", "RCA"
+
+  NOT for single-resource issues with clear patterns (use /debug-pod, /debug-scc, /debug-rbac, or /debug-network instead).
 model: inherit
 color: cyan
+license: Apache-2.0
+allowed-tools: resources_get resources_list events_list pod_list pod_logs get_metric_names get_metric_metadata get_series query
 metadata:
   user_invocable: "true"
 ---
@@ -12,41 +23,99 @@ metadata:
 
 Structured incident investigation for OpenShift — traces from symptoms to root cause using Five Whys, investigation guardrails, and adversarial due diligence.
 
-## Overview
+## Critical: Human-in-the-Loop Requirements
+
+1. **Before any remediation action** (patch, scale, delete, restart)
+   - Display preview: what will change and its impact
+   - Ask: "Should I apply this fix?"
+   - Wait for confirmation (yes/no)
+
+2. **At each investigation phase transition**
+   - Present findings so far
+   - Ask: "Continue to [next phase]? (yes/no)"
+   - Wait for confirmation
+
+**Never assume approval** — always wait for explicit confirmation at each WAIT checkpoint.
+
+## Prerequisites
+
+**Required MCP Servers:**
+- `openshift` ([setup](../../docs/prerequisites.md)) — Kubernetes/OpenShift resource access
+- `observability` — Prometheus metric discovery and PromQL query execution
+
+**Required MCP Tools:**
+- `resources_get` (from openshift) — Retrieve Deployment, ReplicaSet, Pod, Service, and other resource details
+- `resources_list` (from openshift) — List resources by kind in a namespace
+- `pod_list` (from openshift) — List pods matching label selectors
+- `pod_logs` (from openshift) — Retrieve container logs (current and previous)
+- `events_list` (from openshift) — Fetch events filtered by resource
+- `get_metric_names` (from observability) — Discover available Prometheus metrics
+- `get_metric_metadata` (from observability) — Confirm metric type (counter vs gauge)
+- `get_series` (from observability) — Discover available label sets for a metric
+- `query` (from observability) — Execute PromQL queries for trend and saturation analysis
+
+**Verification Steps:**
+1. Check `openshift` server is configured in `mcps.json`
+2. Check `observability` server is configured in `mcps.json`
+3. Verify user is logged into an OpenShift cluster (`oc whoami` succeeds)
+4. Verify user has access to the target namespace(s)
+5. If missing → Human Notification Protocol
+
+**Human Notification Protocol:**
+
+When prerequisites fail:
+1. **Stop immediately** — No tool calls
+2. **Report error:**
+   ```
+   ❌ Cannot execute skill: MCP server `openshift` / `observability` unavailable
+   📋 Setup: See docs/prerequisites.md for cluster access configuration
+   ```
+3. **Request decision:** "How to proceed? (setup/skip/abort)"
+4. **Wait for user input**
+
+**Security:** Never display credential values.
+
+## When to Use This Skill
+
+Use `/incident-triage` when:
+- The incident spans multiple resources or namespaces
+- The root cause is unclear after initial investigation
+- You need a structured RCA with confidence scoring and Five Whys methodology
+- An alert fired and you need to trace from symptom to root cause
+- A predicted issue (e.g., from `predict_linear`) needs proactive assessment
+
+Do **not** use this skill when:
+- The issue is a single pod crashing → use `/debug-pod`
+- SCC admission is blocking pod creation → use `/debug-scc`
+- RBAC 403 errors in pod logs → use `/debug-rbac`
+- Service/Route connectivity failure → use `/debug-network`
+- Build failure → use `/debug-build`
+
+## Workflow
 
 ```
 [Gather Context] → [Hierarchical Investigation] → [Evidence + Metrics] → [Five Whys RCA] → [Due Diligence] → [Findings + Actions]
 ```
 
-**This skill provides:**
-- Structured Five Whys methodology for causal depth
-- Multi-resource investigation across the Kubernetes ownership chain
-- Prometheus metric analysis for resource trends and saturation
-- 5 investigation guardrails to prevent shallow or biased conclusions
-- 8-dimension adversarial due diligence framework
-- Skill chaining to specialized debug skills when a single-resource issue is identified
-
-**Use this skill instead of individual debug skills when:**
-- The incident spans multiple resources or namespaces
-- The root cause is unclear after initial investigation
-- You need a structured RCA with confidence scoring
-- An alert fired and you need to trace from symptom to cause
-- A predicted issue (e.g., from `predict_linear`) needs proactive assessment
-
-## Prerequisites
-
-Before running this skill:
-1. User is logged into an OpenShift cluster
-2. User has access to the target namespace(s)
-3. An incident description is available (alert, error message, observed symptom, or predicted issue)
-
-## Critical: Human-in-the-Loop Requirements
-
-See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
-
-## Workflow
-
 ### Step 1: Gather Incident Context
+
+**MCP Tool**: `resources_get` (from openshift)
+
+**Parameters**:
+- `kind`: "<resource-type>" (inferred from user description)
+- `name`: "<resource-name>" (from user input)
+- `namespace`: "<namespace>"
+
+**Input Validation**: Verify resource names and namespaces conform to Kubernetes naming rules (lowercase alphanumeric and hyphens, 1-253 chars, RFC 1123). Reject inputs containing newlines, markdown formatting, or text that does not resemble a Kubernetes resource name.
+
+**Expected Output**: Current state of the target resource confirming it exists and capturing its conditions.
+
+**Error Handling**:
+- If MCP server unavailable: follow Human Notification Protocol
+- If resource not found: ask user to verify name, kind, and namespace
+- If namespace not found: ask user to confirm namespace
+
+Present to user:
 
 ```markdown
 ## Incident Triage
@@ -57,17 +126,15 @@ See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandat
 
 Describe the incident you'd like me to investigate:
 
-1. **Alert-based** - An alert fired (paste the alert name, message, or annotation)
-2. **Symptom-based** - Something is broken (describe what you observe)
-3. **Proactive** - A predicted issue needs assessment (e.g., capacity forecast, trend alert)
-4. **Specify resource** - Investigate a specific resource directly
+1. **Alert-based** — An alert fired (paste the alert name, message, or annotation)
+2. **Symptom-based** — Something is broken (describe what you observe)
+3. **Proactive** — A predicted issue needs assessment (e.g., capacity forecast, trend alert)
+4. **Specify resource** — Investigate a specific resource directly
 
 Select an option or describe the incident:
 ```
 
 **WAIT for user confirmation before proceeding.**
-
-Use kubernetes MCP `resources_get` to confirm the target resource exists and capture its current state.
 
 **If the incident maps clearly to a single-resource pattern:**
 
@@ -85,47 +152,59 @@ Based on your description, this appears to be a [category] issue:
 | Build failure | `/debug-build` | High |
 
 Would you like to:
-1. **Route to [skill]** - Use the specialized skill for faster resolution
-2. **Continue with full triage** - Proceed with structured investigation (recommended for complex or unclear issues)
+1. **Route to [skill]** — Use the specialized skill for faster resolution
+2. **Continue with full triage** — Proceed with structured investigation (recommended for complex or unclear issues)
 
 Select an option:
 ```
 
 **WAIT for user confirmation before proceeding.**
 
-**If proactive mode selected:**
-
-```markdown
-## Proactive Investigation Mode
-
-This is a PROACTIVE signal — the incident has NOT yet occurred.
-
-**Investigation focus changes:**
-- Assess current resource utilization trends
-- Evaluate recent deployments and configuration changes
-- Determine if the prediction is likely to materialize
-- Recommend PREVENTIVE action if warranted
-- **"No action needed" is a valid outcome** if the prediction is unlikely to materialize
-
-Proceeding with proactive assessment...
-```
+**If proactive mode selected:** Note this is a PROACTIVE signal — the incident has NOT yet occurred. Focus on utilization trends, recent changes, and whether the prediction is likely to materialize. "No action needed" is a valid outcome.
 
 ### Step 2: Hierarchical Investigation
 
-Follow the Kubernetes ownership chain from the target resource downward. The goal is to understand the full state of the workload, not just the resource that reported the symptom.
+**MCP Tool**: `resources_get` (from openshift)
+
+**Parameters**:
+- `kind`: "Deployment" / "ReplicaSet" / "StatefulSet" (trace ownership chain)
+- `name`: "<resource-name>"
+- `namespace`: "<namespace>"
+
+**MCP Tool**: `pod_list` (from openshift)
+
+**Parameters**:
+- `namespace`: "<namespace>"
+- `labelSelector`: "<app-label>=<value>" (from workload `.spec.selector.matchLabels`)
+
+**MCP Tool**: `pod_logs` (from openshift)
+
+**Parameters**:
+- `name`: "<pod-name>" (from pod_list, check up to 3 representative pods)
+- `namespace`: "<namespace>"
+- `tailLines`: 50 (integer, last N lines)
+
+**MCP Tool**: `events_list` (from openshift)
+
+**Parameters**:
+- `namespace`: "<namespace>"
+- Filter by involved object matching the target resource
+
+**Expected Output**: Full ownership chain state (Deployment -> ReplicaSet -> Pod -> Container), events, and log analysis.
+
+**Error Handling**:
+- If permission denied on a resource: report as investigation limitation, do not conflate with incident root cause
+- If pods not found: workload may be scaled to zero or resource type differs
+- If logs empty: container may not have started; check container state
 
 **Investigation rules:**
 - **Trace the ownership chain**: For Deployments, inspect Deployment -> ReplicaSet -> Pod -> Container. For StatefulSets, inspect StatefulSet -> Pod -> Container.
-- **Always check describe AND logs**: A resource reporting "Running" does not mean it is healthy. Check logs for runtime errors even when status looks clean.
-- **Check both current and previous logs**: A pod restart means current logs may not contain relevant pre-restart data. Use both `pod_logs` and previous container logs.
-- **Pod sampling limit**: If the issue affects many pods in the same workload, check up to 3 representative pods. No need to check every pod.
-- **Specific answers required**: Do not say "the pod is pending" without explaining WHY. Do not say "affinity doesn't match" without specifying WHICH label.
+- **Always check describe AND logs**: A resource reporting "Running" does not mean it is healthy.
+- **Check both current and previous logs**: A pod restart means current logs may not contain relevant pre-restart data.
+- **Pod sampling limit**: If the issue affects many pods, check up to 3 representative pods.
+- **Specific answers required**: Do not say "the pod is pending" without explaining WHY.
 
-Use kubernetes MCP tools:
-- `resources_get` for Deployment, ReplicaSet, StatefulSet details
-- `pod_list` to find pods owned by the workload
-- `pod_logs` for container logs (current and previous)
-- `events_list` for namespace events filtered by resource
+Present to user:
 
 ```markdown
 ## Hierarchical Investigation: [resource-name]
@@ -156,41 +235,37 @@ Continue with evidence collection and metric analysis? (yes/no)
 
 ### Step 3: Evidence Collection and Guardrails
 
-Before reaching any conclusion, apply these investigation guardrails:
+Apply these investigation guardrails before reaching any conclusion:
 
-1. **Exhaustive Verification**: Inspect ALL resources mentioned in the signal, error messages, and annotations. Partial evidence does not rule out the problem. Check upstream and downstream dependencies.
+1. **Exhaustive Verification**: Inspect ALL resources mentioned in the signal, error messages, and annotations. Check upstream and downstream dependencies.
+2. **Contradicting Evidence Search**: After forming a hypothesis, explicitly search for evidence that CONTRADICTS it.
+3. **Causal Depth**: If the identified cause can itself be explained by a deeper cause, keep investigating.
+4. **Evidence-Based Claims Only**: Every claim must trace to specific tool output. State unverified claims explicitly.
+5. **Investigation Error Separation**: Distinguish between "error X caused this problem" and "I encountered errors during investigation." Permission errors are obstacles to YOUR investigation, not necessarily the incident's root cause.
 
-2. **Contradicting Evidence Search**: After forming a hypothesis, explicitly search for evidence that CONTRADICTS it. If you cannot find contradicting evidence, note what you searched for.
+**MCP Tool**: `get_metric_names` (from observability)
 
-3. **Causal Depth**: If the identified cause can itself be explained by a deeper cause, keep investigating. The signal resource often reports the symptom; the root cause is typically in a different resource.
+**Parameters**:
+- `match`: "{__name__=~\".*<keyword>.*\"}" (filter by relevant metric patterns, e.g., memory, disk, connections)
 
-4. **Evidence-Based Claims Only**: Every claim must trace to specific tool output. If you cannot verify a claim, state it as unverified.
+**MCP Tool**: `get_metric_metadata` (from observability)
 
-5. **Investigation Error Separation**: Distinguish between "I found error X caused this problem" and "I encountered errors during investigation that prevented analysis." Permission errors (e.g., `Forbidden`) are obstacles to YOUR investigation, not necessarily the incident's root cause.
+**Parameters**:
+- `metric`: "<metric-name>" (confirm type before querying)
 
-**Permission Error Handling:**
-If you encounter `Error from server (Forbidden):` during investigation:
-- Identify the missing resource, API group, and verbs from the error
-- Report the gap as an investigation limitation
-- Do NOT conflate investigation permission errors with the incident's root cause
+**MCP Tool**: `query` (from observability)
 
-**Prometheus Metric Analysis:**
+**Parameters**:
+- `query`: "<PromQL expression>" (use `topk(10, ...)` to limit cardinality, `rate()` for counters, scope with `{namespace="<target>"}`)
 
-Use the observability MCP to investigate resource trends and saturation:
+**Expected Output**: Guardrail compliance table, metric analysis, and cross-resource findings.
 
-**Discovery pattern:**
-1. `get_metric_names` with `match` filter (e.g., `{__name__=~".*memory.*|.*oom.*"}` for memory issues, `{__name__=~".*fs.*|.*disk.*"}` for disk issues)
-2. `get_metric_metadata` to confirm metric type (counter vs gauge) before querying
-3. `get_series` with a specific selector to discover available label sets
+**Error Handling**:
+- If observability MCP unavailable: skip metric analysis, note limitation
+- If Prometheus response truncated: narrow with more specific label selectors or `topk()`
+- If permission denied on cluster resources: report gap, do not conflate with root cause
 
-**Query patterns:**
-- Use `topk(10, ...)` or `bottomk(10, ...)` to limit cardinality
-- For counters, always wrap with `rate()` or `increase()`
-- Break down per-workload with `by (pod, namespace, container)`
-- Scope queries with `{namespace="<target>"}`
-- For capacity forecasting, use `predict_linear(<metric>[6h], 3600 * 24)`
-
-**Truncation awareness:** Prometheus responses may be truncated. If truncated, narrow with more specific label selectors or `topk()` rather than assuming partial data is complete.
+Present to user:
 
 ```markdown
 ## Evidence Summary
@@ -209,9 +284,6 @@ Use the observability MCP to investigate resource trends and saturation:
 |--------|--------------|-------|-----------|------------|
 | [metric-name] | [value] | [rising/stable/falling] | [threshold] | [OK/WARNING/CRITICAL] |
 
-**Cross-Resource Findings:**
-[Evidence gathered from upstream/downstream resources, other namespaces, or cluster-level resources]
-
 Continue to root cause analysis? (yes/no)
 ```
 
@@ -219,7 +291,15 @@ Continue to root cause analysis? (yes/no)
 
 ### Step 4: Root Cause Analysis (Five Whys)
 
-Construct the causal chain from the observed signal to the deepest reachable root cause:
+Construct the causal chain from the observed signal to the deepest reachable root cause.
+
+**Expected Output**: Five Whys chain, remediation target, and signal classification.
+
+**Error Handling**:
+- If causal chain is shallow (fewer than 3 levels): note that deeper investigation may be needed
+- If multiple competing root causes: present both with relative confidence
+
+Present to user:
 
 ```markdown
 ## Root Cause Analysis
@@ -230,15 +310,15 @@ Construct the causal chain from the observed signal to the deepest reachable roo
 2. **Why?** [First-level cause — what directly caused the signal]
 3. **Why?** [Second-level cause — what caused the first-level cause]
 4. **Why?** [Third-level cause — deeper configuration or state issue]
-5. **Root Cause**: [Deepest identifiable cause — the configuration, change, or condition that triggered the chain]
+5. **Root Cause**: [Deepest identifiable cause]
 
 ### Remediation Target
 
 | Field | Value |
 |-------|-------|
 | Kind | [Deployment/StatefulSet/ConfigMap/etc.] |
-| Name | [resource-name] |
-| Namespace | [namespace] |
+| Name | <resource-name> |
+| Namespace | <namespace> |
 | Why this target? | [This is the resource whose configuration change fixes the problem, NOT the resource that reported the symptom] |
 
 ### Signal Classification
@@ -246,15 +326,8 @@ Construct the causal chain from the observed signal to the deepest reachable roo
 | Field | Value |
 |-------|-------|
 | Root cause matches input signal? | [Yes/No — if No, the signal was a symptom] |
-| Actual signal name | [e.g., if input was OOMKilled but root cause is NodePressure] |
 | Severity | [critical/high/medium/low] |
 | Investigation type | [Reactive RCA / Proactive Prevention] |
-
-[If proactive mode:]
-**Prediction Assessment:**
-- Likelihood of materialization: [High/Medium/Low]
-- Time horizon: [estimated time until incident]
-- Recommendation: [Preventive action / Monitor / No action needed]
 
 Continue to due diligence review? (yes/no)
 ```
@@ -263,29 +336,33 @@ Continue to due diligence review? (yes/no)
 
 ### Step 5: Adversarial Due Diligence
 
-Before finalizing findings, perform a comprehensive self-review across 8 dimensions. This prevents shallow analysis, targeting errors, and overconfident conclusions.
+Before finalizing findings, perform a self-review across 8 dimensions to prevent shallow analysis, targeting errors, and overconfident conclusions.
+
+**Expected Output**: Due diligence assessment table with confidence score.
+
+**Error Handling**:
+- If confidence < 0.7: recommend gathering additional evidence or escalating
+
+Present to user:
 
 ```markdown
 ## Adversarial Due Diligence Review
 
 | Dimension | Assessment |
 |-----------|------------|
-| **1. Causal Completeness** | [Have you traced the full chain from signal to deepest root cause? Could the identified root cause be explained by a yet deeper cause?] |
-| **2. Target Accuracy** | [Is the remediation target the resource whose configuration change fixes the problem? Or are you targeting the symptom reporter? Signals propagate upward; fixes apply to the misconfigured resource.] |
-| **3. Evidence Sufficiency** | [Is every claim backed by specific tool output? Which claims are assumptions? What data sources were inaccessible?] |
-| **4. Alternative Hypotheses** | [What alternative root causes did you consider? What contradicting evidence did you search for? Were alternatives explicitly ruled out with evidence?] |
-| **5. Scope Completeness** | [Did you investigate ALL resources mentioned in the signal? Did you check upstream and downstream dependencies? What was NOT examined?] |
-| **6. Proportionality** | [Does the remediation target match the scope of the problem? Is the fix targeted and specific, or overly broad?] |
-| **7. Regression Awareness** | [Has this issue occurred before? Are there recent events suggesting a recurring pattern? If unknown, state "No prior history available."] |
-| **8. Confidence Calibration** | [Start at 1.0 and list each factor that reduced confidence: unverified claims, inaccessible data, permission gaps, remaining alternative hypotheses. Final score: X.XX] |
+| **1. Causal Completeness** | [Full chain traced? Could root cause have a deeper cause?] |
+| **2. Target Accuracy** | [Is remediation target the misconfigured resource, not the symptom reporter?] |
+| **3. Evidence Sufficiency** | [Every claim backed by tool output? Which claims are assumptions?] |
+| **4. Alternative Hypotheses** | [What alternatives were considered and ruled out with evidence?] |
+| **5. Scope Completeness** | [All resources investigated? What was NOT examined?] |
+| **6. Proportionality** | [Is the fix targeted and specific, or overly broad?] |
+| **7. Regression Awareness** | [Has this occurred before? Recent events suggesting recurrence?] |
+| **8. Confidence Calibration** | [Start at 1.0, list each reduction factor. Final score: X.XX] |
 
 **Overall Confidence: [0.XX]**
 
 [If confidence < 0.7:]
-**WARNING**: Confidence is below 0.7. Consider:
-- Gathering additional evidence before acting
-- Escalating to a human operator for review
-- Running targeted debug skills for specific resource types
+**WARNING**: Confidence is below 0.7. Consider gathering additional evidence, escalating, or running targeted debug skills.
 
 Proceed to findings summary? (yes/no)
 ```
@@ -293,6 +370,16 @@ Proceed to findings summary? (yes/no)
 **WAIT for user confirmation before proceeding.**
 
 ### Step 6: Present Findings and Recommend Actions
+
+Synthesize all findings into a structured report with actionable remediation.
+
+**Expected Output**: Root cause summary, contributing factors, remediation commands, and verification steps.
+
+**Error Handling**:
+- If remediation requires destructive actions: ensure HITL confirmation before execution
+- If multiple fix options exist: present least-privilege option first
+
+Present to user:
 
 ```markdown
 ## Incident Triage Findings
@@ -305,9 +392,9 @@ Proceed to findings summary? (yes/no)
 
 ### Causal Chain
 
-1. [Signal → first cause]
-2. [First cause → second cause]
-3. [Second cause → root cause]
+1. [Signal -> first cause]
+2. [First cause -> second cause]
+3. [Second cause -> root cause]
 
 ### Remediation Target
 
@@ -317,7 +404,6 @@ Proceed to findings summary? (yes/no)
 
 - [Factor 1 — specific evidence]
 - [Factor 2 — specific evidence]
-- [Factor 3 — specific evidence]
 
 ### Recommended Actions
 
@@ -331,20 +417,13 @@ Proceed to findings summary? (yes/no)
    [oc command]
    ```
 
-3. **[Monitoring/follow-up]** — [description]
-
 ### Verification
 
 After applying the fix:
 ```bash
-# Verify the resource is healthy
-oc get [resource-type] [name] -n [namespace]
-
-# Check events for new issues
-oc get events -n [namespace] --sort-by='.lastTimestamp' | tail -20
-
-# Verify pods are running
-oc get pods -n [namespace] -l [app-label]
+oc get <resource-type> <name> -n <namespace>
+oc get events -n <namespace> --sort-by='.lastTimestamp' | tail -20
+oc get pods -n <namespace> -l <app-label>
 ```
 
 ### Related Skills
@@ -378,17 +457,34 @@ Select an option:
 ## Dependencies
 
 ### Required MCP Servers
-- `openshift` - Kubernetes/OpenShift resource access for Deployments, Pods, Events, Services, and cluster resources
-- `observability` - Prometheus metric discovery, metadata, series, and PromQL query execution for trend analysis and saturation detection
+- `openshift` — Kubernetes/OpenShift resource access for Deployments, Pods, Events, Services, and cluster resources ([setup](../../docs/prerequisites.md))
+- `observability` — Prometheus metric discovery, metadata, series, and PromQL query execution
+
+### Required MCP Tools
+- `resources_get` (from openshift) — Retrieve individual resource details
+- `resources_list` (from openshift) — List resources by kind in a namespace
+- `pod_list` (from openshift) — List pods matching label selectors
+- `pod_logs` (from openshift) — Retrieve container logs (current and previous)
+- `events_list` (from openshift) — Fetch events filtered by involved object
+- `get_metric_names` (from observability) — Discover available Prometheus metrics by pattern
+- `get_metric_metadata` (from observability) — Confirm metric type before querying
+- `get_series` (from observability) — Discover label sets for a metric
+- `query` (from observability) — Execute PromQL queries
 
 ### Related Skills
-- `/debug-pod` - Single-pod failure diagnosis (CrashLoopBackOff, OOMKilled, ImagePullBackOff)
-- `/debug-scc` - SCC admission violation diagnosis
-- `/debug-rbac` - RBAC permission failure diagnosis
-- `/debug-network` - Service/Route connectivity diagnosis
-- `/debug-build` - Build failure diagnosis
-- `/deploy` - Redeployment after fixes
+- `/debug-pod` — Single-pod failure diagnosis (CrashLoopBackOff, OOMKilled, ImagePullBackOff)
+- `/debug-scc` — SCC admission violation diagnosis
+- `/debug-rbac` — RBAC permission failure diagnosis
+- `/debug-network` — Service/Route connectivity diagnosis
+- `/debug-build` — Build failure diagnosis
+- `/deploy` — Redeployment after fixes
 
 ### Reference Documentation
-- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting trees
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
+- **Internal:** [docs/debugging-patterns.md](../../docs/debugging-patterns.md) — Common error patterns and troubleshooting trees
+- **Official:** [OpenShift Troubleshooting](https://docs.openshift.com/container-platform/latest/support/troubleshooting/troubleshooting-operator-issues.html)
+
+## Example Usage
+
+**User**: Alert `DatabaseConnectionPoolExhausted` fired in namespace `production`. Active connections are at 95% of max. What's going on?
+
+**Skill response**: The skill gathers the alert context, traces the ownership chain from the PostgreSQL Deployment through its ReplicaSet and Pods, checks container logs for connection errors, queries Prometheus for `pg_stat_activity_count` trends and `max_connections` settings, applies investigation guardrails, and constructs a Five Whys chain identifying a connection-leaking sidecar as the root cause. It presents the findings with 0.92 confidence, recommending a targeted fix to the leaking container's connection pool configuration.
