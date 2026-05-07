@@ -125,7 +125,7 @@ The agentic collection transforms raw MCP tools into a reliable, safe, and user-
 
 - Claude Code CLI or IDE extension
 - Podman or Docker installed
-- Red Hat Lightspeed service account ([setup guide](https://console.redhat.com/))
+- Red Hat Lightspeed service account ([setup guide](https://github.com/RedHatInsights/insights-mcp#service-account-setup))
 
 ### Environment Setup
 
@@ -412,7 +412,7 @@ The pack integrates with three MCP servers (configured in `mcps.json`):
 - Remediation playbook generation
 - Requires: `LIGHTSPEED_CLIENT_ID`, `LIGHTSPEED_CLIENT_SECRET`
 
-**Repository**: https://github.com/redhat/lightspeed-mcp
+**Repository**: https://github.com/RedHatInsights/insights-mcp
 
 ### 2. **aap-mcp-job-management** - AAP Job Management
 - Job template management (list, retrieve, launch)
@@ -630,14 +630,16 @@ See main repository [CLAUDE.md](../CLAUDE.md) for:
 
 ## License
 
-[Apache 2.0](LICENSE)
+[Apache 2.0](../LICENSE)
 
 ## References
 
-- [Red Hat Lightspeed](https://console.redhat.com/insights)
-- [lightspeed-mcp GitHub](https://github.com/redhat/lightspeed-mcp)
+- [Agentic skill pack for Site Reliability Engineers repository](https://github.com/RHEcosystemAppEng/agentic-collections/tree/main/rh-sre) - Documentation and details for this skill pack
+- [Red Hat Lightspeed](https://www.redhat.com/en/lightspeed)
+- [Red Hat Hybrid Cloud Console](https://console.redhat.com)
+- [Red Hat Lightspeed MCP](https://github.com/RedHatInsights/insights-mcp)
 - [Ansible Automation Platform](https://www.redhat.com/en/technologies/management/ansible)
 - [AAP REST API Documentation](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/)
 - [Claude Code Documentation](https://docs.anthropic.com/claude-code)
-- [MCP Protocol Specification](https://modelcontextprotocol.io/)
 - [Main Repository](https://github.com/RHEcosystemAppEng/agentic-collections)
+- [MCP Protocol Specification](https://modelcontextprotocol.io/)
