@@ -220,6 +220,7 @@ jobs:
               --recursive \
               --use-behavioral \
               --use-llm \
+              --llm-consensus-runs 3 \
               --check-overlap \
               --enable-meta \
               --fail-on-severity medium \
@@ -237,6 +238,7 @@ jobs:
           fi
 
       - name: Upload security reports
+        id: upload
         if: steps.detect.outputs.pack_count != '0' && steps.creds.outputs.available == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
@@ -257,6 +259,8 @@ jobs:
           set -euo pipefail
           MARKER="<!-- skill-security-scan -->"
           SCAN_RESULT="${{ steps.scan.outputs.scan_result }}"
+          ARTIFACT_URL="${{ steps.upload.outputs.artifact-url }}"
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
 
           if [ "$SCAN_RESULT" = "passed" ]; then
             ICON="✅"
@@ -264,8 +268,26 @@ jobs:
             ICON="❌"
           fi
 
+          EXISTING_COMMENT_ID=$(gh api --paginate \
+            "/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" \
+            | head -1)
+
+          EXISTING_BODY=""
+          RUN_NUMBER=1
+          if [ -n "$EXISTING_COMMENT_ID" ]; then
+            EXISTING_BODY=$(gh api \
+              "/repos/${{ github.repository }}/issues/comments/$EXISTING_COMMENT_ID" \
+              --jq '.body')
+            RUN_NUMBER=$(( $(echo "$EXISTING_BODY" | grep -c '### 🔄 Run #' || true) + 1 ))
+          fi
+
           {
-            echo "$MARKER"
+            if [ "$RUN_NUMBER" -eq 1 ]; then
+              echo "$MARKER"
+            fi
+            echo "### 🔄 Run #${RUN_NUMBER} — ${TIMESTAMP}"
+            echo ""
             echo "## $ICON Skill Security Scan"
             echo ""
 
@@ -286,20 +308,51 @@ jobs:
             fi
 
             echo ""
-            echo "> [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-          } > /tmp/comment.md
-
-          EXISTING_COMMENT_ID=$(gh api --paginate \
-            "/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
-            --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" \
-            | head -1)
+            if [ -n "$ARTIFACT_URL" ]; then
+              echo "> 📦 [Download security reports]($ARTIFACT_URL) | [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            else
+              echo "> [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            fi
+          } > /tmp/new_report.md
 
           if [ -n "$EXISTING_COMMENT_ID" ]; then
-            gh api --method PATCH \
+            {
+              echo "$EXISTING_BODY"
+              echo ""
+              echo "---"
+              echo ""
+              cat /tmp/new_report.md
+            } > /tmp/comment.md
+            gh api \
+              --method PATCH \
               "/repos/${{ github.repository }}/issues/comments/$EXISTING_COMMENT_ID" \
               -f body="$(cat /tmp/comment.md)"
           else
             gh pr comment "$PR_NUMBER" \
               --repo "${{ github.repository }}" \
-              --body-file /tmp/comment.md
+              --body-file /tmp/new_report.md
           fi
+
+      - name: Check scan results
+        if: steps.detect.outputs.pack_count != '0' && steps.creds.outputs.available == 'true'
+        run: |
+          if [ "${{ steps.scan.outputs.scan_result }}" = "failed" ]; then
+            echo "❌ Security scan found MEDIUM or higher severity issues — blocking merge"
+            exit 1
+          else
+            echo "✅ Security scan passed — no MEDIUM or higher severity issues found"
+          fi
+
+      - name: React to PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = '${{ job.status }}';
+            const prNumber = Number('${{ steps.inputs.outputs.pr_number }}');
+            await github.rest.reactions.createForIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              content: result === 'success' ? '+1' : '-1'
+            });
