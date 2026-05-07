@@ -4,6 +4,7 @@ description: |
   Create BuildConfig and ImageStream resources on OpenShift and trigger a Source-to-Image (S2I) build. Use this skill after /detect-project to build container images from source code on the cluster. Handles namespace verification, resource creation with user confirmation, build monitoring with log streaming, and failure recovery. Triggers on /s2i-build command. Run before /deploy.
 model: inherit
 color: green
+license: Apache-2.0
 metadata:
    user_invocable: "true"
 ---

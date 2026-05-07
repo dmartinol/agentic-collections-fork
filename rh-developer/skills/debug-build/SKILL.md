@@ -4,6 +4,7 @@ description: |
   Diagnose OpenShift build failures including S2I builds, Docker/Podman builds, and BuildConfig issues. Automates multi-step diagnosis: BuildConfig validation, build pod logs, registry authentication, and source repository access. Use this skill when builds fail, hang, or produce unexpected results. Triggers on /debug-build command or phrases like "build failed", "S2I error", "can't pull builder image", "can't push to registry", "build timeout".
 model: inherit
 color: cyan
+license: Apache-2.0
 metadata:
   user_invocable: "true"
 ---
