@@ -90,13 +90,19 @@ Orchestrate VM migrations across OpenShift cluster nodes for load balancing, mai
 
 **For Manual Mode:**
 
-Follow the workflow defined in [REBALANCE_MANUAL.md](rh-virt/skills/vm-rebalance/REBALANCE_MANUAL.md).
+**Document Consultation** (REQUIRED - Execute FIRST):
+1. **Action**: Read [REBALANCE_MANUAL.md](rh-virt/skills/vm-rebalance/REBALANCE_MANUAL.md) using Read tool
+2. **Output to user**: "I consulted [REBALANCE_MANUAL.md](rh-virt/skills/vm-rebalance/REBALANCE_MANUAL.md) to understand the manual migration workflow."
+3. **Then execute**: Follow workflow in REBALANCE_MANUAL.md
 
 ---
 
 **For Automatic Mode:**
 
-Follow the workflow defined in [REBALANCE_AUTOMATIC.md](rh-virt/skills/vm-rebalance/REBALANCE_AUTOMATIC.md).
+**Document Consultation** (REQUIRED - Execute FIRST):
+1. **Action**: Read [REBALANCE_AUTOMATIC.md](rh-virt/skills/vm-rebalance/REBALANCE_AUTOMATIC.md) using Read tool
+2. **Output to user**: "I consulted [REBALANCE_AUTOMATIC.md](rh-virt/skills/vm-rebalance/REBALANCE_AUTOMATIC.md) to understand the automatic rebalancing workflow."
+3. **Then execute**: Follow workflow in REBALANCE_AUTOMATIC.md
 
 ## Common Validation Logic
 
