@@ -1,7 +1,16 @@
 ---
 name: debug-scc
 description: |
-  Diagnose OpenShift Security Context Constraint (SCC) violations that prevent pods from being created. Automates multi-step diagnosis: Deployment status, ReplicaSet FailedCreate events, security context field extraction, SCC rejection parsing, and ServiceAccount SCC binding analysis. Use this skill when pods are blocked from scheduling with "unable to validate against any security context constraint" errors. Triggers on /debug-scc command or phrases like "SCC violation", "pod blocked by SCC", "security context constraint", "FailedCreate forbidden", "unable to validate against any security context constraint".
+  Diagnose OpenShift Security Context Constraint (SCC) violations that prevent pods from being created. Automates multi-step diagnosis: Deployment status, ReplicaSet FailedCreate events, security context field extraction, SCC rejection parsing, and ServiceAccount SCC binding analysis.
+
+  Use when:
+  - "SCC violation blocking pod creation"
+  - "unable to validate against any security context constraint"
+  - "FailedCreate forbidden"
+  - "pod blocked by SCC"
+  - User mentions "SCC", "security context constraint", "FailedCreate"
+
+  NOT for pods crashing after creation (use /debug-pod instead).
 model: inherit
 color: cyan
 metadata:
@@ -12,40 +21,84 @@ metadata:
 
 Diagnose OpenShift SCC violations that block pod creation by analyzing security context fields, SCC rejection messages, and ServiceAccount bindings.
 
-## Overview
+## Critical: Human-in-the-Loop Requirements
+
+1. **Before any remediation action** (patch securityContext, grant SCC binding, rollback)
+   - Display preview: what will change and its security implications
+   - Ask: "Should I apply this fix?"
+   - Wait for confirmation (yes/no)
+
+2. **Before granting permissive SCCs** (anyuid, privileged)
+   - Display warning: granting elevated SCCs weakens namespace security
+   - Ask: "Type 'GRANT SCC' to confirm you understand the security implications"
+   - Verify exact match, cancel if mismatch
+
+**Never assume approval** — always wait for explicit confirmation at each WAIT checkpoint.
+
+## Prerequisites
+
+**Required MCP Servers:** `openshift` ([setup](../../docs/prerequisites.md))
+
+**Required MCP Tools:**
+- `resources_get` (from openshift) — Retrieve Deployment, ReplicaSet, and ServiceAccount details
+- `resources_list` (from openshift) — List Deployments, ReplicaSets, and ServiceAccounts in a namespace
+- `events_list` (from openshift) — Fetch FailedCreate and SCC rejection events
+- `pod_list` (from openshift) — List pods for a Deployment
+
+**Verification Steps:**
+1. Check `openshift` server is configured in `mcps.json`
+2. Verify user is logged into an OpenShift cluster (`oc whoami` succeeds)
+3. Verify user has access to the target namespace
+4. If missing → Human Notification Protocol
+
+**Human Notification Protocol:**
+
+When prerequisites fail:
+1. **Stop immediately** — No tool calls
+2. **Report error:**
+   ```
+   ❌ Cannot execute skill: MCP server `openshift` unavailable
+   📋 Setup: See docs/prerequisites.md for cluster access configuration
+   ```
+3. **Request decision:** "How to proceed? (setup/skip/abort)"
+4. **Wait for user input**
+
+**Security:** Never display credential values.
+
+## When to Use This Skill
+
+Use `/debug-scc` when:
+- A Deployment has zero available replicas and ReplicaSet events show `FailedCreate` with "unable to validate against any security context constraint"
+- Pod spec requests capabilities, UID/GID settings, or volume types that violate the namespace's SCC policy
+- You see "is forbidden" errors referencing SecurityContextConstraints
+
+Do **not** use this skill when:
+- Pods are crashing after creation (CrashLoopBackOff, OOMKilled) → use `/debug-pod`
+- Pods fail with 403 Forbidden API errors → use `/debug-rbac`
+- Image pull failures → use `/debug-pod`
+
+## Workflow
 
 ```
 [Identify Deployment] → [Check ReplicaSet Status] → [Parse SCC Rejections] → [Analyze SecurityContext] → [Check SA Bindings] → [Summary + Fix]
 ```
 
-**This skill diagnoses:**
-- Pods blocked by SCC admission (`FailedCreate` events)
-- `runAsUser` violations (running as root when restricted)
-- Forbidden capabilities (`NET_ADMIN`, `SYS_PTRACE`, etc.)
-- `allowPrivilegeEscalation` rejections
-- ServiceAccount lacking SCC bindings
-- `hostUsers`, `hostNetwork`, `hostPID` violations
-
-## Prerequisites
-
-Before running this skill:
-1. User is logged into an OpenShift cluster
-2. User has access to the target namespace
-3. Deployment or pod name is known (or can be identified from recent events)
-
-## Critical: Human-in-the-Loop Requirements
-
-See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
-
-## When to Use This Skill
-
-Use `/debug-scc` when a Deployment has zero available replicas and ReplicaSet events show `FailedCreate` with messages containing "unable to validate against any security context constraint" or "is forbidden". This indicates the pod spec requests capabilities, UID/GID settings, or volume types that violate the namespace's SCC policy.
-
-Do **not** use this skill when pods are failing for other reasons (CrashLoopBackOff, ImagePullBackOff, OOMKilled) — use `/debug-pod` instead.
-
-## Workflow
-
 ### Step 1: Identify Target Deployment
+
+**MCP Tool**: `resources_list` (from openshift)
+
+**Parameters**:
+- `kind`: "Deployment" (resource type)
+- `namespace`: "<namespace>" (target namespace from user)
+
+**Expected Output**: List of Deployments with their availability status.
+
+**Error Handling**:
+- If MCP server unavailable: follow Human Notification Protocol
+- If namespace not found: ask user to confirm namespace name
+- If no deployments found: report empty namespace, suggest checking namespace
+
+Present to user:
 
 ```markdown
 ## SCC Violation Debugging
@@ -56,17 +109,16 @@ Do **not** use this skill when pods are failing for other reasons (CrashLoopBack
 
 Which deployment would you like me to debug for SCC violations?
 
-1. **Specify deployment name** - Enter the deployment name directly
-2. **List deployments with issues** - Show deployments with unavailable replicas
-3. **Search by event** - Find deployments with FailedCreate events
+1. **Specify deployment name** — Enter the deployment name directly
+2. **List deployments with issues** — Show deployments with unavailable replicas
+3. **Search by event** — Find deployments with FailedCreate events
 
 Select an option or enter a deployment name:
 ```
 
 **WAIT for user confirmation before proceeding.**
 
-If user selects "List deployments with issues":
-Use kubernetes MCP `resources_list` for Deployments, filter to those with unavailable replicas:
+If user selects "List deployments with issues", filter to those with unavailable replicas:
 
 ```markdown
 ## Deployments with Issues in [namespace]
@@ -82,7 +134,29 @@ Which deployment would you like me to debug?
 
 ### Step 2: Get Deployment and ReplicaSet Status
 
-Use kubernetes MCP `resources_get` for the Deployment, then identify the failing ReplicaSet:
+**MCP Tool**: `resources_get` (from openshift)
+
+**Parameters**:
+- `kind`: "Deployment" (resource type)
+- `name`: "<deployment-name>" (from Step 1)
+- `namespace`: "<namespace>"
+
+Then retrieve the failing ReplicaSet:
+
+**MCP Tool**: `resources_list` (from openshift)
+
+**Parameters**:
+- `kind`: "ReplicaSet" (resource type)
+- `namespace`: "<namespace>"
+- Filter by owner reference matching the Deployment
+
+**Expected Output**: Deployment spec, conditions, and owned ReplicaSets with their status.
+
+**Error Handling**:
+- If Deployment not found: ask user to verify name and namespace
+- If no ReplicaSets found: Deployment may not have triggered a rollout yet
+
+Present to user:
 
 ```markdown
 ## Deployment Status: [deployment-name]
@@ -111,7 +185,30 @@ Continue with SCC rejection analysis? (yes/no)
 
 ### Step 3: Parse SCC Rejection Messages
 
-Use kubernetes MCP `events_list` filtered by namespace, and `resources_get` for the failing ReplicaSet to extract the `ReplicaFailure` condition message:
+**MCP Tool**: `events_list` (from openshift)
+
+**Parameters**:
+- `namespace`: "<namespace>"
+- Filter by `involvedObject.kind=ReplicaSet`, `involvedObject.name=<rs-name>`, `reason=FailedCreate`
+
+Then also:
+
+**MCP Tool**: `resources_get` (from openshift)
+
+**Parameters**:
+- `kind`: "ReplicaSet" (resource type)
+- `name`: "<rs-name>" (failing ReplicaSet from Step 2)
+- `namespace`: "<namespace>"
+
+Extract the `ReplicaFailure` condition message containing SCC rejection details.
+
+**Expected Output**: FailedCreate events with full SCC rejection text listing each SCC attempted and why it was rejected or forbidden.
+
+**Error Handling**:
+- If no events found: events may have expired (default TTL is 1h); check ReplicaSet conditions instead
+- If events are ambiguous: cross-reference with ReplicaSet `.status.conditions`
+
+Present to user:
 
 ```markdown
 ## SCC Rejection Analysis: [rs-name]
@@ -144,7 +241,22 @@ Continue to inspect the container security context? (yes/no)
 
 ### Step 4: Analyze Container SecurityContext
 
-Use kubernetes MCP `resources_get` for the Deployment to extract the full security context:
+**MCP Tool**: `resources_get` (from openshift)
+
+**Parameters**:
+- `kind`: "Deployment" (resource type)
+- `name`: "<deployment-name>" (from Step 1)
+- `namespace`: "<namespace>"
+
+Extract `.spec.template.spec.securityContext` (pod-level) and `.spec.template.spec.containers[*].securityContext` (container-level), plus `.metadata.managedFields` for change attribution.
+
+**Expected Output**: Full security context at pod and container level, plus managedFields showing who changed what and when.
+
+**Error Handling**:
+- If securityContext is empty/unset: the issue may be implicit defaults conflicting with SCC; note this
+- If managedFields unavailable: skip change attribution, note limitation
+
+Present to user:
 
 ```markdown
 ## SecurityContext Analysis: [deployment-name]
@@ -183,7 +295,27 @@ Continue to check ServiceAccount SCC bindings? (yes/no)
 
 ### Step 5: Check ServiceAccount SCC Bindings
 
-Use kubernetes MCP `resources_list` for ServiceAccounts in the namespace. Note: listing cluster-scoped SecurityContextConstraints may be forbidden depending on RBAC — the skill handles this gracefully by inferring from rejection messages.
+**MCP Tool**: `resources_get` (from openshift)
+
+**Parameters**:
+- `kind`: "ServiceAccount" (resource type)
+- `name`: "<sa-name>" (from Deployment `.spec.template.spec.serviceAccountName`, default: `default`)
+- `namespace`: "<namespace>"
+
+Then attempt:
+
+**MCP Tool**: `resources_list` (from openshift)
+
+**Parameters**:
+- `kind`: "SecurityContextConstraints" (cluster-scoped)
+
+**Expected Output**: ServiceAccount details and list of SCCs. If listing SCCs is RBAC-forbidden, infer SCC access from the rejection messages in Step 3.
+
+**Error Handling**:
+- If listing SCCs is forbidden: gracefully degrade — use rejection messages to infer which SCCs were attempted and their result
+- If ServiceAccount not found: report it; this would also cause pod creation failures
+
+Present to user:
 
 ```markdown
 ## ServiceAccount Analysis
@@ -204,7 +336,6 @@ Use kubernetes MCP `resources_list` for ServiceAccounts in the namespace. Note: 
 | restricted-v3 | Available (but pod spec violates it) |
 | anyuid | Forbidden — SA has no binding |
 | privileged | Forbidden — SA has no binding |
-| [others] | Forbidden — SA has no binding |
 
 **Assessment:**
 [e.g., "The SA 'default' only has access to restricted-v2/v3. The pod spec must be fixed to comply with restricted SCC, OR the SA needs a RoleBinding to a permissive SCC (if elevated privileges are genuinely required)."]
@@ -215,6 +346,16 @@ Continue to diagnosis summary? (yes/no)
 **WAIT for user confirmation before proceeding.**
 
 ### Step 6: Present Diagnosis Summary
+
+Synthesize all findings into a structured summary with actionable remediation options.
+
+**Expected Output**: Root cause summary, causal chain, and three fix options with commands.
+
+**Error Handling**:
+- If insufficient data from earlier steps: note gaps and recommend manual investigation
+- If multiple violations found: prioritize by severity (root UID > capabilities > escalation)
+
+Present to user:
 
 ```markdown
 ## SCC Violation Diagnosis Summary: [deployment-name]
@@ -245,7 +386,7 @@ Continue to diagnosis summary? (yes/no)
 Remove the non-compliant fields to restore restricted SCC compliance:
 
 ```bash
-oc patch deployment [deployment-name] -n [namespace] --type json -p '[
+oc patch deployment <deployment-name> -n <namespace> --type json -p '[
   {"op": "remove", "path": "/spec/template/spec/containers/0/securityContext/runAsUser"},
   {"op": "replace", "path": "/spec/template/spec/containers/0/securityContext/allowPrivilegeEscalation", "value": false},
   {"op": "remove", "path": "/spec/template/spec/containers/0/securityContext/capabilities/add"}
@@ -257,7 +398,7 @@ oc patch deployment [deployment-name] -n [namespace] --type json -p '[
 Create a RoleBinding to a permissive SCC for the ServiceAccount:
 
 ```bash
-oc adm policy add-scc-to-user anyuid -z [sa-name] -n [namespace]
+oc adm policy add-scc-to-user anyuid -z <sa-name> -n <namespace>
 ```
 
 ⚠️ **Warning**: Granting anyuid/privileged SCCs weakens namespace security. Only use if the workload genuinely requires elevated privileges.
@@ -265,7 +406,7 @@ oc adm policy add-scc-to-user anyuid -z [sa-name] -n [namespace]
 **Option C: Rollback to previous revision**
 
 ```bash
-oc rollout undo deployment/[deployment-name] -n [namespace]
+oc rollout undo deployment/<deployment-name> -n <namespace>
 ```
 
 ### Related Documentation
@@ -290,12 +431,24 @@ Select an option:
 ## Dependencies
 
 ### Required MCP Servers
-- `openshift` - Kubernetes/OpenShift resource access for Deployments, ReplicaSets, Events, ServiceAccounts, and SecurityContextConstraints
+- `openshift` — Kubernetes/OpenShift resource access for Deployments, ReplicaSets, Events, ServiceAccounts, and SecurityContextConstraints ([setup](../../docs/prerequisites.md))
+
+### Required MCP Tools
+- `resources_get` (from openshift) — Retrieve individual resource details (Deployment, ReplicaSet, ServiceAccount)
+- `resources_list` (from openshift) — List resources by kind in a namespace
+- `events_list` (from openshift) — Fetch events filtered by involved object
+- `pod_list` (from openshift) — List pods matching label selectors
 
 ### Related Skills
-- `/debug-pod` - If pods exist but are crashing (CrashLoopBackOff, OOMKilled)
-- `/debug-rbac` - If pods run but fail with 403 Forbidden API errors (RBAC, not SCC)
+- `/debug-pod` — If pods exist but are crashing (CrashLoopBackOff, OOMKilled)
+- `/debug-rbac` — If pods run but fail with 403 Forbidden API errors (RBAC, not SCC)
 
 ### Reference Documentation
-- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting trees
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
+- **Internal:** [docs/debugging-patterns.md](../../docs/debugging-patterns.md) — Common error patterns and troubleshooting trees
+- **Official:** [Managing SCCs - OpenShift](https://docs.openshift.com/container-platform/latest/authentication/managing-security-context-constraints.html)
+
+## Example Usage
+
+**User**: My deployment `security-scanner` in namespace `tools` has 0 available replicas. Events say "unable to validate against any security context constraint". Can you help?
+
+**Skill response**: The skill identifies the deployment, finds FailedCreate events on the ReplicaSet, parses the SCC rejection messages to find that `runAsUser: 0` and `capabilities.add: [NET_ADMIN]` violate `restricted-v2`. It checks the ServiceAccount's SCC bindings, determines it only has access to restricted SCCs, and presents three options: patch the securityContext to remove violations, grant an `anyuid` SCC binding, or rollback to the previous revision.

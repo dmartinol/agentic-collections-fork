@@ -1,7 +1,16 @@
 ---
 name: debug-rbac
 description: |
-  Diagnose OpenShift RBAC permission failures that cause workloads to fail with 403 Forbidden errors when accessing the Kubernetes API. Automates multi-step diagnosis: pod logs for FORBIDDEN errors, readiness probe failures, ServiceAccount identification, RoleBinding/ClusterRoleBinding analysis, and remediation history for regression detection. Use this skill when pods are running but failing because their ServiceAccount lacks required API permissions. Triggers on /debug-rbac command or phrases like "RBAC denied", "403 forbidden", "pods can't list resources", "missing RoleBinding", "ServiceAccount permission denied".
+  Diagnose OpenShift RBAC permission failures that cause workloads to fail with 403 Forbidden errors when accessing the Kubernetes API. Automates multi-step diagnosis: pod logs for FORBIDDEN errors, readiness probe failures, ServiceAccount identification, RoleBinding/ClusterRoleBinding analysis, and remediation history for regression detection.
+
+  Use when:
+  - "403 forbidden when accessing Kubernetes API"
+  - "ServiceAccount permission denied"
+  - "pods can't list resources"
+  - "missing RoleBinding"
+  - User mentions "RBAC denied", "403 forbidden", "permission denied"
+
+  NOT for SCC admission failures (use /debug-scc instead).
 model: inherit
 color: cyan
 metadata:
@@ -12,42 +21,85 @@ metadata:
 
 Diagnose RBAC permission failures on OpenShift by analyzing pod logs, readiness probes, ServiceAccount bindings, and Role/RoleBinding configuration.
 
-## Overview
+## Critical: Human-in-the-Loop Requirements
+
+1. **Before creating Role or RoleBinding resources**
+   - Display preview: the exact RBAC resources that will be created and what permissions they grant
+   - Ask: "Should I create these RBAC resources?"
+   - Wait for confirmation (yes/no)
+
+2. **Before binding broad ClusterRoles** (e.g., `view`, `edit`, `admin`)
+   - Display warning: broad ClusterRoles grant more permissions than the minimum required
+   - Ask: "Proceed with broad ClusterRole binding, or create a minimal custom Role instead?"
+   - Wait for confirmation
+
+**Never assume approval** — always wait for explicit confirmation at each WAIT checkpoint.
+
+## Prerequisites
+
+**Required MCP Servers:** `openshift` ([setup](../../docs/prerequisites.md))
+
+**Required MCP Tools:**
+- `resources_get` (from openshift) — Retrieve Deployment, Pod, ServiceAccount, Role, and RoleBinding details
+- `resources_list` (from openshift) — List Deployments, RoleBindings, and ClusterRoleBindings in a namespace
+- `pod_list` (from openshift) — List pods for a Deployment
+- `pod_logs` (from openshift) — Retrieve container logs to identify FORBIDDEN errors
+- `events_list` (from openshift) — Fetch warning events related to RBAC failures
+
+**Verification Steps:**
+1. Check `openshift` server is configured in `mcps.json`
+2. Verify user is logged into an OpenShift cluster (`oc whoami` succeeds)
+3. Verify user has access to the target namespace
+4. If missing → Human Notification Protocol
+
+**Human Notification Protocol:**
+
+When prerequisites fail:
+1. **Stop immediately** — No tool calls
+2. **Report error:**
+   ```
+   ❌ Cannot execute skill: MCP server `openshift` unavailable
+   📋 Setup: See docs/prerequisites.md for cluster access configuration
+   ```
+3. **Request decision:** "How to proceed? (setup/skip/abort)"
+4. **Wait for user input**
+
+**Security:** Never display credential values.
+
+## When to Use This Skill
+
+Use `/debug-rbac` when:
+- A Deployment's pods are running but not ready, and pod logs show `FORBIDDEN` or `403` errors calling the Kubernetes API
+- Readiness probes fail because they check API access (e.g., `kubectl auth can-i`)
+- Application logs show permission denied errors when interacting with Kubernetes resources
+
+Do **not** use this skill when:
+- Pods are blocked from being created entirely → use `/debug-scc` (SCC admission failures)
+- Pods are crashing due to application bugs → use `/debug-pod`
+- The issue is network connectivity → use `/debug-network`
+
+## Workflow
 
 ```
 [Identify Deployment] → [Check Pod Status + Logs] → [Identify RBAC Errors] → [Analyze ServiceAccount] → [Check RoleBindings] → [Summary + Fix]
 ```
 
-**This skill diagnoses:**
-- Pods failing with 403 Forbidden errors against the Kubernetes API
-- Readiness probes that check API access (`kubectl auth can-i`) returning "no"
-- Missing or deleted RoleBindings/ClusterRoleBindings
-- ServiceAccounts lacking required permissions (get, list, watch, create, etc.)
-- Regression patterns where RBAC bindings are repeatedly removed
-
-## Prerequisites
-
-Before running this skill:
-1. User is logged into an OpenShift cluster
-2. User has access to the target namespace
-3. Deployment or pod name is known (or can be identified from recent events)
-
-## Critical: Human-in-the-Loop Requirements
-
-See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
-
-## When to Use This Skill
-
-Use `/debug-rbac` when a Deployment's pods are running but not ready, and pod logs show `FORBIDDEN` or `403` errors when calling the Kubernetes API. This typically manifests as readiness probe failures when the probe checks API access, or application-level errors when the workload needs to interact with Kubernetes resources.
-
-Do **not** use this skill when:
-- Pods are blocked from being created entirely — use `/debug-scc` (SCC admission failures)
-- Pods are crashing due to application bugs — use `/debug-pod`
-- The issue is network connectivity — use `/debug-network`
-
-## Workflow
-
 ### Step 1: Identify Target Deployment
+
+**MCP Tool**: `resources_list` (from openshift)
+
+**Parameters**:
+- `kind`: "Deployment" (resource type)
+- `namespace`: "<namespace>" (target namespace from user)
+
+**Expected Output**: List of Deployments with their availability and readiness conditions.
+
+**Error Handling**:
+- If MCP server unavailable: follow Human Notification Protocol
+- If namespace not found: ask user to confirm namespace name
+- If no deployments found: report empty namespace, suggest checking namespace
+
+Present to user:
 
 ```markdown
 ## RBAC Debugging
@@ -58,17 +110,16 @@ Do **not** use this skill when:
 
 Which deployment would you like me to debug for RBAC issues?
 
-1. **Specify deployment name** - Enter the deployment name directly
-2. **List deployments with issues** - Show deployments with unavailable or not-ready pods
-3. **Search recent events** - Find pods with RBAC-related warning events
+1. **Specify deployment name** — Enter the deployment name directly
+2. **List deployments with issues** — Show deployments with unavailable or not-ready pods
+3. **Search recent events** — Find pods with RBAC-related warning events
 
 Select an option or enter a deployment name:
 ```
 
 **WAIT for user confirmation before proceeding.**
 
-If user selects "List deployments with issues":
-Use kubernetes MCP `resources_list` for Deployments, filter to those with not-ready conditions:
+If user selects "List deployments with issues", filter to those with not-ready conditions:
 
 ```markdown
 ## Deployments with Issues in [namespace]
@@ -84,7 +135,36 @@ Which deployment would you like me to debug?
 
 ### Step 2: Check Pod Status and Logs
 
-Use kubernetes MCP `pod_list` to find pods for the Deployment, then `resources_get` for pod details and `pod_logs` for container logs:
+**MCP Tool**: `pod_list` (from openshift)
+
+**Parameters**:
+- `namespace`: "<namespace>"
+- `labelSelector`: "<app-label>=<value>" (from Deployment `.spec.selector.matchLabels`)
+
+Then for each matching pod:
+
+**MCP Tool**: `resources_get` (from openshift)
+
+**Parameters**:
+- `kind`: "Pod" (resource type)
+- `name`: "<pod-name>" (from pod_list)
+- `namespace`: "<namespace>"
+
+**MCP Tool**: `pod_logs` (from openshift)
+
+**Parameters**:
+- `name`: "<pod-name>"
+- `namespace`: "<namespace>"
+- `tailLines`: 50 (integer, last N lines)
+
+**Expected Output**: Pod status with readiness conditions, and container logs containing FORBIDDEN/403 error lines.
+
+**Error Handling**:
+- If no pods found: Deployment may have zero replicas; check if it's scaled down
+- If logs empty: container may not have started; check container state
+- If multiple pods: analyze the most recent one first
+
+Present to user:
 
 ```markdown
 ## Pod Analysis: [pod-name]
@@ -125,7 +205,15 @@ Continue with ServiceAccount analysis? (yes/no)
 
 ### Step 3: Identify Required Permissions
 
-Based on the FORBIDDEN error messages and readiness probe command, determine what permissions are needed:
+Based on the FORBIDDEN error messages and readiness probe command from Step 2, determine what permissions are needed. This is an analysis step — no additional MCP tool calls required unless log data is insufficient.
+
+**Expected Output**: Table of required permissions extracted from FORBIDDEN error strings, plus a minimal Role definition.
+
+**Error Handling**:
+- If FORBIDDEN messages are ambiguous: request more log lines with increased `tailLines`
+- If no FORBIDDEN errors found: the issue may not be RBAC; suggest `/debug-pod` instead
+
+Present to user:
 
 ```markdown
 ## Required Permissions Analysis
@@ -153,8 +241,8 @@ Based on the FORBIDDEN error messages and readiness probe command, determine wha
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: [sa-name]-role
-  namespace: [namespace]
+  name: <sa-name>-role
+  namespace: <namespace>
 rules:
   - apiGroups: [""]
     resources: ["pods"]
@@ -168,7 +256,34 @@ Continue to check existing RoleBindings? (yes/no)
 
 ### Step 4: Analyze ServiceAccount and RoleBindings
 
-Use kubernetes MCP `resources_get` for the ServiceAccount, and `resources_list` for RoleBindings in the namespace:
+**MCP Tool**: `resources_get` (from openshift)
+
+**Parameters**:
+- `kind`: "ServiceAccount" (resource type)
+- `name`: "<sa-name>" (from Deployment `.spec.template.spec.serviceAccountName`, default: `default`)
+- `namespace`: "<namespace>"
+
+**MCP Tool**: `resources_list` (from openshift)
+
+**Parameters**:
+- `kind`: "RoleBinding" (resource type)
+- `namespace`: "<namespace>"
+
+Optionally, if permissions allow:
+
+**MCP Tool**: `resources_list` (from openshift)
+
+**Parameters**:
+- `kind`: "ClusterRoleBinding" (cluster-scoped)
+
+**Expected Output**: ServiceAccount details and all RoleBindings/ClusterRoleBindings, checked for whether any grant the required permissions to the target ServiceAccount.
+
+**Error Handling**:
+- If listing RoleBindings is forbidden: note the limitation, infer from FORBIDDEN errors
+- If ServiceAccount not found: report as a finding — SA may need to be created
+- If multiple bindings exist: check each for matching subjects and sufficient verbs
+
+Present to user:
 
 ```markdown
 ## ServiceAccount & RoleBinding Analysis
@@ -205,6 +320,16 @@ Continue to diagnosis summary? (yes/no)
 
 ### Step 5: Present Diagnosis Summary
 
+Synthesize all findings into a structured summary with actionable remediation options.
+
+**Expected Output**: Root cause summary, causal chain, remediation commands, and regression warnings if applicable.
+
+**Error Handling**:
+- If insufficient data from earlier steps: note gaps and recommend manual investigation
+- If regression pattern detected (repeated remediation/deletion cycles): highlight prominently
+
+Present to user:
+
 ```markdown
 ## RBAC Diagnosis Summary: [deployment-name]
 
@@ -234,16 +359,16 @@ Continue to diagnosis summary? (yes/no)
 
 ```bash
 # Create the Role
-oc create role [sa-name]-pod-reader \
+oc create role <sa-name>-pod-reader \
   --verb=get,list,watch \
   --resource=pods \
-  -n [namespace]
+  -n <namespace>
 
 # Create the RoleBinding
-oc create rolebinding [sa-name]-pod-reader-binding \
-  --role=[sa-name]-pod-reader \
-  --serviceaccount=[namespace]:[sa-name] \
-  -n [namespace]
+oc create rolebinding <sa-name>-pod-reader-binding \
+  --role=<sa-name>-pod-reader \
+  --serviceaccount=<namespace>:<sa-name> \
+  -n <namespace>
 ```
 
 **Option B: Use an existing ClusterRole**
@@ -251,10 +376,10 @@ oc create rolebinding [sa-name]-pod-reader-binding \
 If a suitable ClusterRole already exists (e.g., `view`):
 
 ```bash
-oc create rolebinding [sa-name]-view \
+oc create rolebinding <sa-name>-view \
   --clusterrole=view \
-  --serviceaccount=[namespace]:[sa-name] \
-  -n [namespace]
+  --serviceaccount=<namespace>:<sa-name> \
+  -n <namespace>
 ```
 
 ⚠️ **Note**: The `view` ClusterRole grants read access to most resources in the namespace. Use a custom Role (Option A) for least-privilege.
@@ -263,10 +388,10 @@ oc create rolebinding [sa-name]-view \
 
 ```bash
 # Check if the SA now has permission
-oc auth can-i list pods -n [namespace] --as=system:serviceaccount:[namespace]:[sa-name]
+oc auth can-i list pods -n <namespace> --as=system:serviceaccount:<namespace>:<sa-name>
 
 # Check pod readiness
-oc get pods -n [namespace] -l app=[app-label] -o wide
+oc get pods -n <namespace> -l app=<app-label> -o wide
 ```
 
 ### Regression Warning
@@ -296,13 +421,26 @@ Select an option:
 ## Dependencies
 
 ### Required MCP Servers
-- `openshift` - Kubernetes/OpenShift resource access for Deployments, Pods, ServiceAccounts, Roles, RoleBindings, and Events
+- `openshift` — Kubernetes/OpenShift resource access for Deployments, Pods, ServiceAccounts, Roles, RoleBindings, and Events ([setup](../../docs/prerequisites.md))
+
+### Required MCP Tools
+- `resources_get` (from openshift) — Retrieve individual resource details (Deployment, Pod, ServiceAccount, Role, RoleBinding)
+- `resources_list` (from openshift) — List resources by kind in a namespace (Deployments, RoleBindings, ClusterRoleBindings)
+- `pod_list` (from openshift) — List pods matching label selectors
+- `pod_logs` (from openshift) — Retrieve container logs for FORBIDDEN error analysis
+- `events_list` (from openshift) — Fetch events filtered by involved object
 
 ### Related Skills
-- `/debug-scc` - If pods are blocked from creation by SCC admission (different from RBAC)
-- `/debug-pod` - If pods are crashing due to application issues, not RBAC
-- `/debug-network` - If pods can't reach services (network, not API access)
+- `/debug-scc` — If pods are blocked from creation by SCC admission (different from RBAC)
+- `/debug-pod` — If pods are crashing due to application issues, not RBAC
+- `/debug-network` — If pods can't reach services (network, not API access)
 
 ### Reference Documentation
-- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting trees
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
+- **Internal:** [docs/debugging-patterns.md](../../docs/debugging-patterns.md) — Common error patterns and troubleshooting trees
+- **Official:** [Using RBAC - OpenShift](https://docs.openshift.com/container-platform/latest/authentication/using-rbac.html)
+
+## Example Usage
+
+**User**: My deployment `metrics-collector` in namespace `demo-rbac` shows 0/1 available. The pod is running but not ready. Logs show "FORBIDDEN: pods is forbidden". What's wrong?
+
+**Skill response**: The skill checks the pod status (Running but not Ready), examines logs to find FORBIDDEN errors on `list pods`, identifies the ServiceAccount (`metrics-collector`), lists RoleBindings in the namespace and finds none granting the required permissions. It presents a diagnosis showing the missing RoleBinding as root cause, detects a regression pattern if prior remediation attempts were undone, and offers two fix options: create a minimal custom Role+RoleBinding, or bind the broader `view` ClusterRole.
