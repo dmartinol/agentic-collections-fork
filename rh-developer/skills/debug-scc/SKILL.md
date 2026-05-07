@@ -13,6 +13,7 @@ description: |
   NOT for pods crashing after creation (use /debug-pod instead).
 model: inherit
 color: cyan
+license: Apache-2.0
 metadata:
   user_invocable: "true"
 ---
