@@ -88,7 +88,9 @@ List and inspect virtual machines in OpenShift Virtualization clusters. This ski
 
 **Step 2: Get Resource Details for Running VMs**
 
-**CRITICAL**: To display complete VM information, query VirtualMachineInstance (VMI) resources:
+**Large cluster safeguard**: If Step 1 returned more than 20 VMs, skip VMI queries entirely. Display a summary table using only VM resource data (Name, Namespace, Status) and suggest the user narrow down by namespace: `⚠️ Found <N> VMs across all namespaces. Showing summary view. Use "List VMs in namespace <ns>" for full details.`
+
+To display complete VM information (when 50 or fewer VMs), query VirtualMachineInstance (VMI) resources:
 
 **MCP Tool**: `resources_list` (apiVersion="kubevirt.io/v1", kind="VirtualMachineInstance")
 
