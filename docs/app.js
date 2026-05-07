@@ -1921,7 +1921,11 @@ function appendSkillEvalBlock(li, skill) {
         : `${coverageCount} scenarios tested`;
     const llmBase = String(ev.llm || '').replace(/\s*\([^)]*\)\s*$/, '').trim() || 'the baseline model';
     const comparedRuns = confidenceBase || coverageCount;
-    const gapPct = Number(ev.mean_reward_gap || 0) * 100;
+    const rawGap = typeof ev.mean_reward_gap === 'number' ? ev.mean_reward_gap : Number(ev.mean_reward_gap || 0);
+    const gapValue = Number.isFinite(rawGap) ? rawGap : 0;
+    const gapPct = gapValue * 100;
+    const gapPctLabel = gapValue === 0 ? '0.0%' : `${gapValue > 0 ? '+' : ''}${gapPct.toFixed(1)}%`;
+    const gapRewardLabel = gapValue === 0 ? '0.00' : `${gapValue > 0 ? '+' : ''}${gapValue.toFixed(2)}`;
     const plainSummaryEl = document.createElement('div');
     plainSummaryEl.className = 'skill-eval-plain-summary';
 
@@ -2106,7 +2110,7 @@ function appendSkillEvalBlock(li, skill) {
         ['Coverage', `${coverageCount} / ${coverageTotal || 'N/A'}`],
         ['Pass rate', passRateLabel],
         ['Reward', formatMetric(meanTreatment, 2)],
-        ['Improvement', `${(Number(ev.mean_reward_gap || 0) * 100).toFixed(1)}%`],
+        ['Improvement', gapPctLabel],
         ['Confidence', significanceText.split(' ')[0]]
     ];
     inlineMetricItems.forEach(([label, value]) => {
@@ -2128,7 +2132,7 @@ function appendSkillEvalBlock(li, skill) {
         { label: 'Coverage', value: `${coverageCount} / ${coverageTotal || 'N/A'}`, sub: `scenarios tested (${coveragePct}%)` },
         { label: 'Pass rate (treatment)', value: passRateLabel, sub: `${Number(ev.n_passed_treatment || 0)} pass · ${Number(ev.n_failed_treatment || 0)} fail` },
         { label: 'Reward (treatment)', value: formatMetric(meanTreatment, 2), sub: 'mean reward' },
-        { label: 'Improvement vs baseline', value: `${(Number(ev.mean_reward_gap || 0) * 100).toFixed(1)}%`, sub: `(+${formatMetric(ev.mean_reward_gap, 2)} reward)` },
+        { label: 'Improvement vs baseline', value: gapPctLabel, sub: `(${gapRewardLabel} reward)` },
         { label: 'Statistical significance', value: significanceText.split(' ')[0], sub: significanceText.slice(significanceText.indexOf('(') > -1 ? significanceText.indexOf('(') : significanceText.length).replace(/[()]/g, '') || 'interpreted' }
     ];
     kpiItems.forEach((item) => {

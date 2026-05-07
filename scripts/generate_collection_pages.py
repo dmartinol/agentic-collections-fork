@@ -164,7 +164,9 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
     mean_c_raw = ev.get("mean_reward_control")
     mean_t = _metric(mean_t_raw, 2)
     mean_c = _metric(mean_c_raw, 2)
-    uplift = _metric(ev.get("mean_reward_gap"))
+    gap_value = float(ev.get("mean_reward_gap") or 0.0)
+    gap_pct_label = f"{gap_value:+.1%}" if gap_value != 0 else "0.0%"
+    gap_reward_label = f"{gap_value:+.2f}" if gap_value != 0 else "0.00"
 
     max_mean = max(
         float(mean_t_raw) if isinstance(mean_t_raw, (int, float)) else 0.0,
@@ -330,7 +332,7 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
             f'<span><strong>Coverage</strong> {coverage_label}</span>'
             f'<span><strong>Pass rate</strong> {pass_rate_label}</span>'
             f'<span><strong>Reward</strong> {mean_t}</span>'
-            f'<span><strong>Improvement</strong> +{float(ev.get("mean_reward_gap") or 0) * 100:.1f}%</span>'
+            f'<span><strong>Improvement</strong> {gap_pct_label}</span>'
             f'<span><strong>Confidence</strong> {html.escape(significance_primary)}</span>'
             '</span></summary>',
             '<div class="skill-eval-details-body">',
@@ -338,7 +340,7 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
             f'<div class="skill-eval-kpi"><p class="kpi-label">Coverage</p><p class="kpi-value">{coverage_label}</p><p class="kpi-sub">{coverage_sub}</p></div>',
             f'<div class="skill-eval-kpi"><p class="kpi-label">Pass rate (treatment)</p><p class="kpi-value">{pass_rate_label}</p><p class="kpi-sub">{np_t} pass · {nf_t} fail</p></div>',
             f'<div class="skill-eval-kpi"><p class="kpi-label">Reward (treatment)</p><p class="kpi-value">{mean_t}</p><p class="kpi-sub">mean reward</p></div>',
-            f'<div class="skill-eval-kpi"><p class="kpi-label">Improvement vs baseline</p><p class="kpi-value">+{float(ev.get("mean_reward_gap") or 0) * 100:.1f}%</p><p class="kpi-sub">(+{uplift} reward)</p></div>',
+            f'<div class="skill-eval-kpi"><p class="kpi-label">Improvement vs baseline</p><p class="kpi-value">{gap_pct_label}</p><p class="kpi-sub">({gap_reward_label} reward)</p></div>',
             f'<div class="skill-eval-kpi"><p class="kpi-label">Statistical significance</p><p class="kpi-value">{html.escape(significance_text.split(" ")[0])}</p><p class="kpi-sub">{html.escape(significance_text.replace(significance_text.split(" ")[0] + " ", ""))}</p></div>',
             '</div>',
             '<div class="skill-eval-lower-grid">',
@@ -645,7 +647,7 @@ def render_collection_page(pack: Dict[str, Any], mcp_data: List[Dict[str, Any]])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.css?v=72">
+    <link rel="stylesheet" href="../styles.css?v=73">
 </head>
 <body>
     <div class="site-brand-accent" aria-hidden="true"></div>
@@ -692,7 +694,7 @@ def render_collection_page(pack: Dict[str, Any], mcp_data: List[Dict[str, Any]])
         <div class="modal-content" id="mcp-details"></div>
     </div>
 
-    <script src="../app.js?v=72"></script>
+    <script src="../app.js?v=73"></script>
 </body>
 </html>
 """
