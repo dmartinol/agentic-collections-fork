@@ -114,3 +114,4 @@ config.local.*
 # Generated Documentation
 docs/data.json
 reports/
+docs/collections/*.html

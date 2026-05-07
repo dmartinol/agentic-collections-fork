@@ -1826,6 +1826,31 @@ ul.simple-list.collection-resources li {
     gap: 0.75rem;
 }
 
+.skill-eval-plain-summary {
+    font-size: 1.05rem;
+    font-weight: 650;
+    line-height: 1.35;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.skill-eval-delta {
+    font-weight: 700;
+}
+
+.skill-eval-delta-better {
+    color: #13795b;
+}
+
+.skill-eval-delta-worse {
+    color: #a61b1b;
+}
+
+.model-name {
+    color: #06c;
+    font-weight: 600;
+}
+
 .skill-eval-head-badges {
     display: inline-flex;
     align-items: center;
@@ -1898,6 +1923,135 @@ ul.simple-list.collection-resources li {
 .skill-eval-inline-signals.warn {
     color: #8a6600;
     font-weight: 600;
+}
+
+.skill-eval-evidence-row {
+    margin-top: 0.55rem;
+    padding: 0.6rem 0.1rem 0.65rem 0.1rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.skill-eval-evidence-main {
+    min-width: 0;
+}
+
+.skill-eval-evidence-main .evidence-title {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text-primary);
+    font-family: "Red Hat Text", "Red Hat Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.skill-eval-evidence-main .evidence-line {
+    margin-top: 0.08rem;
+    font-size: 0.82rem;
+    line-height: 1.3;
+    color: var(--text-secondary);
+    font-family: "Red Hat Text", "Red Hat Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.skill-eval-evidence-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
+    white-space: nowrap;
+}
+
+.skill-eval-evidence-links .collection-inline-link {
+    margin-top: 0;
+    font-size: 0.85rem;
+    line-height: 1.2;
+}
+
+.skill-eval-details {
+    margin-top: 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.skill-eval-details-summary {
+    list-style: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0.6rem 2rem 0.6rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+    background: var(--bg-section);
+    border-radius: 10px;
+}
+
+.skill-eval-details-summary::-webkit-details-marker {
+    display: none;
+}
+
+.skill-eval-details-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.skill-eval-details-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+.skill-eval-details-chevron {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.95rem;
+    line-height: 1;
+    color: var(--text-secondary);
+}
+
+.skill-eval-details-chevron::before {
+    content: "v";
+}
+
+.skill-eval-details[open] .skill-eval-details-chevron::before {
+    content: "^";
+}
+
+.skill-eval-details-inline-metrics {
+    margin-top: 0.35rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.35rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.8rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.skill-eval-details-inline-metrics span {
+    white-space: nowrap;
+}
+
+.skill-eval-details-inline-metrics strong {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-right: 0.18rem;
+}
+
+.skill-eval-details[open] .skill-eval-details-inline-metrics {
+    display: none;
+}
+
+.skill-eval-details-body {
+    border-top: 1px solid var(--border);
+    padding: 0.55rem 0.7rem 0.7rem 0.7rem;
+    background: #fff;
 }
 
 .skill-eval-top-meta {
@@ -2246,6 +2400,15 @@ ul.simple-list.collection-resources li {
         align-items: flex-start;
     }
 
+    .skill-eval-evidence-row {
+        flex-direction: column;
+    }
+
+    .skill-eval-evidence-links {
+        align-items: flex-start;
+        white-space: normal;
+    }
+
     .skill-eval-kpi {
         border-right: none;
         border-bottom: 1px solid var(--border);
@@ -2289,6 +2452,11 @@ ul.simple-list.collection-resources li {
 
     .skill-eval-kpis {
         grid-template-columns: repeat(2, minmax(120px, 1fr));
+    }
+
+    .skill-eval-details-inline-metrics {
+        gap: 0.2rem 0.55rem;
+        font-size: 0.76rem;
     }
 
     .skill-eval-compare-card .bar-row {
