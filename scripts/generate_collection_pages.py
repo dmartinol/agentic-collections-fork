@@ -153,7 +153,6 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
 
     conf_label = str(ev.get("confidence_level") or "LOW")
     conf_cls = conf_label.lower()
-    conf_sub = f"n={min(nt, nc)}"
     has_failures = bool(ev.get("has_failures"))
     failed_trials = int(ev.get("failed_trials") or 0)
     trial_name = html.escape(str(ev.get("latest_trial_name") or "N/A"))
@@ -165,7 +164,9 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
     mean_c_raw = ev.get("mean_reward_control")
     mean_t = _metric(mean_t_raw, 2)
     mean_c = _metric(mean_c_raw, 2)
-    uplift = _metric(ev.get("mean_reward_gap"))
+    gap_value = float(ev.get("mean_reward_gap") or 0.0)
+    gap_pct_label = f"{gap_value:+.1%}" if gap_value != 0 else "0.0%"
+    gap_reward_label = f"{gap_value:+.2f}" if gap_value != 0 else "0.00"
 
     max_mean = max(
         float(mean_t_raw) if isinstance(mean_t_raw, (int, float)) else 0.0,
@@ -187,6 +188,42 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
     coverage_pct = (nt / coverage_total * 100.0) if coverage_total > 0 else 0.0
     coverage_label = f"{nt} / {coverage_total if coverage_total else 'N/A'}"
     coverage_sub = f"scenarios tested ({coverage_pct:.1f}%)"
+    compared_runs = min(nt, nc)
+    coverage_signal = (
+        f"{nt} of {coverage_total} scenarios tested ({coverage_pct:.1f}%)"
+        if coverage_total > 0
+        else f"{nt} scenarios tested"
+    )
+
+    llm_raw = str(ev.get("llm") or "").strip()
+    llm_baseline = re.sub(r"\s*\([^)]*\)\s*$", "", llm_raw).strip() if llm_raw else ""
+    llm_baseline_label = html.escape(llm_baseline or "the baseline model")
+    llm_baseline_html = f'<span class="model-name">{llm_baseline_label}</span>'
+    gap_raw = ev.get("mean_reward_gap")
+    if isinstance(gap_raw, (int, float)):
+        gap_pct = abs(float(gap_raw) * 100.0)
+        if float(gap_raw) > 0:
+            plain_summary = (
+                f'This skill performed <strong class="skill-eval-delta skill-eval-delta-better">{gap_pct:.1f}% better</strong> '
+                f"than vanilla {llm_baseline_html} across {compared_runs} evaluation "
+                f'run{"s" if compared_runs != 1 else ""}.'
+            )
+        elif float(gap_raw) < 0:
+            plain_summary = (
+                f'This skill performed <strong class="skill-eval-delta skill-eval-delta-worse">{gap_pct:.1f}% worse</strong> '
+                f"than vanilla {llm_baseline_html} across {compared_runs} evaluation "
+                f'run{"s" if compared_runs != 1 else ""}.'
+            )
+        else:
+            plain_summary = (
+                f"This skill performed about the same as vanilla {llm_baseline_html} "
+                f'across {compared_runs} evaluation run{"s" if compared_runs != 1 else ""}.'
+            )
+    else:
+        plain_summary = (
+            f"Evaluation results are available, but uplift versus vanilla {llm_baseline_html} "
+            "is not available yet."
+        )
 
     fisher = ev.get("fisher_p_value")
     significance_text = (
@@ -198,6 +235,7 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
             else "Moderate (not statistically significant)"
         )
     )
+    significance_primary = significance_text.split(" ")[0]
 
     raw_generated = ev.get("generated_at")
     freshness = (
@@ -242,11 +280,11 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
         '<div class="skill-eval-card">',
         '<div class="skill-eval-header-grid">',
         '<div class="skill-eval-header-main">',
-        '<div class="skill-eval-card-header"><strong>Evaluation summary</strong></div>',
+        f'<div class="skill-eval-plain-summary">{plain_summary}</div>',
         f'<span class="skill-eval-head-badges"><span class="skill-eval-head-badge status {rec_cls}">'
         f'{pass_icon_html}<span>{rec_label}</span></span>'
         f'<span class="skill-eval-head-badge confidence {conf_cls}">{conf_label} confidence</span></span>',
-        f'<div class="skill-eval-inline-signals">{html.escape(str(ev.get("coverage_status") or "PARTIAL").lower())} coverage · {html.escape(conf_label.lower())} confidence ({html.escape(conf_sub)})</div>',
+        f'<div class="skill-eval-inline-signals">{coverage_signal}</div>',
         '</div>',
         '<div class="skill-eval-top-meta">',
         '<span class="skill-eval-meta-item">'
@@ -266,14 +304,43 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
     ]
     if has_failures:
         parts.append(f'<div class="skill-eval-inline-signals warn">⚠ {failed_trials} failed trial{"s" if failed_trials != 1 else ""}</div>')
+    parts.extend(
+        [
+            '<div class="skill-eval-evidence-row">',
+            '<div class="skill-eval-evidence-main">',
+            '<div class="evidence-title">✓ Latest verified execution</div>',
+            f'<div class="evidence-line">{trial_status} - reward {trial_reward} - {html.escape(freshness)}</div>',
+            f'<div class="evidence-line">{trial_name}</div>',
+            '</div>',
+            '<div class="skill-eval-evidence-links">',
+            f'<a class="collection-inline-link" href="{html.escape(md_url or json_url, quote=True)}" target="_blank" rel="noopener noreferrer">View execution details</a>',
+            (
+                f'<a class="collection-inline-link" href="{html.escape(json_url, quote=True)}" target="_blank" rel="noopener noreferrer">Raw report (JSON)</a>'
+                if json_url
+                else ""
+            ),
+            '</div>',
+            '</div>',
+        ]
+    )
 
     parts.extend(
         [
+            '<details class="skill-eval-details">',
+            '<summary class="skill-eval-details-summary"><span class="skill-eval-details-title">Technical evaluation details</span><span class="skill-eval-details-subtitle">Coverage, experiments, reproducibility, and raw evaluation artifacts</span><span class="skill-eval-details-chevron" aria-hidden="true"></span>'
+            '<span class="skill-eval-details-inline-metrics">'
+            f'<span><strong>Coverage</strong> {coverage_label}</span>'
+            f'<span><strong>Pass rate</strong> {pass_rate_label}</span>'
+            f'<span><strong>Reward</strong> {mean_t}</span>'
+            f'<span><strong>Improvement</strong> {gap_pct_label}</span>'
+            f'<span><strong>Confidence</strong> {html.escape(significance_primary)}</span>'
+            '</span></summary>',
+            '<div class="skill-eval-details-body">',
             '<div class="skill-eval-kpis">',
             f'<div class="skill-eval-kpi"><p class="kpi-label">Coverage</p><p class="kpi-value">{coverage_label}</p><p class="kpi-sub">{coverage_sub}</p></div>',
             f'<div class="skill-eval-kpi"><p class="kpi-label">Pass rate (treatment)</p><p class="kpi-value">{pass_rate_label}</p><p class="kpi-sub">{np_t} pass · {nf_t} fail</p></div>',
             f'<div class="skill-eval-kpi"><p class="kpi-label">Reward (treatment)</p><p class="kpi-value">{mean_t}</p><p class="kpi-sub">mean reward</p></div>',
-            f'<div class="skill-eval-kpi"><p class="kpi-label">Improvement vs baseline</p><p class="kpi-value">+{float(ev.get("mean_reward_gap") or 0) * 100:.1f}%</p><p class="kpi-sub">(+{uplift} reward)</p></div>',
+            f'<div class="skill-eval-kpi"><p class="kpi-label">Improvement vs baseline</p><p class="kpi-value">{gap_pct_label}</p><p class="kpi-sub">({gap_reward_label} reward)</p></div>',
             f'<div class="skill-eval-kpi"><p class="kpi-label">Statistical significance</p><p class="kpi-value">{html.escape(significance_text.split(" ")[0])}</p><p class="kpi-sub">{html.escape(significance_text.replace(significance_text.split(" ")[0] + " ", ""))}</p></div>',
             '</div>',
             '<div class="skill-eval-lower-grid">',
@@ -309,6 +376,8 @@ def _render_skill_evaluation_block(ev: Dict[str, Any]) -> str:
             f"<span>{related_pr_html}</span>"
             '</div>'
             '</div>',
+            '</div>',
+            '</details>',
         ]
     )
     parts.extend(["</div>"])
@@ -578,7 +647,7 @@ def render_collection_page(pack: Dict[str, Any], mcp_data: List[Dict[str, Any]])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.css?v=63">
+    <link rel="stylesheet" href="../styles.css?v=73">
 </head>
 <body>
     <div class="site-brand-accent" aria-hidden="true"></div>
@@ -625,7 +694,7 @@ def render_collection_page(pack: Dict[str, Any], mcp_data: List[Dict[str, Any]])
         <div class="modal-content" id="mcp-details"></div>
     </div>
 
-    <script src="../app.js?v=63"></script>
+    <script src="../app.js?v=73"></script>
 </body>
 </html>
 """

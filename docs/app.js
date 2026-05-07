@@ -1873,10 +1873,6 @@ function appendSkillEvalBlock(li, skill) {
     headerGrid.className = 'skill-eval-header-grid';
     const headerMain = document.createElement('div');
     headerMain.className = 'skill-eval-header-main';
-    const header = document.createElement('div');
-    header.className = 'skill-eval-card-header';
-    header.textContent = 'Evaluation summary';
-    headerMain.appendChild(header);
 
     const rec = String(ev.recommendation || 'unknown').toLowerCase();
     const statusLabel = rec === 'pass' ? 'PASS' : (rec === 'fail' ? 'FAIL' : 'UNKNOWN');
@@ -1920,6 +1916,52 @@ function appendSkillEvalBlock(li, skill) {
     const coverageCount = Number(ev.n_trials_treatment || 0);
     const coverageTotal = Number(ev.catalog_skill_count || 0);
     const coveragePct = coverageTotal > 0 ? ((coverageCount / coverageTotal) * 100).toFixed(1) : '0.0';
+    const coverageSignal = coverageTotal > 0
+        ? `${coverageCount} of ${coverageTotal} scenarios tested (${coveragePct}%)`
+        : `${coverageCount} scenarios tested`;
+    const llmBase = String(ev.llm || '').replace(/\s*\([^)]*\)\s*$/, '').trim() || 'the baseline model';
+    const comparedRuns = confidenceBase || coverageCount;
+    const rawGap = typeof ev.mean_reward_gap === 'number' ? ev.mean_reward_gap : Number(ev.mean_reward_gap || 0);
+    const gapValue = Number.isFinite(rawGap) ? rawGap : 0;
+    const gapPct = gapValue * 100;
+    const gapPctLabel = gapValue === 0 ? '0.0%' : `${gapValue > 0 ? '+' : ''}${gapPct.toFixed(1)}%`;
+    const gapRewardLabel = gapValue === 0 ? '0.00' : `${gapValue > 0 ? '+' : ''}${gapValue.toFixed(2)}`;
+    const plainSummaryEl = document.createElement('div');
+    plainSummaryEl.className = 'skill-eval-plain-summary';
+
+    const appendModelName = () => {
+        const modelSpan = document.createElement('span');
+        modelSpan.className = 'model-name';
+        modelSpan.textContent = llmBase;
+        plainSummaryEl.appendChild(modelSpan);
+    };
+    const appendDeltaSummary = (deltaText, deltaClass) => {
+        plainSummaryEl.appendChild(document.createTextNode('This skill performed '));
+        const deltaEl = document.createElement('strong');
+        deltaEl.className = `skill-eval-delta ${deltaClass}`;
+        deltaEl.textContent = deltaText;
+        plainSummaryEl.appendChild(deltaEl);
+        plainSummaryEl.appendChild(document.createTextNode(' than vanilla '));
+        appendModelName();
+        plainSummaryEl.appendChild(document.createTextNode(` across ${comparedRuns} evaluation run${comparedRuns === 1 ? '' : 's'}.`));
+    };
+
+    if (typeof ev.mean_reward_gap === 'number') {
+        if (gapPct > 0) {
+            appendDeltaSummary(`${Math.abs(gapPct).toFixed(1)}% better`, 'skill-eval-delta-better');
+        } else if (gapPct < 0) {
+            appendDeltaSummary(`${Math.abs(gapPct).toFixed(1)}% worse`, 'skill-eval-delta-worse');
+        } else {
+            plainSummaryEl.appendChild(document.createTextNode('This skill performed about the same as vanilla '));
+            appendModelName();
+            plainSummaryEl.appendChild(document.createTextNode(` across ${comparedRuns} evaluation run${comparedRuns === 1 ? '' : 's'}.`));
+        }
+    } else {
+        plainSummaryEl.appendChild(document.createTextNode('Evaluation results are available, but uplift versus vanilla '));
+        appendModelName();
+        plainSummaryEl.appendChild(document.createTextNode(' is not available yet.'));
+    }
+    headerMain.appendChild(plainSummaryEl);
 
     const headBadges = document.createElement('span');
     headBadges.className = 'skill-eval-head-badges';
@@ -1942,7 +1984,7 @@ function appendSkillEvalBlock(li, skill) {
     headerMain.appendChild(headBadges);
     const signals = document.createElement('div');
     signals.className = 'skill-eval-inline-signals';
-    signals.textContent = `${String(ev.coverage_status || '').toLowerCase() || 'partial'} coverage · ${confText.toLowerCase()} confidence (n=${confidenceBase || 0})`;
+    signals.textContent = coverageSignal;
     headerMain.appendChild(signals);
     headerGrid.appendChild(headerMain);
 
@@ -2006,13 +2048,91 @@ function appendSkillEvalBlock(li, skill) {
         failures.textContent = `⚠ ${failedTrials} failed trial${failedTrials === 1 ? '' : 's'}`;
         card.appendChild(failures);
     }
+
+    const evidenceRow = document.createElement('div');
+    evidenceRow.className = 'skill-eval-evidence-row';
+    const evidenceMain = document.createElement('div');
+    evidenceMain.className = 'skill-eval-evidence-main';
+    const evidenceTopTitle = document.createElement('div');
+    evidenceTopTitle.className = 'evidence-title';
+    evidenceTopTitle.textContent = '✓ Latest verified execution';
+    const evidenceTopLineOne = document.createElement('div');
+    evidenceTopLineOne.className = 'evidence-line';
+    const topTrialState = ev.latest_trial_passed === true ? 'PASS' : (ev.latest_trial_passed === false ? 'FAIL' : 'N/A');
+    evidenceTopLineOne.textContent = `${topTrialState} - reward ${formatMetric(ev.latest_trial_reward, 2)} - ${freshnessAge}`;
+    const evidenceTopLineTwo = document.createElement('div');
+    evidenceTopLineTwo.className = 'evidence-line';
+    evidenceTopLineTwo.textContent = String(ev.latest_trial_name || 'N/A');
+    evidenceMain.appendChild(evidenceTopTitle);
+    evidenceMain.appendChild(evidenceTopLineOne);
+    evidenceMain.appendChild(evidenceTopLineTwo);
+    const evidenceLinks = document.createElement('div');
+    evidenceLinks.className = 'skill-eval-evidence-links';
+    const evidenceDetailsLink = document.createElement('a');
+    evidenceDetailsLink.className = 'collection-inline-link';
+    evidenceDetailsLink.href = String(ev.report_md_url || ev.report_json_url || '#');
+    evidenceDetailsLink.target = '_blank';
+    evidenceDetailsLink.rel = 'noopener noreferrer';
+    evidenceDetailsLink.textContent = 'View execution details';
+    evidenceLinks.appendChild(evidenceDetailsLink);
+    if (ev.report_json_url) {
+        const evidenceRawLink = document.createElement('a');
+        evidenceRawLink.className = 'collection-inline-link';
+        evidenceRawLink.href = String(ev.report_json_url);
+        evidenceRawLink.target = '_blank';
+        evidenceRawLink.rel = 'noopener noreferrer';
+        evidenceRawLink.textContent = 'Raw report (JSON)';
+        evidenceLinks.appendChild(evidenceRawLink);
+    }
+    evidenceRow.appendChild(evidenceMain);
+    evidenceRow.appendChild(evidenceLinks);
+    card.appendChild(evidenceRow);
+
+    const technicalDetails = document.createElement('details');
+    technicalDetails.className = 'skill-eval-details';
+    const technicalSummary = document.createElement('summary');
+    technicalSummary.className = 'skill-eval-details-summary';
+    const technicalTitle = document.createElement('span');
+    technicalTitle.className = 'skill-eval-details-title';
+    technicalTitle.textContent = 'Technical evaluation details';
+    const technicalSubtitle = document.createElement('span');
+    technicalSubtitle.className = 'skill-eval-details-subtitle';
+    technicalSubtitle.textContent = 'Coverage, experiments, reproducibility, and raw evaluation artifacts';
+    const technicalChevron = document.createElement('span');
+    technicalChevron.className = 'skill-eval-details-chevron';
+    technicalChevron.setAttribute('aria-hidden', 'true');
+    technicalSummary.appendChild(technicalTitle);
+    technicalSummary.appendChild(technicalSubtitle);
+    technicalSummary.appendChild(technicalChevron);
+    const inlineMetrics = document.createElement('span');
+    inlineMetrics.className = 'skill-eval-details-inline-metrics';
+    const inlineMetricItems = [
+        ['Coverage', `${coverageCount} / ${coverageTotal || 'N/A'}`],
+        ['Pass rate', passRateLabel],
+        ['Reward', formatMetric(meanTreatment, 2)],
+        ['Improvement', gapPctLabel],
+        ['Confidence', significanceText.split(' ')[0]]
+    ];
+    inlineMetricItems.forEach(([label, value]) => {
+        const metric = document.createElement('span');
+        const labelEl = document.createElement('strong');
+        labelEl.textContent = label;
+        metric.appendChild(labelEl);
+        metric.appendChild(document.createTextNode(` ${value}`));
+        inlineMetrics.appendChild(metric);
+    });
+    technicalSummary.appendChild(inlineMetrics);
+    technicalDetails.appendChild(technicalSummary);
+    const technicalBody = document.createElement('div');
+    technicalBody.className = 'skill-eval-details-body';
+
     const kpis = document.createElement('div');
     kpis.className = 'skill-eval-kpis';
     const kpiItems = [
         { label: 'Coverage', value: `${coverageCount} / ${coverageTotal || 'N/A'}`, sub: `scenarios tested (${coveragePct}%)` },
         { label: 'Pass rate (treatment)', value: passRateLabel, sub: `${Number(ev.n_passed_treatment || 0)} pass · ${Number(ev.n_failed_treatment || 0)} fail` },
         { label: 'Reward (treatment)', value: formatMetric(meanTreatment, 2), sub: 'mean reward' },
-        { label: 'Improvement vs baseline', value: `${(Number(ev.mean_reward_gap || 0) * 100).toFixed(1)}%`, sub: `(+${formatMetric(ev.mean_reward_gap, 2)} reward)` },
+        { label: 'Improvement vs baseline', value: gapPctLabel, sub: `(${gapRewardLabel} reward)` },
         { label: 'Statistical significance', value: significanceText.split(' ')[0], sub: significanceText.slice(significanceText.indexOf('(') > -1 ? significanceText.indexOf('(') : significanceText.length).replace(/[()]/g, '') || 'interpreted' }
     ];
     kpiItems.forEach((item) => {
@@ -2032,7 +2152,7 @@ function appendSkillEvalBlock(li, skill) {
         box.appendChild(s);
         kpis.appendChild(box);
     });
-    card.appendChild(kpis);
+    technicalBody.appendChild(kpis);
 
     const lower = document.createElement('div');
     lower.className = 'skill-eval-lower-grid';
@@ -2117,7 +2237,7 @@ function appendSkillEvalBlock(li, skill) {
         trialPreview.appendChild(rawLink);
     }
     lower.appendChild(trialPreview);
-    card.appendChild(lower);
+    technicalBody.appendChild(lower);
 
     const repro = document.createElement('div');
     repro.className = 'skill-eval-repro';
@@ -2162,7 +2282,9 @@ function appendSkillEvalBlock(li, skill) {
     repro.appendChild(reproTitle);
     repro.appendChild(reproLabels);
     repro.appendChild(reproValues);
-    card.appendChild(repro);
+    technicalBody.appendChild(repro);
+    technicalDetails.appendChild(technicalBody);
+    card.appendChild(technicalDetails);
 
     li.appendChild(card);
 }
