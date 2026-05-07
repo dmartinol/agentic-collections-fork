@@ -54,15 +54,11 @@ Permanently delete virtual machine snapshots in OpenShift Virtualization. Deleti
 ## When to Use This Skill
 
 **Trigger this skill when:**
-- User wants to free storage by removing old snapshots
-- User wants to delete a specific snapshot
-- User wants to implement snapshot retention policies
+- User wants to delete a specific snapshot by name
 
 **User phrases that trigger this skill:**
 - "Delete snapshot pre-upgrade-backup"
-- "Remove old snapshots for VM database-01"
-- "Delete all snapshots older than 7 days"
-- "Free up snapshot storage"
+- "Remove snapshot pre-upgrade-backup in production"
 
 **Do NOT use this skill when:**
 - User wants to create snapshots → Use `vm-snapshot-create` skill
