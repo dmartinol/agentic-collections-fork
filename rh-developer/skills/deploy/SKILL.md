@@ -4,6 +4,7 @@ description: |
   Create Kubernetes Deployment, Service, and Route resources on OpenShift to deploy and expose an application. Use this skill after /s2i-build to make the built image accessible. Handles port detection, replica configuration, HTTPS route creation, rollout monitoring, and rollback on failure. Triggers on /deploy command when user wants to deploy a container image to OpenShift.
 model: inherit
 color: green
+license: Apache-2.0
 metadata:
   user_invocable: "true"
 ---

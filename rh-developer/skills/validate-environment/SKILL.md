@@ -4,6 +4,7 @@ description: |
   Check and report the status of required tools and environment for rh-developer skills. Validates tool installation (oc, helm, podman, git, skopeo, etc.), cluster connectivity, and permissions. Use this skill before running other deployment skills to ensure prerequisites are met. Triggers on /validate-environment command or when user asks to check their environment setup.
 model: inherit
 color: cyan
+license: Apache-2.0
 metadata:
   user_invocable: "true"
 ---

@@ -4,6 +4,7 @@ description: |
   Diagnose local container issues with Podman/Docker including image pull errors, container startup failures, OOM kills, and networking problems. Automates multi-step diagnosis: container inspect, logs retrieval, image analysis, and resource constraint checking. Use this skill when containers fail to run locally before deployment. Triggers on /debug-container command or phrases like "container won't start", "podman run fails", "local container crashing", "container exits immediately".
 model: inherit
 color: cyan
+license: Apache-2.0
 metadata:
   user_invocable: "true"
 ---

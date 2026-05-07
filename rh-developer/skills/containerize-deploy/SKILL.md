@@ -4,6 +4,7 @@ description: |
   Complete end-to-end workflow for containerizing and deploying applications to OpenShift or standalone RHEL systems. Orchestrates /detect-project, /s2i-build, /deploy, /helm-deploy, and /rhel-deploy skills with user confirmation checkpoints at each phase. Supports S2I, Podman, Helm deployment strategies for OpenShift, and Podman/native deployments for RHEL hosts. Use this skill when user wants to go from source code to running application in one guided workflow. Supports resume after interruption and rollback on failure. Triggers on /containerize-deploy command.
 model: inherit
 color: green
+license: Apache-2.0
 metadata:
    user_invocable: "true"
 ---
