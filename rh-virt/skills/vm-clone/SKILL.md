@@ -152,7 +152,11 @@ Parse: Extract storage names, calculate size, determine DataSources vs container
 
 **Option 2 warning**: `⚠️ Shared Storage Dangerous - Both VMs share disk, data corruption risk. Only safe if source stopped. Use Option 1 instead. Proceed anyway? (yes/cancel)` Wait for explicit "yes".
 
-### Step 3: Present Clone Configuration for Confirmation
+### Step 3: Check Namespace Quota and Present Clone Configuration
+
+**3.0: Check ResourceQuota** (before presenting confirmation)
+
+Use `resources_list` (apiVersion="v1", kind="ResourceQuota", namespace=`<target-namespace>`) to check if quotas exist. If a quota is found, compare current usage against limits for CPU, memory, and storage. If the clone would push usage above 80% of any limit, include a warning in the confirmation summary.
 
 **Present configuration summary:**
 
