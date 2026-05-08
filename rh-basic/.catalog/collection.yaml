@@ -23,7 +23,7 @@ summary: Lightweight, self-contained skills for everyday Red Hat operations and 
 contents:
   description: |
     The pack provides 6 skills covering the most common Red Hat support and operations workflows.
-    All skills are self-contained and fall back to WebFetch when the Lightspeed MCP server is unavailable.
+    All skills are self-contained and fall back to WebFetch when the Red Hat Security MCP server is unavailable.
   skills:
   - name: red-hat-cve-explainer
     description: CVE Explanation and Severity Rating
