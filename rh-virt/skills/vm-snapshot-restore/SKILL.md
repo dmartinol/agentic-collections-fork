@@ -43,14 +43,11 @@ Restore virtual machines from snapshots in OpenShift Virtualization. **CRITICAL*
 ## When to Use This Skill
 
 **Trigger this skill when:**
-- User wants to restore a VM to a previous state
-- User wants to recover from failed changes/upgrades
-- User explicitly requests snapshot restore
+- User explicitly requests restoring a VM from a named snapshot
 
 **User phrases that trigger this skill:**
 - "Restore VM api-server from snapshot snapshot-20240115"
-- "Roll back database-01 to pre-upgrade snapshot"
-- "Recover VM web-server from backup"
+- "Roll back database-01 to snapshot pre-upgrade"
 
 **Do NOT use this skill when:**
 - User wants to create snapshots → Use `vm-snapshot-create` skill

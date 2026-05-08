@@ -151,7 +151,11 @@ Parse: Extract storage names, calculate size, determine DataSources vs container
 
 **Option 2 warning**: `⚠️ Shared Storage Dangerous - Both VMs share disk, data corruption risk. Only safe if source stopped. Use Option 1 instead. Proceed anyway? (yes/cancel)` Wait for explicit "yes".
 
-### Step 3: Present Clone Configuration for Confirmation
+### Step 3: Check Namespace Quota and Present Clone Configuration
+
+**3.0: Check ResourceQuota** (before presenting confirmation)
+
+Use `resources_list` (apiVersion="v1", kind="ResourceQuota", namespace=`<target-namespace>`) to check if quotas exist. If a quota is found, compare current usage against limits for CPU, memory, and storage. If the clone would push usage above 80% of any limit, include a warning in the confirmation summary.
 
 **Present configuration summary:**
 
@@ -275,8 +279,8 @@ Would you like help troubleshooting this error?
 
 ### Batch Cloning
 **User request:** "Create 3 copies of template-vm named web-01, web-02, web-03"
-**Workflow**: Validate source once, generate/check target names, present combined scope, ask storage strategy, confirm, execute sequentially
-**Batch confirmation**: Show source, targets list, strategy, total impact (VMs, storage, vCPU, memory), estimated time
+**Limit**: Maximum 5 clones per batch request. If user requests more, refuse and explain the limit exists to prevent resource exhaustion.
+**Workflow**: Validate source once, generate/check target names, ask storage strategy once, then process each clone individually through Steps 3-5 with separate confirmation per VM. Stop on first failure.
 
 ### Cross-Namespace Cloning
 **User request:** "Clone production-vm from production to staging namespace"
@@ -417,17 +421,22 @@ Agent: "✓ VM Cloned Successfully"
 ```
 User: "Create 3 copies of template-vm named web-01, web-02, web-03 in production"
 
-Agent: [Validates source, checks all names, presents batch review]
-       "Source: template-vm, Targets: 3 VMs (web-01, web-02, web-03)"
-       "Total Impact: 90Gi, 6 vCPU, 12Gi, ~20-30 min"
-       "Proceed? (yes/no)"
+Agent: [Validates source, checks all names, asks storage strategy once]
+       "Storage strategy for all clones: Clone Storage (1)"
 
+       ## Clone 1 of 3: web-01
+       "Source: template-vm → Target: web-01 (production), 30Gi clone"
+       "Proceed with VM cloning? (yes/no)"
 User: "yes"
+Agent: "✓ web-01 cloned"
 
-Agent: "📦 Cloning VM 1 of 3: web-01... ✓"
-       "📦 Cloning VM 2 of 3: web-02... ✓"
-       "📦 Cloning VM 3 of 3: web-03... ✓"
-       "✓ Batch Cloning Completed - 3 VMs, 90Gi storage, all Stopped"
+       ## Clone 2 of 3: web-02
+       "Source: template-vm → Target: web-02 (production), 30Gi clone"
+       "Proceed with VM cloning? (yes/no)"
+User: "yes"
+Agent: "✓ web-02 cloned"
+
+       [... repeats for each VM with individual confirmation ...]
 ```
 
 ### Example 4: Shared Storage Warning

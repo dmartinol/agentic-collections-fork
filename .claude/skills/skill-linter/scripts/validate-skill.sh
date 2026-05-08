@@ -172,9 +172,17 @@ if [ -n "$COMPAT" ]; then
   pass "Compatibility valid ($COMPAT_LEN chars)"
 fi
 
-# Check allowed-tools (if present)
+# Check allowed-tools (optional)
 TOOLS=$(echo "$FRONTMATTER" | grep '^allowed-tools:' | sed 's/^allowed-tools:[[:space:]]*//' || true)
-if [ -n "$TOOLS" ]; then
+if [ -z "$TOOLS" ]; then
+  # Check for YAML multi-line array (allowed-tools:\n  - item)
+  if echo "$FRONTMATTER" | grep -q '^allowed-tools:$'; then
+    NEXT_LINE=$(echo "$FRONTMATTER" | grep -A1 '^allowed-tools:$' | sed -n '2p')
+    if echo "$NEXT_LINE" | grep -qE '^[[:space:]]*-[[:space:]]'; then
+      fail "allowed-tools must be space-delimited, not YAML array"
+    fi
+  fi
+else
   # FAIL if commas found (must be space-delimited)
   if echo "$TOOLS" | grep -qE ','; then
     fail "allowed-tools must be space-delimited, not comma-separated: $TOOLS"
@@ -183,13 +191,6 @@ if [ -n "$TOOLS" ]; then
     fail "allowed-tools must be space-delimited, not array syntax: $TOOLS"
   else
     pass "Allowed-tools field valid"
-  fi
-fi
-# FAIL if YAML multi-line array detected (allowed-tools:\n  - item)
-if echo "$FRONTMATTER" | grep -q '^allowed-tools:$'; then
-  NEXT_LINE=$(echo "$FRONTMATTER" | grep -A1 '^allowed-tools:$' | sed -n '2p')
-  if echo "$NEXT_LINE" | grep -qE '^[[:space:]]*-[[:space:]]'; then
-    fail "allowed-tools must be space-delimited, not YAML array"
   fi
 fi
 
