@@ -223,7 +223,15 @@ spec:
 
 ## postgres_exporter Setup
 
-To expose PostgreSQL metrics to Prometheus:
+To expose PostgreSQL metrics to Prometheus, first create a Secret with the data source name (DSN):
+
+```bash
+oc create secret generic postgres-exporter-dsn \
+  --from-literal=dsn="postgresql://postgres:<password>@postgresql:5432/postgres?sslmode=disable" \
+  -n <namespace>
+```
+
+Then deploy the exporter referencing the Secret:
 
 ```yaml
 apiVersion: apps/v1
@@ -239,7 +247,10 @@ spec:
           image: quay.io/prometheuscommunity/postgres-exporter:latest
           env:
             - name: DATA_SOURCE_NAME
-              value: "postgresql://postgres:<password>@postgresql:5432/postgres?sslmode=disable"
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-exporter-dsn
+                  key: dsn
           ports:
             - containerPort: 9187
               name: metrics
