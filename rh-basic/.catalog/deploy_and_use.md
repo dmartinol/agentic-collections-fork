@@ -6,21 +6,13 @@
 ### Prerequisites
 
 - Claude Code CLI or IDE extension (if using Claude Code)
-- Podman installed (for the container-based Lightspeed MCP server)
 - Red Hat service account ([console.redhat.com](https://console.redhat.com/iam/service-accounts))
 
-Skills fall back to WebFetch on public Red Hat documentation if the MCP server is not configured — Podman and a service account are optional.
+Skills fall back to WebFetch on public Red Hat documentation if the MCP server is not configured.
 
 ### Environment setup
 
-Configure Red Hat Lightspeed credentials (names must match **`mcps.json`**):
-
-```bash
-export LIGHTSPEED_CLIENT_ID="your-service-account-client-id"
-export LIGHTSPEED_CLIENT_SECRET="your-service-account-client-secret"
-```
-
-Secrets must never be committed to the repository and must not be echoed in assistant output.
+No environment variables are required for this pack's MCP server. Authentication uses Red Hat Customer Portal browser SSO.
 
 ### Installation (Lola)
 
@@ -46,6 +38,8 @@ lola install -f rh-basic -a cursor
 
 ### MCP configuration
 
-Server definitions live in **`mcps.json`** at the pack root. The Lightspeed MCP server runs as a Podman container using `${LIGHTSPEED_CLIENT_ID}` and `${LIGHTSPEED_CLIENT_SECRET}` placeholders only; never commit secret values.
+Server definitions live in **`mcps.json`** at the pack root and use HTTP transport:
 
-Configure the environment variables above, then run `lola install -f rh-basic` to install the pack.
+- `red-hat-security` -> `https://security-mcp.api.redhat.com/mcp`
+
+After installation, run `/red-hat-security-mcp-setup` to add the server to your project's `.mcp.json` and complete browser SSO authentication.
