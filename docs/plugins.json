@@ -16,5 +16,8 @@
   },
   "rh-automation": {
     "title": "Agentic skill pack for Automation Engineers"
+  },
+  "rh-basic": {
+    "title": "agentic skill pack for Red Hat customers"
   }
 }
