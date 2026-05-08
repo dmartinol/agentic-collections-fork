@@ -58,7 +58,7 @@ Do NOT use when:
 **CRITICAL**: Document consultation MUST happen BEFORE any MCP tool invocations.
 
 **Document Consultation** (REQUIRED - Execute FIRST):
-1. **Action**: Read [governance-readiness.md](../../docs/aap/governance-readiness.md) using the Read tool to understand the 7-domain assessment framework, Red Hat source citations, decision tables, and output template
+1. **Action**: Read [governance-readiness.md](docs/aap/governance-readiness.md) using the Read tool to understand the 7-domain assessment framework, Red Hat source citations, decision tables, and output template
 2. **Output to user**: "I consulted [governance-readiness.md](docs/aap/governance-readiness.md) to understand Red Hat's governance best practices for the 7-domain assessment framework."
 
 ### Step 1.5: Determine Assessment Scope
@@ -285,7 +285,7 @@ For any domains with GAP or WARN status, offer to remediate using MCP write tool
 - `execution-summary` - Generate audit trail after assessment
 
 ### Reference Documentation
-- [governance-readiness.md](../../docs/aap/governance-readiness.md) - The 7-domain assessment reference
+- [governance-readiness.md](docs/aap/governance-readiness.md) - The 7-domain assessment reference
 
 ## Critical: Human-in-the-Loop Requirements
 

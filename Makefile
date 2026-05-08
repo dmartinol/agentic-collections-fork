@@ -40,6 +40,10 @@ install: check-uv
 validate: check-uv
 	@echo "Validating agentic collection structure..."
 	@uv run python scripts/validate_structure.py
+	@echo "Validating skill docs links..."
+	@uv run python scripts/validate_skill_doc_links.py
+	@echo "Validating docs tree links..."
+	@uv run python scripts/validate_docs_tree_links.py
 	@echo "Validating collection compliance (.catalog/)..."
 	@uv run python scripts/validate_collection_compliance.py
 	@echo "✓ Validation passed!"

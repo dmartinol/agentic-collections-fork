@@ -1,0 +1,1 @@
+../../cluster-report/docs/input-validation-guide.md

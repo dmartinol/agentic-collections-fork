@@ -27,7 +27,7 @@ Deploy applications to OpenShift using Helm charts. Supports existing charts or 
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 ## Workflow
 
@@ -352,6 +352,6 @@ Your application is live!
 - `/debug-network` - Diagnose networking issues with deployed services
 
 ### Reference Documentation
-- [docs/builder-images.md](../../docs/builder-images.md) - Container image references for chart values
-- [docs/image-selection-criteria.md](../../docs/image-selection-criteria.md) - Image variant selection for production deployments
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc, helm)
+- [docs/builder-images.md](docs/builder-images.md) - Container image references for chart values
+- [docs/image-selection-criteria.md](docs/image-selection-criteria.md) - Image variant selection for production deployments
+- [docs/prerequisites.md](docs/prerequisites.md) - Required tools (oc, helm)

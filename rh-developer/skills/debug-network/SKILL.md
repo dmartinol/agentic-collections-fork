@@ -26,7 +26,7 @@ Use this skill when services cannot communicate, routes return 503/502 errors, o
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 ## Workflow
 
@@ -316,7 +316,7 @@ Select an option:
 
 ## Common Connectivity Issues
 
-For detailed diagnosis and fix tables covering service, route, and network policy issues, see [docs/debugging-patterns.md](../../docs/debugging-patterns.md).
+For detailed diagnosis and fix tables covering service, route, and network policy issues, see [docs/debugging-patterns.md](docs/debugging-patterns.md).
 
 ## Dependencies
 
@@ -328,5 +328,5 @@ For detailed diagnosis and fix tables covering service, route, and network polic
 - `/deploy` - To fix and redeploy the service
 
 ### Reference Documentation
-- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
+- [docs/debugging-patterns.md](docs/debugging-patterns.md) - Common error patterns
+- [docs/prerequisites.md](docs/prerequisites.md) - Required tools (oc), cluster access verification

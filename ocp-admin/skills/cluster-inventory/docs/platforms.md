@@ -1,0 +1,1 @@
+../../cluster-report/docs/platforms.md

@@ -34,7 +34,7 @@ Diagnose local Podman/Docker container issues by automatically gathering contain
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 ## When to Use This Skill
 
@@ -286,7 +286,7 @@ Continue to diagnosis summary? (yes/no)
 - Evidence: [from logs]
 - Impact: [application cannot access data]
 
-See [debugging-patterns.md](../../docs/debugging-patterns.md) for exit code reference.
+See [debugging-patterns.md](docs/debugging-patterns.md) for exit code reference.
 
 ### Recommended Actions
 
@@ -329,7 +329,7 @@ Select an option:
 
 **WAIT for user to select next action.**
 
-For exit codes, common container issues, and SELinux volume guidance, see [debugging-patterns.md](../../docs/debugging-patterns.md).
+For exit codes, common container issues, and SELinux volume guidance, see [debugging-patterns.md](docs/debugging-patterns.md).
 
 ## Dependencies
 
@@ -341,5 +341,5 @@ For exit codes, common container issues, and SELinux volume guidance, see [debug
 - `/recommend-image` - select a better base image
 
 ### Reference Documentation
-- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns, exit codes
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (podman)
+- [docs/debugging-patterns.md](docs/debugging-patterns.md) - Common error patterns, exit codes
+- [docs/prerequisites.md](docs/prerequisites.md) - Required tools (podman)

@@ -55,7 +55,7 @@ Do NOT use when:
 - Reports risk assessment with Red Hat citations AND operational context
 
 **Document Consultation** (performed by the skill):
-The execution-risk-analyzer skill reads [execution-governance.md](../../docs/aap/execution-governance.md) and reports its consultation.
+The execution-risk-analyzer skill reads [execution-governance.md](docs/aap/execution-governance.md) and reports its consultation.
 
 **If secrets detected**: STOP. Report the finding and recommend using AAP credentials.
 
@@ -107,7 +107,7 @@ The execution-risk-analyzer skill reads [execution-governance.md](../../docs/aap
 - `governance-assessor` - Pre-execution platform readiness check
 
 ### Reference Documentation
-- [execution-governance.md](../../docs/aap/execution-governance.md) - Risk classification, check mode, rollback
+- [execution-governance.md](docs/aap/execution-governance.md) - Risk classification, check mode, rollback
 
 ## Example Usage
 

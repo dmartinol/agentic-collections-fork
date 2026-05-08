@@ -26,7 +26,7 @@ Use this skill when pods are not running, restarting frequently, or stuck in non
 
 ## Critical: Human-in-the-Loop Requirements
 
-See [Human-in-the-Loop Requirements](../../docs/human-in-the-loop.md) for mandatory checkpoint behavior.
+See [Human-in-the-Loop Requirements](docs/human-in-the-loop.md) for mandatory checkpoint behavior.
 
 ## Workflow
 
@@ -244,7 +244,7 @@ Select an option:
 
 **WAIT for user confirmation before proceeding.**
 
-For pod failure categories and exit code reference, see [debugging-patterns.md](../../docs/debugging-patterns.md).
+For pod failure categories and exit code reference, see [debugging-patterns.md](docs/debugging-patterns.md).
 
 ## Dependencies
 
@@ -257,5 +257,5 @@ For pod failure categories and exit code reference, see [debugging-patterns.md](
 - `/deploy` - To redeploy after fixing issues
 
 ### Reference Documentation
-- [docs/debugging-patterns.md](../../docs/debugging-patterns.md) - Common error patterns and troubleshooting trees
-- [docs/prerequisites.md](../../docs/prerequisites.md) - Required tools (oc), cluster access verification
+- [docs/debugging-patterns.md](docs/debugging-patterns.md) - Common error patterns and troubleshooting trees
+- [docs/prerequisites.md](docs/prerequisites.md) - Required tools (oc), cluster access verification

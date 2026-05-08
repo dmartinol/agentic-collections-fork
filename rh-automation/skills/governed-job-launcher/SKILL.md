@@ -44,7 +44,7 @@ Do NOT use when:
 **CRITICAL**: Document consultation MUST happen BEFORE any MCP tool invocations.
 
 **Document Consultation** (REQUIRED - Execute FIRST):
-1. **Action**: Read [execution-governance.md](../../docs/aap/execution-governance.md) using the Read tool to understand check mode execution, interpretation, phased rollout, and rollback patterns
+1. **Action**: Read [execution-governance.md](docs/aap/execution-governance.md) using the Read tool to understand check mode execution, interpretation, phased rollout, and rollback patterns
 2. **Output to user**: "I consulted [execution-governance.md](docs/aap/execution-governance.md) to understand Red Hat's check mode behavior, rollback patterns, and phased rollout strategy."
 
 ### Step 2: Adapt Execution Strategy Based on Risk Signals
@@ -278,7 +278,7 @@ If the job fails, offer rollback options per execution-governance.md:
 - `execution-summary` - Audit trail after launch
 
 ### Reference Documentation
-- [execution-governance.md](../../docs/aap/execution-governance.md) - Check mode, rollback, phased rollout patterns
+- [execution-governance.md](docs/aap/execution-governance.md) - Check mode, rollback, phased rollout patterns
 
 ## Critical: Human-in-the-Loop Requirements
 

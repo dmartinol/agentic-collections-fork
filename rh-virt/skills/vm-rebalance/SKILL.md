@@ -143,7 +143,7 @@ Orchestrate VM migrations across OpenShift cluster nodes for load balancing, mai
 
 **Errors**: Not found → "Node doesn't exist" | Not Ready → "Choose different target" | Cordoned → "Uncordon or choose different target"
 
-**Reference**: [scheduling-errors.md](../../docs/troubleshooting/scheduling-errors.md)
+**Reference**: [scheduling-errors.md](docs/troubleshooting/scheduling-errors.md)
 
 ## Node Selection for Automatic Rebalancing
 
@@ -272,12 +272,12 @@ If any node's CPU or Memory percentage **exceeds 100%** after rebalancing:
 ### Error 1: Live Migration Fails - Storage Not RWX
 **Symptom**: "Cannot live migrate: PVC access mode is ReadWriteOnce"
 **Solution**: Use cold migration OR convert PVC to RWX
-**Reference**: [storage-errors.md](../../docs/troubleshooting/storage-errors.md)
+**Reference**: [storage-errors.md](docs/troubleshooting/storage-errors.md)
 
 ### Error 2: VM Stuck ErrorUnschedulable After Cold Migration
 **Symptom**: "VM cannot be scheduled: ErrorUnschedulable"
 **Solution**: Check node capacity (`nodes_top`), verify no blocking taints (`resources_get` Node), add tolerations, choose different target, remove nodeSelector
-**Reference**: [scheduling-errors.md](../../docs/troubleshooting/scheduling-errors.md)
+**Reference**: [scheduling-errors.md](docs/troubleshooting/scheduling-errors.md)
 
 ### Error 3: Live Migration Times Out
 **Symptom**: "Migration exceeded timeout: 150s per GiB"
@@ -331,10 +331,10 @@ If any node's CPU or Memory percentage **exceeds 100%** after rebalancing:
 - [references/production-considerations.md](./references/production-considerations.md) - HA, capacity, security
 
 **Troubleshooting**:
-- [Troubleshooting INDEX](../../docs/troubleshooting/INDEX.md) - Master index
-- [scheduling-errors.md](../../docs/troubleshooting/scheduling-errors.md) - ErrorUnschedulable, taints
-- [storage-errors.md](../../docs/troubleshooting/storage-errors.md) - PVC access modes
-- [lifecycle-errors.md](../../docs/troubleshooting/lifecycle-errors.md) - VM start/stop
+- [Troubleshooting INDEX](docs/troubleshooting/INDEX.md) - Master index
+- [scheduling-errors.md](docs/troubleshooting/scheduling-errors.md) - ErrorUnschedulable, taints
+- [storage-errors.md](docs/troubleshooting/storage-errors.md) - PVC access modes
+- [lifecycle-errors.md](docs/troubleshooting/lifecycle-errors.md) - VM start/stop
 
 **Official Documentation**:
 - [OpenShift Virt - Live Migration](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html-single/virtualization/index#virt-live-migration)

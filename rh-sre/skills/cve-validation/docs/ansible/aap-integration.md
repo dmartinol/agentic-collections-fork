@@ -1,0 +1,1 @@
+../../../playbook-generator/docs/ansible/aap-integration.md
