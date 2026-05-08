@@ -1,1 +1,1 @@
-../../../playbook-generator/docs/references/compliance-frameworks.md
+../../../mcp-aap-validator/docs/references/compliance-frameworks.md

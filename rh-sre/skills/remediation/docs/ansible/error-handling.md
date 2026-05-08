@@ -1,1 +1,1 @@
-../../../playbook-generator/docs/ansible/error-handling.md
+../../../mcp-aap-validator/docs/ansible/error-handling.md

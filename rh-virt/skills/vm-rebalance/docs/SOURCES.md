@@ -1,4 +1,1 @@
----
-title: TODO
-status: draft
----
+../../vm-delete/docs/SOURCES.md

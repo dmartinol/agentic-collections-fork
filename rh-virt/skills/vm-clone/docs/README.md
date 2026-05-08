@@ -1,1 +1,1 @@
-../../vm-rebalance/docs/README.md
+../../vm-delete/docs/README.md

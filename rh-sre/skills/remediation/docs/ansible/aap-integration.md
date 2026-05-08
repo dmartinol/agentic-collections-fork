@@ -1,1 +1,1 @@
-../../../playbook-generator/docs/ansible/aap-integration.md
+../../../mcp-aap-validator/docs/ansible/aap-integration.md

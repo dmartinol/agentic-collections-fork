@@ -1,1 +1,1 @@
-../../../playbook-generator/docs/rhel/version-compatibility.md
+../../../mcp-aap-validator/docs/rhel/version-compatibility.md
