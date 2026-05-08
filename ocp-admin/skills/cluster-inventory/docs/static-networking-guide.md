@@ -1,0 +1,1 @@
+../../cluster-report/docs/static-networking-guide.md

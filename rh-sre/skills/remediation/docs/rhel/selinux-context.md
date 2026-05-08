@@ -1,0 +1,1 @@
+../../../playbook-generator/docs/rhel/selinux-context.md
