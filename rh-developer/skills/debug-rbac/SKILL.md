@@ -14,7 +14,7 @@ description: |
 model: inherit
 color: cyan
 license: Apache-2.0
-allowed-tools: resources_get resources_list events_list pod_list pod_logs
+allowed-tools: resources_get resources_list events_list pods_list pods_list_in_namespace pods_log
 metadata:
   user_invocable: "true"
 ---
@@ -44,8 +44,8 @@ Diagnose RBAC permission failures on OpenShift by analyzing pod logs, readiness 
 **Required MCP Tools:**
 - `resources_get` (from openshift) — Retrieve Deployment, Pod, ServiceAccount, Role, and RoleBinding details
 - `resources_list` (from openshift) — List Deployments, RoleBindings, and ClusterRoleBindings in a namespace
-- `pod_list` (from openshift) — List pods for a Deployment
-- `pod_logs` (from openshift) — Retrieve container logs to identify FORBIDDEN errors
+- `pods_list` (from openshift) — List pods for a Deployment
+- `pods_log` (from openshift) — Retrieve container logs to identify FORBIDDEN errors
 - `events_list` (from openshift) — Fetch warning events related to RBAC failures
 
 **Verification Steps:**
@@ -139,7 +139,7 @@ Which deployment would you like me to debug?
 
 ### Step 2: Check Pod Status and Logs
 
-**MCP Tool**: `pod_list` (from openshift)
+**MCP Tool**: `pods_list` (from openshift)
 
 **Parameters**:
 - `namespace`: "<namespace>"
@@ -151,10 +151,10 @@ Then for each matching pod:
 
 **Parameters**:
 - `kind`: "Pod" (resource type)
-- `name`: "<pod-name>" (from pod_list)
+- `name`: "<pod-name>" (from pods_list)
 - `namespace`: "<namespace>"
 
-**MCP Tool**: `pod_logs` (from openshift)
+**MCP Tool**: `pods_log` (from openshift)
 
 **Parameters**:
 - `name`: "<pod-name>"
@@ -430,8 +430,8 @@ Select an option:
 ### Required MCP Tools
 - `resources_get` (from openshift) — Retrieve individual resource details (Deployment, Pod, ServiceAccount, Role, RoleBinding)
 - `resources_list` (from openshift) — List resources by kind in a namespace (Deployments, RoleBindings, ClusterRoleBindings)
-- `pod_list` (from openshift) — List pods matching label selectors
-- `pod_logs` (from openshift) — Retrieve container logs for FORBIDDEN error analysis
+- `pods_list` (from openshift) — List pods matching label selectors
+- `pods_log` (from openshift) — Retrieve container logs for FORBIDDEN error analysis
 - `events_list` (from openshift) — Fetch events filtered by involved object
 
 ### Related Skills

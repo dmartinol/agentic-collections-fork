@@ -14,7 +14,7 @@ description: |
 model: inherit
 color: cyan
 license: Apache-2.0
-allowed-tools: resources_get resources_list events_list pod_list
+allowed-tools: resources_get resources_list events_list pods_list pods_list_in_namespace
 metadata:
   user_invocable: "true"
 ---
@@ -45,7 +45,7 @@ Diagnose OpenShift SCC violations that block pod creation by analyzing security 
 - `resources_get` (from openshift) — Retrieve Deployment, ReplicaSet, and ServiceAccount details
 - `resources_list` (from openshift) — List Deployments, ReplicaSets, and ServiceAccounts in a namespace
 - `events_list` (from openshift) — Fetch FailedCreate and SCC rejection events
-- `pod_list` (from openshift) — List pods for a Deployment
+- `pods_list` (from openshift) — List pods for a Deployment
 
 **Verification Steps:**
 1. Check `openshift` server is configured in `mcps.json`
@@ -441,7 +441,7 @@ Select an option:
 - `resources_get` (from openshift) — Retrieve individual resource details (Deployment, ReplicaSet, ServiceAccount)
 - `resources_list` (from openshift) — List resources by kind in a namespace
 - `events_list` (from openshift) — Fetch events filtered by involved object
-- `pod_list` (from openshift) — List pods matching label selectors
+- `pods_list` (from openshift) — List pods matching label selectors
 
 ### Related Skills
 - `/debug-pod` — If pods exist but are crashing (CrashLoopBackOff, OOMKilled)
