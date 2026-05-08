@@ -125,6 +125,11 @@
       "url": "https://access.redhat.com/product-life-cycles/"
     },
     {
+      "description": "Red Hat Security API MCP server providing live CVE, advisory, and errata data via browser SSO.",
+      "title": "Red Hat Security MCP",
+      "url": "https://security-mcp.api.redhat.com/mcp"
+    },
+    {
       "description": "Official severity levels and SLA commitments for Red Hat support subscriptions.",
       "title": "Red Hat Support Severity Definitions",
       "url": "https://access.redhat.com/support/policy/support_process"
