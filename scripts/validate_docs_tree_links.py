@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -117,6 +118,18 @@ def validate_file(path: Path, pack_root: Path) -> list[str]:
                 except ValueError:
                     errs.append(
                         f"{path}:{line_no}: link escapes pack root '{raw}' -> '{resolved}'"
+                    )
+
+            if link_path.is_symlink():
+                raw_link = os.readlink(link_path)
+                immediate = (
+                    link_path.parent / raw_link
+                    if not os.path.isabs(raw_link)
+                    else Path(raw_link)
+                )
+                if immediate.is_symlink():
+                    errs.append(
+                        f"{path}:{line_no}: symlink chain detected for '{raw}'"
                     )
     return errs
 

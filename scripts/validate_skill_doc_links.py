@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass, field
@@ -120,6 +121,18 @@ def validate_skill_file(skill_file: Path, result: ValidationResult) -> None:
                 result.errors.append(
                     f"{skill_file}:{line_no}: linked doc escapes pack root '{raw_target}' -> '{resolved}'"
                 )
+
+            if link_path.is_symlink():
+                raw_link = os.readlink(link_path)
+                immediate = (
+                    link_path.parent / raw_link
+                    if not os.path.isabs(raw_link)
+                    else Path(raw_link)
+                )
+                if immediate.is_symlink():
+                    result.errors.append(
+                        f"{skill_file}:{line_no}: symlink chain detected for '{raw_target}'"
+                    )
 
             if link_path.is_symlink() and not link_path.exists():
                 result.errors.append(
