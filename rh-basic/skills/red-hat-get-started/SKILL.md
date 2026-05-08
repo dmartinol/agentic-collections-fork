@@ -1,6 +1,7 @@
 ---
 name: red-hat-get-started
 description: Bootstrap installer. Fetches and installs all Red Hat agent skills into this project.
+license: Apache-2.0
 user_invocable: true
 model: inherit
 color: yellow

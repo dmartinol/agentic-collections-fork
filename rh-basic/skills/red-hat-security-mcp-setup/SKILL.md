@@ -1,6 +1,7 @@
 ---
 name: red-hat-security-mcp-setup
 description: Add the Red Hat Security MCP server to this project. Configures the HTTP transport endpoint and explains the Red Hat Customer Portal SSO browser login flow.
+license: Apache-2.0
 user_invocable: true
 model: inherit
 color: blue

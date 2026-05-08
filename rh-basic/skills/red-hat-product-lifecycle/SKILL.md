@@ -1,6 +1,7 @@
 ---
 name: red-hat-product-lifecycle
 description: Explain a Red Hat product's lifecycle status, support phases, and recommended action. Answers questions like "Is RHEL 8.6 still supported?" or "When does OpenShift 4.14 reach end of maintenance?"
+license: Apache-2.0
 user_invocable: true
 model: inherit
 color: cyan

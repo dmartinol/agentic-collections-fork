@@ -1,6 +1,7 @@
 ---
 name: red-hat-diagnostics
 description: Explain how to gather diagnostic information for Red Hat products (RHEL, OpenShift, Ansible Automation Platform, Satellite) to share with Red Hat Technical Support.
+license: Apache-2.0
 user_invocable: true
 model: inherit
 color: cyan
