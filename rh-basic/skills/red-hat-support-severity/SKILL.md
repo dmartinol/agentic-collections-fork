@@ -1,6 +1,7 @@
 ---
 name: red-hat-support-severity
 description: Help determine the correct severity level for a Red Hat support ticket, explain SLAs, and guide what information to include.
+license: Apache-2.0
 user_invocable: true
 model: inherit
 color: cyan
