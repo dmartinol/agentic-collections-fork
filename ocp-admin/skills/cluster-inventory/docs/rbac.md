@@ -1,1 +1,1 @@
-../../cluster-report/docs/rbac.md
+../../cluster-creator/docs/rbac.md

@@ -1,1 +1,1 @@
-../../../debug-inference/docs/references/live-doc-lookup.md
+../../../references/live-doc-lookup.md

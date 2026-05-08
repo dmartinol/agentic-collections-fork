@@ -1,1 +1,1 @@
-../../mcp-lightspeed-validator/docs/SOURCES.md
+../../../docs/SOURCES.md

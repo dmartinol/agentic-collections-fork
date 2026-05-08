@@ -1,1 +1,1 @@
-../../cluster-report/docs/platforms.md
+../../cluster-creator/docs/platforms.md

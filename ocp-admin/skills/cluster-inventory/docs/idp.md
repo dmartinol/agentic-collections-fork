@@ -1,1 +1,1 @@
-../../cluster-report/docs/idp.md
+../../cluster-creator/docs/idp.md

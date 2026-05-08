@@ -1,1 +1,1 @@
-../../cluster-report/docs/certificate-rotation.md
+../../cluster-creator/docs/certificate-rotation.md

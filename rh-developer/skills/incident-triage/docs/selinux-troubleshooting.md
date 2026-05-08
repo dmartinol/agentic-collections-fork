@@ -1,1 +1,1 @@
-../../deploy/docs/selinux-troubleshooting.md
+../../debug-rhel/docs/selinux-troubleshooting.md

@@ -1,1 +1,1 @@
-../../cluster-report/docs/input-validation-guide.md
+../../cluster-creator/docs/input-validation-guide.md

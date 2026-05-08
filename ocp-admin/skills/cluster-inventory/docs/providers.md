@@ -1,1 +1,1 @@
-../../cluster-report/docs/providers.md
+../../cluster-creator/docs/providers.md

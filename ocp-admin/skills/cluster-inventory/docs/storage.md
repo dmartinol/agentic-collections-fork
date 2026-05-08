@@ -1,1 +1,1 @@
-../../cluster-report/docs/storage.md
+../../cluster-creator/docs/storage.md

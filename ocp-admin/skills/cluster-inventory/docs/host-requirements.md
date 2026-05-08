@@ -1,1 +1,1 @@
-../../cluster-report/docs/host-requirements.md
+../../cluster-creator/docs/host-requirements.md

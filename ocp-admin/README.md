@@ -553,7 +553,6 @@ The pack includes 17 comprehensive reference documents covering all aspects of O
 - [Quick Reference](skills/cluster-creator/docs/quick-reference.md) - Common `oc` commands and scenarios
 - [Troubleshooting](skills/cluster-creator/docs/troubleshooting.md) - Common errors and resolutions
 - [INDEX.md](skills/cluster-creator/docs/INDEX.md) - Complete documentation navigation
-- [TODO_LIST.md](skills/cluster-creator/docs/TODO_LIST.md) - Future documentation topics
 
 **All documentation**:
 - Derived from official Red Hat sources
@@ -645,8 +644,7 @@ ocp-admin/
 │   ├── certificate-management.md
 │   ├── backup-restore.md
 │   ├── quick-reference.md
-│   ├── troubleshooting.md
-│   └── TODO_LIST.md
+│   └── troubleshooting.md
 ├── skills/
 │   ├── cluster-creator/SKILL.md      # End-to-end cluster deployment
 │   ├── cluster-inventory/SKILL.md    # Cluster discovery and status

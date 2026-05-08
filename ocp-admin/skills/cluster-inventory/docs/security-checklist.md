@@ -1,1 +1,1 @@
-../../cluster-report/docs/security-checklist.md
+../../cluster-creator/docs/security-checklist.md
