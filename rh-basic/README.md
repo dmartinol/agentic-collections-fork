@@ -9,8 +9,8 @@ Essential Red Hat skills for IT professionals working with Red Hat products. Thi
 
 The agentic skill pack for Red Hat customers provides lightweight, self-contained skills that work with or without a configured MCP server. Each skill falls back to web sources when MCP tools are unavailable.
 
-- **5 skills** covering the most common Red Hat support and operations workflows
-- **1 MCP server integration** (Red Hat Lightspeed) for live CVE and inventory data
+- **6 skills** covering the most common Red Hat support and operations workflows
+- **1 MCP server integration** (Red Hat Security MCP) for live CVE and advisory data
 - **Self-installing** via the `red-hat-get-started` skill
 
 ## Quick Start
@@ -72,7 +72,7 @@ Reports the current lifecycle phase and support dates for any Red Hat product or
 - "What App Streams are available for RHEL 9?"
 
 **What it does:**
-- Retrieves lifecycle dates via Lightspeed MCP or Red Hat lifecycle pages
+- Retrieves lifecycle dates via the Red Hat Security MCP or Red Hat lifecycle pages
 - Explains what updates each phase receives (security, bug, features)
 - Gives a concrete action recommendation (upgrade, EUS, patch normally)
 - Explains Red Hat's backporting model
@@ -99,6 +99,20 @@ Fetches and installs all skills from the agentic skill pack for Red Hat customer
 **Use when:**
 - Setting up Red Hat skills for the first time in a project
 
+### 6. **red-hat-security-mcp-setup** - Red Hat Security MCP Configuration
+
+Adds the Red Hat Security MCP server to the current project's `.mcp.json` using HTTP transport and browser SSO.
+
+**Use when:**
+- "Set up the Red Hat Security MCP server"
+- "Add red-hat-security to my MCP config"
+
+**What it does:**
+- Locates or creates `.mcp.json` in the project root
+- Merges the `red-hat-security` HTTP transport entry without removing existing servers
+- Explains the Red Hat Customer Portal SSO browser login flow
+- Advises the user to restart Claude Code for the new server to take effect
+
 ## Skills Decision Guide
 
 | User Request | Skill | Reason |
@@ -108,6 +122,7 @@ Fetches and installs all skills from the agentic skill pack for Red Hat customer
 | "Is RHEL 8 still supported?" | **red-hat-product-lifecycle** | Lifecycle date lookup |
 | "What severity is my support case?" | **red-hat-support-severity** | SLA guidance |
 | "Install Red Hat skills" | **red-hat-get-started** | First-time setup |
+| "Set up the Red Hat Security MCP server" | **red-hat-security-mcp-setup** | MCP server configuration |
 
 ## MCP Server Integration
 
@@ -139,13 +154,13 @@ rh-basic/
     ├── red-hat-diagnostics/SKILL.md
     ├── red-hat-get-started/SKILL.md
     ├── red-hat-product-lifecycle/SKILL.md
+    ├── red-hat-security-mcp-setup/SKILL.md
     └── red-hat-support-severity/SKILL.md
 ```
 
 ## References
 
 - [Red Hat Customer Portal](https://access.redhat.com/)
-- [Red Hat Lightspeed](https://console.redhat.com/insights)
 - [Red Hat Product Lifecycle](https://access.redhat.com/product-life-cycles/)
 - [Red Hat CVE Database](https://access.redhat.com/security/security-updates/#/cve)
 - [Lola Package Manager](https://github.com/RedHatProductSecurity/lola)

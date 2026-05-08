@@ -15,7 +15,7 @@
       {
         "description": "CVE Explanation and Severity Rating",
         "name": "red-hat-cve-explainer",
-        "summary_markdown": "Explain a CVE using Red Hat's severity rating system and recommend a course of action.\n**Use when:**\n- What is CVE-2024-1234?\n- How severe is this CVE?\n- Should I patch CVE-X immediately?\n**What it does:**\n- Looks up CVE metadata via Lightspeed MCP or Red Hat CVE pages\n- Maps to Red Hat severity (Critical/Important/Moderate/Low)\n- Links to applicable security advisories (RHSA/RHBA/RHEA)\n- Gives a concrete action recommendation per severity\n"
+        "summary_markdown": "Explain a CVE using Red Hat's severity rating system and recommend a course of action.\n**Use when:**\n- What is CVE-2024-1234?\n- How severe is this CVE?\n- Should I patch CVE-X immediately?\n**What it does:**\n- Looks up CVE metadata via the Red Hat Security MCP or Red Hat CVE pages\n- Maps to Red Hat severity (Critical/Important/Moderate/Low)\n- Links to applicable security advisories (RHSA/RHBA/RHEA)\n- Gives a concrete action recommendation per severity\n"
       },
       {
         "description": "Diagnostic Data Gathering for Red Hat Support",
@@ -30,7 +30,7 @@
       {
         "description": "Product Lifecycle Status and Support Phase Lookup",
         "name": "red-hat-product-lifecycle",
-        "summary_markdown": "Report the current lifecycle phase and support dates for any Red Hat product or version.\n**Use when:**\n- Is RHEL 8.6 still supported?\n- When does OpenShift 4.14 reach end of maintenance?\n- What App Streams are available for RHEL 9?\n**What it does:**\n- Retrieves lifecycle dates via Lightspeed MCP or Red Hat lifecycle pages\n- Explains what updates each phase receives (security, bug, features)\n- Gives a concrete action recommendation (upgrade, EUS, patch normally)\n- Explains Red Hat's backporting model when relevant\n"
+        "summary_markdown": "Report the current lifecycle phase and support dates for any Red Hat product or version.\n**Use when:**\n- Is RHEL 8.6 still supported?\n- When does OpenShift 4.14 reach end of maintenance?\n- What App Streams are available for RHEL 9?\n**What it does:**\n- Retrieves lifecycle dates via the Red Hat Security MCP or Red Hat lifecycle pages\n- Explains what updates each phase receives (security, bug, features)\n- Gives a concrete action recommendation (upgrade, EUS, patch normally)\n- Explains Red Hat's backporting model when relevant\n"
       },
       {
         "description": "Support Ticket Severity and SLA Guidance",
@@ -123,11 +123,6 @@
       "description": "Lifecycle phase dates for RHEL, OpenShift, Ansible, and other Red Hat products.",
       "title": "Red Hat Product Life Cycles",
       "url": "https://access.redhat.com/product-life-cycles/"
-    },
-    {
-      "description": "Red Hat Insights console for inventory, CVE data, and patch advisory information.",
-      "title": "Red Hat Lightspeed",
-      "url": "https://console.redhat.com/insights"
     },
     {
       "description": "Official severity levels and SLA commitments for Red Hat support subscriptions.",
