@@ -1,1 +1,1 @@
-../../../playbook-generator/docs/rhel/selinux-context.md
+../../../mcp-aap-validator/docs/rhel/selinux-context.md

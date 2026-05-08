@@ -1,1 +1,1 @@
-../../vm-rebalance/docs/SOURCES.md
+../../vm-delete/docs/SOURCES.md

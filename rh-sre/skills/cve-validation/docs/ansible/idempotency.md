@@ -1,1 +1,1 @@
-../../../playbook-generator/docs/ansible/idempotency.md
+../../../mcp-aap-validator/docs/ansible/idempotency.md

@@ -1,1 +1,1 @@
-../../../playbook-generator/docs/rhel/systemd-services.md
+../../../mcp-aap-validator/docs/rhel/systemd-services.md
