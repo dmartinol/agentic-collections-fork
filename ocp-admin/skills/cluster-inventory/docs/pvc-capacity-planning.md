@@ -1,1 +1,1 @@
-../../cluster-report/docs/pvc-capacity-planning.md
+../../cluster-creator/docs/pvc-capacity-planning.md

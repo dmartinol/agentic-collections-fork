@@ -1,1 +1,1 @@
-../../cluster-report/docs/examples.md
+../../cluster-creator/docs/examples.md

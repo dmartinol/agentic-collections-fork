@@ -1,1 +1,1 @@
-../../cluster-creator/docs/multi-cluster-auth.md
+../../cluster-report/docs/multi-cluster-auth.md

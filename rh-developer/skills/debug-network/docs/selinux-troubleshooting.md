@@ -1,1 +1,1 @@
-../../debug-container/docs/selinux-troubleshooting.md
+../../debug-rhel/docs/selinux-troubleshooting.md

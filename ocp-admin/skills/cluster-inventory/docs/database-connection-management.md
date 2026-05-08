@@ -1,1 +1,1 @@
-../../cluster-report/docs/database-connection-management.md
+../../cluster-creator/docs/database-connection-management.md
