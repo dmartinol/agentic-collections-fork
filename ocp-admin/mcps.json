@@ -49,15 +49,23 @@
       }
     },
     "openshift-administration": {
-      "command": "bash",
+      "command": "podman",
       "args": [
-        "-c",
-        "U=(); [ \"$(uname -s)\" = Linux ] && U=(--userns=keep-id:uid=65532,gid=65532); exec podman run \"${U[@]}\" --rm -i --network=host -v \"${KUBECONFIG}:/kubeconfig:ro,Z\" --entrypoint /openshift-mcp-server quay.io/redhat-user-workloads/crt-nshift-lightspeed-tenant/openshift-mcp-server@sha256:2f52c860f91ab3c8a5129b727bdef0d620e733013f073b10355866c45eafd053 --kubeconfig /kubeconfig --read-only --toolsets core,config"
+        "run",
+        "--rm",
+        "-i",
+        "--network=host",
+        "--userns=keep-id:uid=65532,gid=65532",
+        "-v", "${KUBECONFIG}:/kubeconfig:ro,Z",
+        "--entrypoint", "/app/kubernetes-mcp-server",
+        "quay.io/ecosystem-appeng/openshift-mcp-server@sha256:3531cb78f51f8c7ebcdb21adc21358ab8924116994848a3ce1ff542b3fc23742",
+        "--kubeconfig", "/kubeconfig",
+        "--toolsets", "core,config"
       ],
       "env": {
         "KUBECONFIG": "${KUBECONFIG}"
       },
-      "description": "Red Hat OpenShift MCP server for multi-cluster administration and reporting",
+      "description": "Red Hat Openshift MCP server for interacting with Openshift Container Platform clusters and its operators",
       "security": {
         "isolation": "container",
         "network": "local",
