@@ -16,6 +16,7 @@ description: |
   NOT for model performance monitoring (use /ai-observability).
 color: cyan
 model: inherit
+license: Apache-2.0
 ---
 
 # /model-registry Skill

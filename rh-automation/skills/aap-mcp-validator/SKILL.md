@@ -11,6 +11,7 @@ description: |
   NOT for: actual automation tasks (use specialized skills instead).
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # AAP MCP Validator

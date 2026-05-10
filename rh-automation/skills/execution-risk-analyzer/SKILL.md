@@ -12,6 +12,7 @@ description: |
   NOT for: launching jobs (use governed-job-launcher) or troubleshooting failures (use job-failure-analyzer).
 model: inherit
 color: yellow
+license: Apache-2.0
 ---
 
 # Execution Risk Analyzer

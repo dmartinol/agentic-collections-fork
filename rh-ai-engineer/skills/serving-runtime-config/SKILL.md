@@ -16,6 +16,7 @@ description: |
   NOT for NIM platform setup (use /nim-setup).
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # /serving-runtime-config Skill
