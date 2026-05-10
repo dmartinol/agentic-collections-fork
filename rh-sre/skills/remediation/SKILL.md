@@ -22,6 +22,7 @@ color: red
 metadata:
   author: "Red Hat Ecosystem Engineering"
   priority: "high"
+license: Apache-2.0
 ---
 
 # Remediation Skill

@@ -16,6 +16,7 @@ description: |
   **IMPORTANT**: ALWAYS use this skill instead of calling verification MCP tools directly.
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # Remediation Verification Skill

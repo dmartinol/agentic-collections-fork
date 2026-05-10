@@ -18,6 +18,7 @@ description: |
   This skill orchestrates MCP tools from lightspeed-mcp for fleet visibility and system inventory management.
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # Fleet Inventory Skill

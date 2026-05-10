@@ -12,6 +12,7 @@ description: |
   NOT for: analyzing job events (use job-failure-analyzer first) or resolution guidance (use resolution-advisor after).
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # Host Fact Inspector

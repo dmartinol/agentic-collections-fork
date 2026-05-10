@@ -12,6 +12,7 @@ description: |
   NOT for: starting a new workflow (use the appropriate skill instead).
 model: inherit
 color: green
+license: Apache-2.0
 ---
 
 # Execution Summary

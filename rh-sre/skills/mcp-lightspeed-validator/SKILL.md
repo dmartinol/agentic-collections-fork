@@ -4,6 +4,7 @@ description: |
   Validate Red Hat Lightspeed MCP server connectivity. Use when the user asks to "validate Lightspeed MCP", "check Lightspeed connection", or when other skills need to verify lightspeed-mcp availability before CVE operations.
 model: haiku
 color: yellow
+license: Apache-2.0
 ---
 
 # MCP Lightspeed Validator

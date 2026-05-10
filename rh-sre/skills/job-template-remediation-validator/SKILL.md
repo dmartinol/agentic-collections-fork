@@ -12,6 +12,7 @@ description: |
   NOT for: AAP MCP connectivity (use `/mcp-aap-validator`), creating templates (use `/job-template-creator`).
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # AAP Job Template Remediation Validator

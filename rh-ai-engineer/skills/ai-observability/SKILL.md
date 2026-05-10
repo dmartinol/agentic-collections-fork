@@ -17,6 +17,7 @@ description: |
   NOT for debugging failed deployments (use /debug-inference).
 model: inherit
 color: cyan
+license: Apache-2.0
 ---
 
 # /ai-observability Skill
