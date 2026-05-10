@@ -10,6 +10,7 @@ description: |
   This skill guides through adding playbooks to Git projects and creating job templates via AAP Web UI.
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # AAP Job Template Creator Skill

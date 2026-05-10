@@ -18,6 +18,7 @@ description: |
   NOT for model training jobs (use training skills).
 color: green
 model: inherit
+license: Apache-2.0
 ---
 
 # /pipeline-manage Skill

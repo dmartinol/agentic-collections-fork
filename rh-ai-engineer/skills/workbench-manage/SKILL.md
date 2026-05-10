@@ -20,6 +20,7 @@ model: inherit
 metadata:
   author: "Red Hat Ecosystem Engineering"
   version: "1.0"
+license: Apache-2.0
 ---
 
 # /workbench-manage Skill

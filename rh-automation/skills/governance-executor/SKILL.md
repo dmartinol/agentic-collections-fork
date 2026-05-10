@@ -11,6 +11,7 @@ description: |
   NOT for platform assessment (use governance-assessor) or troubleshooting (use forensic-troubleshooter).
 model: inherit
 color: red
+license: Apache-2.0
 ---
 
 # Governance Executor

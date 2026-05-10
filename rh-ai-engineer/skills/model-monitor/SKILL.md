@@ -17,6 +17,7 @@ description: |
   NOT for infrastructure-level observability (use /ai-observability).
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # /model-monitor Skill

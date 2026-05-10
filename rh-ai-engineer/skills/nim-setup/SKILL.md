@@ -15,6 +15,7 @@ description: |
   NOT for vLLM or Caikit deployments (NIM-specific only).
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # /nim-setup Skill

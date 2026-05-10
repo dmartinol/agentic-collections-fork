@@ -11,6 +11,7 @@ description: |
   NOT for: host fact correlation (use host-fact-inspector) or resolution recommendations (use resolution-advisor).
 model: inherit
 color: yellow
+license: Apache-2.0
 ---
 
 # Job Failure Analyzer

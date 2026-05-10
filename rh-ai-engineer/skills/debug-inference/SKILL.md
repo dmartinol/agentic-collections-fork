@@ -16,6 +16,7 @@ description: |
   NOT for creating runtimes (use /serving-runtime-config).
 model: inherit
 color: yellow
+license: Apache-2.0
 ---
 
 # /debug-inference Skill

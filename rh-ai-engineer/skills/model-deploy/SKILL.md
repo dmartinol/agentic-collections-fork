@@ -16,6 +16,7 @@ description: |
   NOT for custom runtime creation (use /serving-runtime-config).
 model: inherit
 color: green
+license: Apache-2.0
 ---
 
 # /model-deploy Skill

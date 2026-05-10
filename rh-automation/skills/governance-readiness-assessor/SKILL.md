@@ -13,6 +13,7 @@ description: |
   NOT for: executing jobs (use governance-executor) or troubleshooting failures (use forensic-troubleshooter).
 model: inherit
 color: red
+license: Apache-2.0
 ---
 
 # Governance Readiness Assessor

@@ -18,6 +18,7 @@ description: |
   - ALWAYS delegate execution to /playbook-executor skill
 model: inherit
 color: yellow
+license: Apache-2.0
 ---
 
 # Ansible Playbook Generator Skill

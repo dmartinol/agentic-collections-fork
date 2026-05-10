@@ -4,6 +4,7 @@ description: |
   Validate AAP (Ansible Automation Platform) MCP server connectivity. Use when the user asks to "validate AAP MCP", "check AAP connection", or when other skills need to verify AAP MCP availability before job management or inventory operations.
 model: haiku
 color: yellow
+license: Apache-2.0
 ---
 
 # MCP AAP Validator

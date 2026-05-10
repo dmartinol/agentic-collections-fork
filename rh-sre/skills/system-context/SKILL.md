@@ -16,6 +16,7 @@ description: |
   **IMPORTANT**: ALWAYS use this skill instead of calling get_cve_systems or get_host_details directly for system context gathering.
 model: inherit
 color: blue
+license: Apache-2.0
 ---
 
 # System Context Gathering Skill
