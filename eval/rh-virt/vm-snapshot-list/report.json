@@ -1,15 +1,15 @@
 {
-  "submission_name": "rh-sre-playbook-generator",
+  "submission_name": "rh-virt-vm-snapshot-list",
   "provenance": {
-    "generated_at": "2026-05-12T06:27:46.523633Z",
-    "commit_sha": "8352a8f9c9146a8da8a5b02ea01e808cc4d25bcb",
-    "pipeline_run_id": "abevalflow-2g6nh",
-    "treatment_image_ref": "image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-sre-playbook-generator@sha256:f054e3f834ae1d813e3610c77676f2b59c3921fd5df2bf86ffc91c301ce4cdae",
-    "control_image_ref": "image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-sre-playbook-generator@sha256:0a41a68bb48b9b1c31c2b46bfa6fda1107c1afeaba49daec1018c4d86c4315b3",
+    "generated_at": "2026-05-08T18:05:36.199154Z",
+    "commit_sha": "f96d44d8a711de5c6203a5fbb8af8325dd66e395",
+    "pipeline_run_id": "abevalflow-fqsx9",
+    "treatment_image_ref": "image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-virt-vm-snapshot-list@sha256:a1769d7efcc54a0d837be0e96f649ce558c1c85d89f309e93bce0b92ba80babf",
+    "control_image_ref": "image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-virt-vm-snapshot-list@sha256:6a5c18d82b3786096a60ba0f2688d3dcf36d81fd544ab934d9eab49354ceb964",
     "harbor_fork_revision": "main"
   },
   "summary": {
-    "related_pr": "https://github.com/RHEcosystemAppEng/skill-submissions/pull/13",
+    "related_pr": "https://github.com/RHEcosystemAppEng/skill-submissions/pull/25",
     "llm": "Claude Sonnet 4.5 (vertex_ai)",
     "treatment": {
       "n_trials": 3,
@@ -39,34 +39,34 @@
   "trials": {
     "treatment": [
       {
-        "trial_name": "rh-sre-playbook-generator__FYdbqCz",
-        "reward": 1.0,
-        "passed": true
-      },
-      {
-        "trial_name": "rh-sre-playbook-generator__hBkkQBV",
+        "trial_name": "rh-virt-vm-snapshot-list__Bk7t5b4",
         "reward": 0.9091,
         "passed": true
       },
       {
-        "trial_name": "rh-sre-playbook-generator__m3GRAnd",
+        "trial_name": "rh-virt-vm-snapshot-list__bXbLXhS",
+        "reward": 1.0,
+        "passed": true
+      },
+      {
+        "trial_name": "rh-virt-vm-snapshot-list__o4rqbo8",
         "reward": 1.0,
         "passed": true
       }
     ],
     "control": [
       {
-        "trial_name": "rh-sre-playbook-generator__2UKpsAz",
+        "trial_name": "rh-virt-vm-snapshot-list__HMMzi7F",
         "reward": 0.7273,
         "passed": true
       },
       {
-        "trial_name": "rh-sre-playbook-generator__QiXp9CT",
+        "trial_name": "rh-virt-vm-snapshot-list__ftvfZiL",
         "reward": 0.9091,
         "passed": true
       },
       {
-        "trial_name": "rh-sre-playbook-generator__Uz4AKRk",
+        "trial_name": "rh-virt-vm-snapshot-list__kwS2UB5",
         "reward": 0.9091,
         "passed": true
       }
