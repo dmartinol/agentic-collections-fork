@@ -53,11 +53,10 @@ Structured incident investigation for OpenShift — traces from symptoms to root
 - `alertmanager_alerts` (from openshift, observability toolset) — Retrieve active Alertmanager alerts
 
 **Verification Steps:**
-1. Check `openshift` server is configured in `mcps.json`
-2. Check `openshift` server is configured in `mcps.json` with `observability` in its `--toolsets`
-3. Verify user is logged into an OpenShift cluster (`oc whoami` succeeds)
-4. Verify user has access to the target namespace(s)
-5. If missing → Human Notification Protocol
+1. Check `openshift` server is configured in `mcps.json` with `observability` in its `--toolsets`
+2. Verify user is logged into an OpenShift cluster (`oc whoami` succeeds)
+3. Verify user has access to the target namespace(s)
+4. If missing → Human Notification Protocol
 
 **Human Notification Protocol:**
 
@@ -244,12 +243,12 @@ Apply these investigation guardrails before reaching any conclusion:
 **MCP Tool**: `prometheus_query` (from openshift, observability toolset)
 
 **Parameters**:
-- `match`: "{__name__=~\".*<keyword>.*\"}" (filter by relevant metric patterns, e.g., memory, disk, connections)
+- `query`: "{__name__=~\".*<keyword>.*\"}" (discover available metrics by pattern, e.g., memory, disk, connections)
 
 **MCP Tool**: `prometheus_query` (from openshift, observability toolset)
 
 **Parameters**:
-- `metric`: "<metric-name>" (confirm type before querying)
+- `query`: "<metric-name>" (confirm metric exists and inspect its current value)
 
 **MCP Tool**: `prometheus_query` (from openshift, observability toolset)
 
