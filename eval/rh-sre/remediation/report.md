@@ -1,9 +1,9 @@
-# A/B Evaluation Report: rh-sre-job-template-remediation-validator
+# A/B Evaluation Report: rh-sre-remediation
 
 ## Summary
 
-* Related PR: https://github.com/RHEcosystemAppEng/skill-submissions/pull/11
-* LLM: Claude Sonnet 4.6 (vertex_ai)
+* Related PR: https://github.com/RHEcosystemAppEng/skill-submissions/pull/5
+* LLM: Claude Sonnet 4.5 (vertex_ai)
 
 | Metric | Treatment | Control |
 |--------|-----------|---------|
@@ -12,24 +12,24 @@
 | Failed | 0 | 0 |
 | Errors | 0 | 0 |
 | Pass Rate | 1.0000 | 1.0000 |
-| Mean Reward | 1.0000 | 0.9047 |
-| Median Reward | 1.0000 | 0.8571 |
-| Std Reward | 0.0000 | 0.0825 |
+| Mean Reward | 0.9333 | 0.5000 |
+| Median Reward | 0.9000 | 0.5000 |
+| Std Reward | 0.0577 | 0.1000 |
 
 ## Comparison
 
-- **Mean reward gap (Uplift):** +0.0953
-- **Welch's t-test p-value:** 0.1835
+- **Mean reward gap (Uplift):** +0.4333
+- **Welch's t-test p-value:** 0.0061
 - **Fisher's exact p-value:** 1.0000
 - **Recommendation:** **PASS**
 
 ## Provenance
 
-- Generated at: 2026-05-05T19:56:18.660394+00:00
-- Commit SHA: `0a6c8f2a54e9c4a903a01554aa397204181ec851`
-- Pipeline run: `abevalflow-tblqn`
-- Treatment image: `image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-sre-job-template-remediation-validator@sha256:7db7e44b9ded890f8c6c9df820da7b9e28f3bcae0ced01706afc23cb18393f84`
-- Control image: `image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-sre-job-template-remediation-validator@sha256:96a268b2517796ea04a9af44a5a8dffbe7be15047a80434cb9e6504dc80f01ce`
+- Generated at: 2026-05-07T11:08:43.791786+00:00
+- Commit SHA: `196a2028dbb3b1a3b9d9f04ffa9a9e10e7f87281`
+- Pipeline run: `abevalflow-79xr7`
+- Treatment image: `image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-sre-remediation@sha256:29f01d69b6d8970c26fd4b03efe3bdfee9ff85287f104aab555845377a8136bc`
+- Control image: `image-registry.openshift-image-registry.svc:5000/ab-eval-flow/rh-sre-remediation@sha256:9248e92d534e69fd3fb8fb9c725f2d3344da5bb1f2a14ad29e1eda89c533f0a3`
 - Harbor fork revision: `main`
 
 ## Trial Details
@@ -39,9 +39,9 @@
 
 | # | Trial | Reward | Passed |
 |---|-------|--------|--------|
-| 1 | rh-sre-job-template-remediation__7zUghav | 1.0000 | PASS |
-| 2 | rh-sre-job-template-remediation__R7tjGUb | 1.0000 | PASS |
-| 3 | rh-sre-job-template-remediation__dHFdrdu | 1.0000 | PASS |
+| 1 | rh-sre-remediation__EHXxEoU | 0.9000 | PASS |
+| 2 | rh-sre-remediation__mgVj6Y5 | 0.9000 | PASS |
+| 3 | rh-sre-remediation__vMpzmEL | 1.0000 | PASS |
 
 </details>
 
@@ -50,8 +50,8 @@
 
 | # | Trial | Reward | Passed |
 |---|-------|--------|--------|
-| 1 | rh-sre-job-template-remediation__7WnE7rc | 0.8571 | PASS |
-| 2 | rh-sre-job-template-remediation__UHPHpWX | 0.8571 | PASS |
-| 3 | rh-sre-job-template-remediation__yhJCtLb | 1.0000 | PASS |
+| 1 | rh-sre-remediation__3jZ8C6c | 0.5000 | PASS |
+| 2 | rh-sre-remediation__GTJyQuq | 0.4000 | PASS |
+| 3 | rh-sre-remediation__wzRDKZi | 0.6000 | PASS |
 
 </details>
