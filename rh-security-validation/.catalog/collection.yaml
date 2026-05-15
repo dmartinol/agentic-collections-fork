@@ -28,6 +28,20 @@ contents:
   description: |
     The pack provides 4 skills for Red Hat container security validation,
     supported by 9 helper scripts for deterministic data fetching.
+  orchestration_skills: []
+  skills_decision_guide:
+  - user_request: '"Validate this CVE against my container image" or "Is CVE-X a false positive?"'
+    skill_to_use: container-cve-validator
+    reason: Full validation pipeline using SBOM attestations, Red Hat VEX data, and newer image scanning.
+  - user_request: '"Check if this CVE affects CoreOS in OCP 4.20" or "Validate RHSA against RHCOS"'
+    skill_to_use: coreos-cve-validator
+    reason: Extracts CoreOS RPM list, validates against VEX with RHEL EUS stream awareness.
+  - user_request: '"What packages does CVE-X affect?" or "Look up CVE details"'
+    skill_to_use: cve-recon
+    reason: Quick CVE metadata lookup from MITRE, OSV.dev, and Go vulnerability database.
+  - user_request: '"Inspect this container image" or "What SBOM does this image have?"'
+    skill_to_use: image-inspect
+    reason: Fetches image labels, registry ownership, and SBOM artifact reference.
   skills:
   - name: container-cve-validator
     description: Container Image CVE Validation
@@ -60,3 +74,39 @@ mcp_section: |
   This pack does not use MCP servers. All data fetching is performed via
   local Python helper scripts that call public APIs directly.
 security_model: '#security_model.md'
+sample_workflows:
+- name: Container CVE validation
+  workflow: |
+    User: "Is CVE-2024-45490 a real issue in registry.redhat.io/ubi9/ubi:latest?"
+    - container-cve-validator extracts SBOM, checks VEX, confirms true/false positive with remediation
+- name: Scanner RHSA verification
+  workflow: |
+    User: "My scanner flagged RHSA-2026:3337 on our UBI9 image. Is this relevant?"
+    - container-cve-validator resolves RHSA to CVEs, validates each against the image, reports which apply
+- name: CoreOS vulnerability check
+  workflow: |
+    User: "Does CVE-2025-61726 affect CoreOS in OCP 4.20.16?"
+    - coreos-cve-validator extracts RPMs, finds podman, checks VEX under OCP and RHEL EUS CPEs
+- name: Quick CVE research
+  workflow: |
+    User: "What packages does CVE-2024-45490 affect?"
+    - cve-recon queries MITRE, OSV.dev, returns affected packages with version ranges
+resources:
+- title: Red Hat Security Data
+  url: https://security.access.redhat.com/
+  description: Official Red Hat VEX/CSAF data, security advisories, and CVE information.
+- title: MITRE CVE API
+  url: https://cveawg.mitre.org/
+  description: Authoritative CVE metadata source used for vulnerability reconnaissance.
+- title: OSV.dev
+  url: https://osv.dev/
+  description: Open Source Vulnerability database with cross-references to Go, PyPI, npm ecosystems.
+- title: Sigstore cosign
+  url: https://github.com/sigstore/cosign
+  description: Tool for downloading SBOM attestations from container images.
+- title: regclient
+  url: https://regclient.org/
+  description: Registry client tool for remote image metadata inspection.
+- title: Lola Package Manager
+  url: https://github.com/RedHatProductSecurity/lola
+  description: Package manager used to install agentic collections.

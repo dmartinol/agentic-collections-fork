@@ -19,6 +19,10 @@ Match the user's request to the correct skill:
 
 If the request doesn't clearly match one skill, ask the user to clarify.
 
+## MCP Servers
+
+This pack does not use MCP servers. All data fetching is performed by Python helper scripts that call public APIs directly (Red Hat security APIs, MITRE CVE API, OSV.dev).
+
 ## Helper Scripts
 
 Skills use Python helper scripts in `scripts/` for deterministic data fetching. Skills call these scripts via `python $SCRIPTS_DIR/<script>` — do not call scripts directly outside of a skill workflow.

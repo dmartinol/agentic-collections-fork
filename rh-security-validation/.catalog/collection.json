@@ -1,52 +1,125 @@
 {
-  "id": "rh-security-validation",
-  "name": "Red Hat Security Validation",
-  "provider": "Red Hat",
-  "version": "0.1.0",
   "categories": [
     "Security",
     "Container Security",
     "Vulnerability Management"
   ],
+  "contents": {
+    "description": "The pack provides 4 skills for Red Hat container security validation,\nsupported by 9 helper scripts for deterministic data fetching.\n",
+    "orchestration_skills": [],
+    "skills": [
+      {
+        "description": "Container Image CVE Validation",
+        "name": "container-cve-validator",
+        "summary_markdown": "Full CVE validation pipeline for Red Hat container images. Extracts official\nSBOM attestations, checks Red Hat VEX data, performs version comparison,\nscans for newer patched images, and detects VEX data gaps. Supports CVE IDs\nand RHSA advisory IDs as input, with batch scanning via CSV files.\n"
+      },
+      {
+        "description": "CoreOS CVE Validation",
+        "name": "coreos-cve-validator",
+        "summary_markdown": "CVE validation for Red Hat Enterprise Linux CoreOS (RHCOS) in specific OCP\nreleases. Extracts RPM packages from CoreOS images, classifies by source\n(RHEL/OCP/Fast Datapath), validates against VEX data with RHEL EUS stream\nawareness, and detects RHCOS VEX discrepancies.\n"
+      },
+      {
+        "description": "CVE Reconnaissance",
+        "name": "cve-recon",
+        "summary_markdown": "Queries MITRE CVE API, OSV.dev, and Go vulnerability database to produce\na structured report of affected packages, ecosystems, and vulnerable\nversion ranges for a given CVE ID.\n"
+      },
+      {
+        "description": "Container Image Inspection",
+        "name": "image-inspect",
+        "summary_markdown": "Fetches container image labels, validates registry ownership, resolves\ntag/digest via SBOM, and reports the SBOM artifact OCI reference.\n"
+      }
+    ],
+    "skills_decision_guide": [
+      {
+        "reason": "Full validation pipeline using SBOM attestations, Red Hat VEX data, and newer image scanning.",
+        "skill_to_use": "container-cve-validator",
+        "user_request": "\"Validate this CVE against my container image\" or \"Is CVE-X a false positive?\""
+      },
+      {
+        "reason": "Extracts CoreOS RPM list, validates against VEX with RHEL EUS stream awareness.",
+        "skill_to_use": "coreos-cve-validator",
+        "user_request": "\"Check if this CVE affects CoreOS in OCP 4.20\" or \"Validate RHSA against RHCOS\""
+      },
+      {
+        "reason": "Quick CVE metadata lookup from MITRE, OSV.dev, and Go vulnerability database.",
+        "skill_to_use": "cve-recon",
+        "user_request": "\"What packages does CVE-X affect?\" or \"Look up CVE details\""
+      },
+      {
+        "reason": "Fetches image labels, registry ownership, and SBOM artifact reference.",
+        "skill_to_use": "image-inspect",
+        "user_request": "\"Inspect this container image\" or \"What SBOM does this image have?\""
+      }
+    ]
+  },
+  "deploy_and_use": "#deploy_and_use.md",
+  "description": "Advanced CVE validation for Red Hat container images and OpenShift CoreOS using official SBOMs and VEX data.",
+  "documentation_section": "#documentation_section.md",
+  "id": "rh-security-validation",
+  "marketplaces": [
+    "Claude Code"
+  ],
+  "maturity": "ORANGE",
+  "mcp_section": "This pack does not use MCP servers. All data fetching is performed via\nlocal Python helper scripts that call public APIs directly.\n",
+  "name": "Red Hat Security Validation",
   "personas": [
     "Security Engineer",
     "Platform Engineer",
     "DevSecOps"
   ],
-  "marketplaces": [
-    "Claude Code"
+  "provider": "Red Hat",
+  "resources": [
+    {
+      "description": "Official Red Hat VEX/CSAF data, security advisories, and CVE information.",
+      "title": "Red Hat Security Data",
+      "url": "https://security.access.redhat.com/"
+    },
+    {
+      "description": "Authoritative CVE metadata source used for vulnerability reconnaissance.",
+      "title": "MITRE CVE API",
+      "url": "https://cveawg.mitre.org/"
+    },
+    {
+      "description": "Open Source Vulnerability database with cross-references to Go, PyPI, npm ecosystems.",
+      "title": "OSV.dev",
+      "url": "https://osv.dev/"
+    },
+    {
+      "description": "Tool for downloading SBOM attestations from container images.",
+      "title": "Sigstore cosign",
+      "url": "https://github.com/sigstore/cosign"
+    },
+    {
+      "description": "Registry client tool for remote image metadata inspection.",
+      "title": "regclient",
+      "url": "https://regclient.org/"
+    },
+    {
+      "description": "Package manager used to install agentic collections.",
+      "title": "Lola Package Manager",
+      "url": "https://github.com/RedHatProductSecurity/lola"
+    }
   ],
-  "support_level": "Unknown",
-  "maturity": "ORANGE",
-  "description": "Advanced CVE validation for Red Hat container images and OpenShift CoreOS using official SBOMs and VEX data.",
+  "sample_workflows": [
+    {
+      "name": "Container CVE validation",
+      "workflow": "User: \"Is CVE-2024-45490 a real issue in registry.redhat.io/ubi9/ubi:latest?\"\n- container-cve-validator extracts SBOM, checks VEX, confirms true/false positive with remediation\n"
+    },
+    {
+      "name": "Scanner RHSA verification",
+      "workflow": "User: \"My scanner flagged RHSA-2026:3337 on our UBI9 image. Is this relevant?\"\n- container-cve-validator resolves RHSA to CVEs, validates each against the image, reports which apply\n"
+    },
+    {
+      "name": "CoreOS vulnerability check",
+      "workflow": "User: \"Does CVE-2025-61726 affect CoreOS in OCP 4.20.16?\"\n- coreos-cve-validator extracts RPMs, finds podman, checks VEX under OCP and RHEL EUS CPEs\n"
+    },
+    {
+      "name": "Quick CVE research",
+      "workflow": "User: \"What packages does CVE-2024-45490 affect?\"\n- cve-recon queries MITRE, OSV.dev, returns affected packages with version ranges\n"
+    }
+  ],
+  "security_model": "#security_model.md",
   "summary": "Validates CVEs against Red Hat container images and CoreOS nodes using official\nSBOM attestations, Red Hat VEX/CSAF data, and CVE metadata from MITRE/OSV.dev.\nEliminates false positives from security scanners and provides clear remediation\nguidance including layered product relationships and newer image availability.\n",
-  "contents": {
-    "description": "The pack provides 4 skills for Red Hat container security validation,\nsupported by 9 helper scripts for deterministic data fetching.\n",
-    "skills": [
-      {
-        "name": "container-cve-validator",
-        "description": "Container Image CVE Validation",
-        "summary_markdown": "Full CVE validation pipeline for Red Hat container images. Extracts official\nSBOM attestations, checks Red Hat VEX data, performs version comparison,\nscans for newer patched images, and detects VEX data gaps. Supports CVE IDs\nand RHSA advisory IDs as input, with batch scanning via CSV files.\n"
-      },
-      {
-        "name": "coreos-cve-validator",
-        "description": "CoreOS CVE Validation",
-        "summary_markdown": "CVE validation for Red Hat Enterprise Linux CoreOS (RHCOS) in specific OCP\nreleases. Extracts RPM packages from CoreOS images, classifies by source\n(RHEL/OCP/Fast Datapath), validates against VEX data with RHEL EUS stream\nawareness, and detects RHCOS VEX discrepancies.\n"
-      },
-      {
-        "name": "cve-recon",
-        "description": "CVE Reconnaissance",
-        "summary_markdown": "Queries MITRE CVE API, OSV.dev, and Go vulnerability database to produce\na structured report of affected packages, ecosystems, and vulnerable\nversion ranges for a given CVE ID.\n"
-      },
-      {
-        "name": "image-inspect",
-        "description": "Container Image Inspection",
-        "summary_markdown": "Fetches container image labels, validates registry ownership, resolves\ntag/digest via SBOM, and reports the SBOM artifact OCI reference.\n"
-      }
-    ]
-  },
-  "deploy_and_use": "#deploy_and_use.md",
-  "documentation_section": "#documentation_section.md",
-  "mcp_section": "This pack does not use MCP servers. All data fetching is performed via\nlocal Python helper scripts that call public APIs directly.\n",
-  "security_model": "#security_model.md"
+  "support_level": "Unknown",
+  "version": "0.1.0"
 }
