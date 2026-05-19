@@ -9,7 +9,7 @@ color: cyan
 
 # Red Hat Container Image Inspector
 
-## When to use this skill
+## When to Use This Skill
 
 Use this skill when the user asks you to inspect, describe, check metadata for, or get information about a Red Hat container image. The user may provide a tag-based or digest-based image reference. Input is taken from conversation context.
 
@@ -178,3 +178,19 @@ Always produce a report. Use `N/A` for any label that was absent or any value th
 image_reference,registry,registry_ownership,canonical_reference,reference_type,tags,digest,image_index_detected,amd64_digest,name,cpe,component,vendor,maintainer,created,sbom_method,sbom_artifact_ref,sbom_fetch_command
 [values — tags as space-separated list; sbom_fetch_command quoted if it contains commas]
 ```
+
+## Dependencies
+
+### Required MCP Servers
+- None — this skill uses bundled Python scripts, not MCP tools
+
+### Required MCP Tools
+- `inspect_image` — extracts container image metadata via regctl
+- `download_sbom` — fetches SBOM attestations from registry
+
+### Related Skills
+- `container-cve-validator` — full CVE validation pipeline (uses this for Input Validation)
+
+### Reference Documentation
+- [regctl Documentation](https://github.com/regclient/regclient)
+- [SPDX SBOM Specification](https://spdx.dev/)
