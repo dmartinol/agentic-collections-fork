@@ -1,4 +1,4 @@
-.PHONY: help install validate validate-collection-schema validate-collection-compliance catalog-mirror-json validate-skill-design validate-skill-design-changed generate serve clean test test-full check-uv
+.PHONY: help install validate validate-collection-schema validate-collection-compliance catalog-mirror-json validate-skill-design validate-skill-design-changed validate-mcp-tools generate serve clean test test-full check-uv
 
 help:
 	@echo "agentic-collections Documentation Generator"
@@ -11,6 +11,7 @@ help:
 	@echo "  catalog-mirror-json           - Regenerate all .catalog/collection.json from YAML"
 	@echo "  validate-skill-design         - Validate all skills (use PACK=rh-sre for a specific pack)"
 	@echo "  validate-skill-design-changed - Validate only changed skills (staged + unstaged, for local dev)"
+	@echo "  validate-mcp-tools            - Validate allowed-tools against live MCP servers (requires podman)"
 	@echo "  generate    - Generate docs/data.json"
 	@echo "  serve       - Start local server on http://localhost:8000"
 	@echo "  test        - Quick test (validate + generate + verify)"
@@ -42,7 +43,9 @@ validate: check-uv
 	@uv run python scripts/validate_structure.py
 	@echo "Validating collection compliance (.catalog/)..."
 	@uv run python scripts/validate_collection_compliance.py
-	@echo "✓ Validation passed!"
+	@echo "Validating MCP tool references (skips gracefully without podman)..."
+	@uv run python scripts/validate_mcp_tools.py
+	@echo "✓ Validation complete!"
 
 validate-collection-schema: check-uv
 	@uv run python scripts/validate_collection_schema.py
@@ -58,6 +61,11 @@ validate-skill-design: check-uv
 
 validate-skill-design-changed: check-uv
 	@VALIDATE_INCLUDE_UNCOMMITTED=1 ./scripts/ci-validate-changed-skills.sh
+
+validate-mcp-tools: check-uv
+	@echo "Validating MCP tool references against live servers..."
+	@uv run python scripts/validate_mcp_tools.py $(if $(PACK),$(PACK))
+	@echo "✓ MCP tool validation complete!"
 
 generate: check-uv
 	@echo "Generating documentation..."
