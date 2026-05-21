@@ -65,6 +65,7 @@ jobs:
           fi
 
       - name: Validate federated modules
+        id: validate
         if: steps.detect.outputs.has_modules == 'true'
         run: |
           source $HOME/.cargo/env
@@ -99,11 +100,8 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
-            const { execSync } = require('child_process');
-
-            const success = '${{ steps.detect.outputs.has_modules }}' === 'true' &&
-                            '${{ job.status }}' === 'Success';
+            const success = '${{ steps.validate.outcome }}' === 'success';
+            const runUrl = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
 
             const icon = success ? '✅' : '❌';
             const status = success ? 'ALL CHECKS PASSED' : 'VALIDATION FAILED';
@@ -121,7 +119,7 @@ jobs:
             | MCP pinning | No \`:latest\` tags, no hardcoded credentials |
             | Credential scan | gitleaks secret detection |
 
-            See workflow run for full details.`;
+            [See workflow run for full details](${runUrl})`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
