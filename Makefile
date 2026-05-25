@@ -11,6 +11,7 @@ help:
 	@echo "  catalog-mirror-json           - Regenerate all .catalog/collection.json from YAML"
 	@echo "  validate-skill-design         - Validate all skills (use PACK=rh-sre for a specific pack)"
 	@echo "  validate-skill-design-changed - Validate only changed skills (staged + unstaged, for local dev)"
+	@echo "  validate-federated            - Validate federated modules from marketplace YAML"
 	@echo "  validate-mcp-tools            - Validate allowed-tools against live MCP servers (requires podman)"
 	@echo "  generate    - Generate docs/data.json"
 	@echo "  serve       - Start local server on http://localhost:8000"

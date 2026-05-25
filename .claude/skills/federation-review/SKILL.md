@@ -1,6 +1,14 @@
 ---
 name: federation-review
-description: Review a Federation Request issue and validate the external pack for inclusion in the catalog
+description: |
+  Review a Federation Request issue and validate the external pack for inclusion in the catalog.
+
+  Use when:
+  - "Review federation request"
+  - "Validate external pack"
+  - User mentions "federation", "federate", or "external pack"
+
+  NOT for direct contributions (use /agentic-contribution-skill instead).
 model: inherit
 color: yellow
 license: Apache-2.0
@@ -108,7 +116,7 @@ federated_modules:
     version: "<from repo>"
     repository: "<repo-url>"
     ref: "<ref>"
-    pack: "<pack-name>"
+    pack_path: "."
     tags: []
 ```
 
@@ -118,17 +126,27 @@ federated_modules:
 
 ## Dependencies
 
-### Required Tools
-- `gh` CLI (GitHub CLI) for reading issues and creating PRs
-- `uv` for running Python validation scripts
-- `git` for cloning external repos
+### Required MCP Servers
 
-### Required Scripts
+None — this skill uses CLI tools (`gh`, `git`, `uv`) and repository scripts only.
+
+### Required MCP Tools
+
+None — no MCP tools are invoked.
+
+### Related Skills
+
+- `/agentic-contribution-skill` — for direct contributions (create or import skills into this repo)
+
+### Reference Documentation
+
+**Internal:**
+- [Federation Review Guide](../../../docs/FEDERATION_REVIEW_GUIDE.md) — full evaluation criteria
+- [CONTRIBUTING.md](../../../CONTRIBUTING.md) — contribution paths overview
+- [SKILL_DESIGN_PRINCIPLES.md](../../../SKILL_DESIGN_PRINCIPLES.md) — Tier 2 design principles
+
+**Scripts:**
 - `scripts/validate_federation.py` — automated validation checks
-
-### Reference Docs
-- [Federation Review Guide](../../../docs/FEDERATION_REVIEW_GUIDE.md)
-- [SKILL_DESIGN_PRINCIPLES.md](../../../SKILL_DESIGN_PRINCIPLES.md)
 
 ## Human-in-the-Loop
 

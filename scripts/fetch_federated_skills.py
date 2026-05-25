@@ -42,7 +42,7 @@ class ModuleResult:
     name: str
     repository: str
     ref: str
-    pack: str
+    pack_path: str
     clone_ok: bool = False
     skills: List[SkillResult] = field(default_factory=list)
     error: str = ""
@@ -113,10 +113,10 @@ def process_module(
     name = module.get("name", "unknown")
     repository = module.get("repository", "")
     ref = module.get("ref", "")
-    pack = module.get("pack", "")
+    pack_path = module.get("pack_path", ".")
     skill_paths = module.get("skills", [])
 
-    result = ModuleResult(name=name, repository=repository, ref=ref, pack=pack)
+    result = ModuleResult(name=name, repository=repository, ref=ref, pack_path=pack_path)
 
     if not repository or not ref:
         result.error = "Missing repository or ref"
@@ -184,7 +184,7 @@ def main() -> int:
             print(f"Module: {mod.get('name', '?')}")
             print(f"  Repository: {mod.get('repository', '?')}")
             print(f"  Ref: {mod.get('ref', '?')}")
-            print(f"  Target pack: {mod.get('pack', '?')}")
+            print(f"  Pack path: {mod.get('pack_path', '.')}")
             print(f"{'='*60}")
 
         mr = process_module(mod, base_dir, validate=not args.fetch_only)
