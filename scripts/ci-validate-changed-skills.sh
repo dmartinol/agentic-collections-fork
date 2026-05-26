@@ -37,5 +37,8 @@ fi
 echo "Validating changed skills:"
 echo "$CHANGED" | sed 's/^/  - /'
 
-# Run validator on changed skills only
-uv run python scripts/validate_skill_design.py $(echo "$CHANGED" | tr '\n' ' ')
+# Run validators on changed skills only
+SKILL_ARGS=$(echo "$CHANGED" | tr '\n' ' ')
+uv run python scripts/validate_skill_design.py $SKILL_ARGS
+uv run python scripts/validate_skill_doc_links.py $SKILL_ARGS
+uv run python scripts/validate_docs_tree_links.py $SKILL_ARGS

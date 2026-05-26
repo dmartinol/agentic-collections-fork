@@ -151,6 +151,12 @@ If you prefer manual creation:
    
    # Tier 2 validation (design principles)
    make validate-skill-design-changed
+
+   # Skill docs link validation (must use skill-local docs/... paths)
+   uv run python scripts/validate_skill_doc_links.py <pack>/skills/<skill-name>/SKILL.md
+
+   # Skill docs tree validation (skills docs markdown links)
+   uv run python scripts/validate_docs_tree_links.py <pack>/skills/<skill-name>/SKILL.md
    
    # Both must pass before committing
    ```
@@ -262,6 +268,8 @@ Before submitting a PR, test your skill locally:
 - [ ] Skill created with agentic-contribution-skill or manually validated
 - [ ] Tier 1 validation passed: `./scripts/run-skill-linter.sh`
 - [ ] Tier 2 validation passed: `make validate-skill-design-changed`
+- [ ] Skill docs links validation passed: `uv run python scripts/validate_skill_doc_links.py <pack>/skills/<skill-name>/SKILL.md`
+- [ ] Skill docs tree links validation passed: `uv run python scripts/validate_docs_tree_links.py <pack>/skills/<skill-name>/SKILL.md`
 - [ ] Tested skill locally by invoking it in Claude Code
 - [ ] Reviewed generated skill for accuracy
 - [ ] No credentials exposed in skill documentation

@@ -181,6 +181,12 @@ Every skill MUST include a **Dependencies** section listing:
 **Official:** [Title - Product](https://docs.redhat.com/...)
 ```
 
+**Skill-local docs rule (required):**
+- Internal docs consumed by a skill must resolve under that skill directory using `docs/...` links.
+- Do **not** use upward traversal links to pack-level docs such as `../docs/...`, `../../docs/...`, or `../../../docs/...`.
+- Shared docs may be reused via symlinks under `skills/<skill>/docs/...`.
+- Pack-level `docs/INDEX.md` and `docs/SOURCES.md` may exist for repository navigation/source attribution, but skills must not depend on them at execution time.
+
 **Rationale**: Makes dependencies explicit for debugging and troubleshooting.
 
 ## 6. Human-in-the-Loop Requirements
