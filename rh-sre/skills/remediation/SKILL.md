@@ -23,7 +23,7 @@ metadata:
   author: "Red Hat Ecosystem Engineering"
   priority: "high"
 license: Apache-2.0
-allowed-tools: get_cves get_cve get_cve_systems get_system_cves find_host_by_name get_host_details create_vuln_playbook job_templates_list job_templates_retrieve projects_list job_templates_launch_retrieve jobs_retrieve jobs_stdout_retrieve jobs_job_events_list jobs_job_host_summaries_list jobs_relaunch_retrieve inventories_list hosts_list
+allowed-tools: vulnerability__get_cves vulnerability__get_cve vulnerability__get_cve_systems vulnerability__get_system_cves inventory__find_host_by_name inventory__get_host_details remediations__create_vuln_playbook job_templates_list job_templates_retrieve projects_list job_templates_launch_retrieve jobs_retrieve jobs_stdout_retrieve jobs_job_events_list jobs_job_host_summaries_list jobs_relaunch_retrieve inventories_list hosts_list
 ---
 
 # Remediation Skill

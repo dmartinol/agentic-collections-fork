@@ -5,7 +5,7 @@ description: |
 model: inherit
 color: green
 license: Apache-2.0
-allowed-tools: helm_list helm_install helm_upgrade pods_list_in_namespace resources_create_or_update
+allowed-tools: helm_list helm_install pods_list_in_namespace resources_create_or_update
 metadata:
    user_invocable: "true"
 ---

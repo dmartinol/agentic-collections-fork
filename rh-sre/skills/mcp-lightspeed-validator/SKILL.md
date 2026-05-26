@@ -5,7 +5,7 @@ description: |
 model: haiku
 color: yellow
 license: Apache-2.0
-allowed-tools: get_cves
+allowed-tools: vulnerability__get_cves
 ---
 
 # MCP Lightspeed Validator
