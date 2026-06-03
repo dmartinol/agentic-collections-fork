@@ -35,20 +35,26 @@ jobs:
         id: detect
         run: |
           source $HOME/.cargo/env
-          # Extract new federated_modules entries from the PR diff
+          # Identify federated modules (external repository) in the modules list
           uv run python -c "
-          import yaml, json, subprocess, sys
+          import yaml, json, sys
 
-          # Get marketplace YAML from PR branch
+          MAIN_REPO = 'https://github.com/RHEcosystemAppEng/agentic-collections'
+
           with open('marketplace/rh-agentic-collection.yml') as f:
               data = yaml.safe_load(f) or {}
 
-          modules = data.get('federated_modules') or []
-          if not isinstance(modules, list):
-              modules = []
+          all_modules = data.get('modules') or []
+          if not isinstance(all_modules, list):
+              all_modules = []
 
-          # Filter to actual entries (not empty list)
-          modules = [m for m in modules if isinstance(m, dict) and m.get('repository')]
+          # Federated = modules whose repository differs from this repo
+          modules = [
+              m for m in all_modules
+              if isinstance(m, dict)
+              and m.get('repository', '').rstrip('/') != MAIN_REPO
+              and m.get('repository')
+          ]
 
           if not modules:
               print('No federated modules found')
@@ -58,7 +64,6 @@ jobs:
           for m in modules:
               print(f'  - {m.get(\"name\", \"unknown\")}: {m.get(\"repository\", \"?\")} @ {m.get(\"ref\", \"?\")}')
 
-          # Write module list for next step
           with open('/tmp/federation-modules.json', 'w') as f:
               json.dump(modules, f)
           " || true
@@ -85,7 +90,7 @@ jobs:
           for mod in modules:
               repo = mod.get('repository', '')
               ref = mod.get('ref', '')
-              pack_path = mod.get('pack_path', '.')
+              pack_path = mod.get('path', '.')
               skills = mod.get('skills')
               name = mod.get('name', 'unknown')
 
@@ -164,7 +169,7 @@ jobs:
             const body = [
               `## ${icon} Federation Validation: ${status}`,
               '',
-              'Automated validation ran on federated modules declared in `marketplace/rh-agentic-collection.yml`.',
+              'Automated validation ran on federated modules (external repository) in `marketplace/rh-agentic-collection.yml`.',
               moduleSections,
               `[See workflow run for full details](${runUrl})`,
               '',

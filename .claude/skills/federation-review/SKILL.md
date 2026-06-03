@@ -99,7 +99,7 @@ Present the combined results and ask the user for a decision:
 
 | Decision | Action |
 |----------|--------|
-| **Approve** | Comment on the issue confirming approval. Create a PR to add the pack to `marketplace/rh-agentic-collection.yml` under `federated_modules`. Add label `federation` to the PR. |
+| **Approve** | Comment on the issue confirming approval. Create a PR to add the pack as a new module in `marketplace/rh-agentic-collection.yml`. Add label `federation` to the PR. |
 | **Request changes** | Comment on the issue listing specific fixes needed. Add label `federation/changes-requested` to the issue. |
 | **Reject** | Comment on the issue with explanation. Add label `federation/rejected` to the issue. Close the issue. |
 
@@ -107,17 +107,18 @@ Present the combined results and ask the user for a decision:
 
 If the user approves, create the registration PR:
 
-1. **Action:** Add the federated module entry to `marketplace/rh-agentic-collection.yml`:
+1. **Action:** Add the federated pack as a new module entry in `marketplace/rh-agentic-collection.yml`:
 
 ```yaml
-federated_modules:
+modules:
+  # ... existing modules ...
   - name: "<pack-name>"
     description: "<from issue>"
     version: "<from repo>"
     license: "<from issue>"
     repository: "<repo-url>"
     ref: "<ref>"
-    pack_path: "."
+    path: "."
     tags: []
 ```
 

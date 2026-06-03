@@ -315,7 +315,7 @@ def load_federated_packs() -> List[Dict[str, Any]]:
             version = mod.get("version", "0.0.0")
             license_id = mod.get("license", "Unknown")
             tags = mod.get("tags", [])
-            pack_path = mod.get("pack_path", ".")
+            pack_path = mod.get("path", ".")
             skill_subset = mod.get("skills")
 
             if not repository or not ref:

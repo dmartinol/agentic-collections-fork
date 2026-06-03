@@ -133,7 +133,7 @@ Verify the declared AI agent compatibility from the issue:
 | Minor issues | Comment on issue with specific fixes, label `federation/changes-requested` |
 | Major issues | Reject with explanation, label `federation/rejected`, close issue |
 
-When approving, add the pack to `marketplace/rh-agentic-collection.yml` under `federated_modules` (include the `license` field from the issue) and link back to the issue.
+When approving, add the pack as a new entry in `modules` in `marketplace/rh-agentic-collection.yml` (include the `license` field from the issue, and use the external repository URL) and link back to the issue.
 
 ---
 
@@ -141,7 +141,7 @@ When approving, add the pack to `marketplace/rh-agentic-collection.yml` under `f
 
 PRs with the `federation` label automatically trigger the **Federation Validation** workflow (`.github/workflows/federation-validation.yml`). It:
 
-1. Reads `federated_modules` from `marketplace/rh-agentic-collection.yml`
+1. Identifies federated modules (external repository) in `marketplace/rh-agentic-collection.yml`
 2. Runs `scripts/validate_federation.py` on each entry
 3. Posts a summary comment on the PR with pass/fail results
 

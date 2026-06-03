@@ -2,9 +2,9 @@
 """
 Fetch and validate skills from federated external repositories.
 
-Reads federated_modules from marketplace/rh-agentic-collection.yml, clones each
-external repo at its pinned ref, runs Tier 1 validation on declared skills, and
-reports results as structured JSON.
+Identifies federated modules (external repository) in the marketplace YAML
+modules list, clones each at its pinned ref, runs Tier 1 validation on
+declared skills, and reports results as structured JSON.
 
 Usage:
     python scripts/fetch_federated_skills.py                  # validate all
@@ -113,7 +113,7 @@ def process_module(
     name = module.get("name", "unknown")
     repository = module.get("repository", "")
     ref = module.get("ref", "")
-    pack_path = module.get("pack_path", ".")
+    pack_path = module.get("path", ".")
     skill_paths = module.get("skills", [])
 
     result = ModuleResult(name=name, repository=repository, ref=ref, pack_path=pack_path)
@@ -176,7 +176,7 @@ def main() -> int:
     if args.module:
         modules = [m for m in modules if m.get("name") == args.module]
         if not modules:
-            print(f"Module '{args.module}' not found in federated_modules", file=sys.stderr)
+            print(f"Module '{args.module}' not found in federated modules", file=sys.stderr)
             return 1
 
     use_temp = args.output_dir is None
@@ -192,7 +192,7 @@ def main() -> int:
             print(f"Module: {mod.get('name', '?')}")
             print(f"  Repository: {mod.get('repository', '?')}")
             print(f"  Ref: {mod.get('ref', '?')}")
-            print(f"  Pack path: {mod.get('pack_path', '.')}")
+            print(f"  Pack path: {mod.get('path', '.')}")
             print(f"{'='*60}")
 
         mr = process_module(mod, base_dir, validate=not args.fetch_only)

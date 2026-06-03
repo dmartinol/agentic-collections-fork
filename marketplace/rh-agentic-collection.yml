@@ -105,11 +105,13 @@ modules:
       - "troubleshooting"
       - "execution"
 
-# Federated modules — complete Lola packs hosted in external repositories.
-# Each entry points to a public repo at a pinned ref. The build clones, validates,
-# and includes them in the catalog as standalone federated packs.
-# To request federation, open a GitHub issue using the "Federation Request" template.
-federated_modules: []
+  # Federated modules — complete Lola packs hosted in external repositories.
+  # Add them as regular module entries with a different repository URL.
+  # The build identifies federated packs by comparing the repository field
+  # against this repo's URL. Extra fields (ref, license, skills) are
+  # project extensions that Lola silently ignores.
+  # To request federation, open a GitHub issue using the "Federation Request" template.
+  #
   # Example:
   # - name: "partner-network-tools"
   #   description: "Network troubleshooting skills for SDN and OVN diagnostics"
@@ -117,7 +119,7 @@ federated_modules: []
   #   license: "Apache-2.0"       # must be compatible with Apache 2.0
   #   repository: "https://github.com/partner-org/network-skills"
   #   ref: "a1b2c3d4e5f6789012345678901234567890abcd"
-  #   pack_path: "."              # path within the repo where the Lola pack lives (default: repo root)
+  #   path: "."                   # path within the repo where the Lola pack lives (default: repo root)
   #   skills:                     # optional: federate only these skills (omit to include all)
   #     - "skills/sdn-diagnostics/SKILL.md"
   #     - "skills/ovn-trace/SKILL.md"

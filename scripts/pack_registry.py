@@ -85,19 +85,26 @@ def load_marketplace_module_by_path(
     return None
 
 
+MAIN_REPO_URL = "https://github.com/RHEcosystemAppEng/agentic-collections"
+
+
 def load_federated_modules(
     marketplace_path: Optional[Path] = None,
 ) -> List[Dict[str, Any]]:
-    """Return the list of federated module entries from marketplace YAML."""
+    """Return modules whose repository differs from the main repo (federated packs)."""
     path = marketplace_path or (_repo_root() / DEFAULT_MARKETPLACE)
     if not path.exists():
         return []
     with open(path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
-    federated = data.get("federated_modules") or []
-    if not isinstance(federated, list):
+    modules = data.get("modules") or []
+    if not isinstance(modules, list):
         return []
-    return [m for m in federated if isinstance(m, dict)]
+    return [
+        m for m in modules
+        if isinstance(m, dict)
+        and m.get("repository", "").rstrip("/") != MAIN_REPO_URL
+    ]
 
 
 def load_plugin_title(pack_dir: str, repo_root: Optional[Path] = None) -> Optional[str]:
