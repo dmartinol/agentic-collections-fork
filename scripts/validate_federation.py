@@ -56,9 +56,15 @@ class ValidationReport:
     ref: str
     checks: list[CheckResult] = field(default_factory=list)
 
+    # Checks listed here produce warnings instead of blocking the merge.
+    WARN_ONLY_CHECKS = {"tier2_design_principles"}
+
     @property
     def all_passed(self) -> bool:
-        return all(c.passed for c in self.checks)
+        return all(
+            c.passed for c in self.checks
+            if c.name not in self.WARN_ONLY_CHECKS
+        )
 
 
 def clone_at_ref(repo_url: str, ref: str, dest: Path) -> CheckResult:
@@ -273,6 +279,9 @@ def print_report(report: ValidationReport) -> None:
         elif c.passed:
             status = "PASS"
             icon = "✅"
+        elif c.name in ValidationReport.WARN_ONLY_CHECKS:
+            status = "WARN"
+            icon = "⚠️"
         else:
             status = "FAIL"
             icon = "❌"

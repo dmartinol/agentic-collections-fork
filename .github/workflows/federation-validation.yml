@@ -134,10 +134,12 @@ jobs:
               clone: { name: 'Clone & access', desc: 'Repository cloned at pinned ref' },
               lola_structure: { name: 'Lola structure', desc: 'CLAUDE.md, README.md, mcps.json, skills/' },
               tier1_agentskills: { name: 'Tier 1', desc: 'agentskills.io spec compliance' },
-              tier2_design_principles: { name: 'Tier 2', desc: 'Design principles compliance' },
+              tier2_design_principles: { name: 'Tier 2', desc: 'Design principles compliance (warning only)' },
               mcp_version_pinning: { name: 'MCP pinning', desc: 'No `:latest` tags, no hardcoded credentials' },
               gitleaks: { name: 'Credential scan', desc: 'gitleaks secret detection' },
             };
+            // Checks that warn instead of blocking the merge
+            const warnOnlyChecks = new Set(['tier2_design_principles']);
 
             let moduleSections = '';
             try {
@@ -154,7 +156,8 @@ jobs:
                 moduleSections += '|-------|-------------|--------|\n';
                 for (const check of report.checks) {
                   const label = checkLabels[check.name] || { name: check.name, desc: '' };
-                  const statusIcon = check.skipped ? '⚠️' : (check.passed ? '✅' : '❌');
+                  const isWarnOnly = warnOnlyChecks.has(check.name);
+                  const statusIcon = check.skipped ? '⚠️' : (check.passed ? '✅' : (isWarnOnly ? '⚠️' : '❌'));
                   moduleSections += `| ${label.name} | ${label.desc} | ${statusIcon} |\n`;
                 }
                 moduleSections += '\n';

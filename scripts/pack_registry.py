@@ -107,6 +107,24 @@ def load_federated_modules(
     ]
 
 
+def get_federation_module_dirs(repo_root: Optional[Path] = None) -> List[str]:
+    """Return ``federation/modules/<name>`` paths that have a ``.catalog/collection.yaml`` on disk."""
+    root = repo_root or _repo_root()
+    fed_root = root / "federation" / "modules"
+    if not fed_root.is_dir():
+        return []
+    return sorted(
+        f"federation/modules/{p.name}"
+        for p in fed_root.iterdir()
+        if p.is_dir() and (p / ".catalog" / "collection.yaml").is_file()
+    )
+
+
+def is_federation_module(pack_dir: str) -> bool:
+    """Return ``True`` if *pack_dir* lives under ``federation/modules/``."""
+    return pack_dir.startswith("federation/modules/")
+
+
 def load_plugin_title(pack_dir: str, repo_root: Optional[Path] = None) -> Optional[str]:
     root = repo_root or _repo_root()
     p = root / DEFAULT_PLUGINS_JSON
