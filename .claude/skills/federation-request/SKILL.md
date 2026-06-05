@@ -69,7 +69,7 @@ Collect only two inputs from the user, then infer the rest from the repository.
 1. **repository** — Git repository URL (e.g., `https://github.com/org/repo`)
    - Validate: valid URL; must NOT be `https://github.com/RHEcosystemAppEng/agentic-collections` (direct contribution, not federation)
 
-2. **path** — Path to the Lola pack inside the repo (e.g., `.`, `plugins/claude-code-setup`, `my-pack`)
+2. **path** — Path to the skill pack inside the repo (e.g., `.`, `plugins/claude-code-setup`, `my-pack`)
    - Validate: non-empty; use `.` only when the pack root is the repo root
 
 Do **not** ask for name, description, version, ref, tags, or maturity individually — infer them in Step 2.
@@ -100,7 +100,7 @@ If verification fails, report the error and ask the user to correct the reposito
 
 | Field | Inference rules |
 |-------|-------------------|
-| **name** | 1) `.claude-plugin/plugin.json` → `name` · 2) basename of `path` (if not `.`) · 3) sole `skills/<dir>/` folder name · Must be kebab-case, unique in `marketplace/rh-agentic-collection.yml` |
+| **name** | 1) `.claude-plugin/plugin.json` or `.cursor-plugin/plugin.json` → `name` · 2) basename of `path` (if not `.`) · 3) sole `skills/<dir>/` folder name · Must be kebab-case, unique in `marketplace/rh-agentic-collection.yml` |
 | **title** | Human-readable catalog display name · 1) `README.md` first `# ` heading · 2) title-case words from `name` (`claude-code-setup` → `Claude Code Setup`) · 3) short phrase from `plugin.json` `description` · Non-empty, ≤120 chars; used in `collection.yaml` `name:` and `docs/plugins.json` |
 | **description** | 1) `plugin.json` → `description` · 2) `README.md` first substantive sentence · 3) first skill `SKILL.md` frontmatter `description` (flatten to one line, ≤200 chars) |
 | **version** | 1) `plugin.json` → `version` (normalize to semver `X.Y.Z`) · 2) default `0.1.0` |
@@ -358,7 +358,7 @@ User: /federation-request
 
 Skill: I'll add your external pack to the marketplace. I only need two things:
        1. Git repository URL
-       2. Path to the Lola pack inside the repo (use "." if it's at the repo root)
+       2. Path to the skill pack inside the repo (use "." if it's at the repo root)
 
 User: https://github.com/partner-org/net-diag-skills
        plugins/network-diagnostics
